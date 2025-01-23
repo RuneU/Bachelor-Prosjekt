@@ -3,24 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/index.css">
     <title>Min Nettsted</title>
 </head>
 <body>
     <header>
         <nav>
             <ul>
-                <li><a href="#om-oss">Om oss</a></li>
+                <li><a href="https://norwegiankiwi-glitch.github.io/bachelor-gruppe" target="_blank">Om oss</a></li>
                 <li><a href="#tjenester">Tjenester</a></li>
-                <li><a href="#kontakt-oss">Kontakt oss</a></li>
+                <li><a href="https://norwegiankiwi-glitch.github.io/bachelor-gruppe/#kontakt-oss" target="_blank">Kontakt oss</a></li>
             </ul>
         </nav>
         <h1>Velkommen til mitt nettsted</h1>
     </header>
     <main>
-        
+         <p>Velkommen til gruppe 4 sitt bacheloreprosjekt for 2024.</p>
+         <p> Dette prosjektet er utviklet over vår semesteret 2025 med CIEM som oppdragsgiver</p>   
     </main>
     <footer>
-        <p>&copy; 2023 Mitt Nettsted. Alle rettigheter reservert.</p>
+        <p>&copy; <span id="year"></span> Mitt Nettsted. Alle rettigheter reservert.</p>
     </footer>
+
+    <script>
+        // Get the current year and update the footer
+        document.getElementById("year").textContent = new Date().getFullYear();
+    </script>
 </body>
 </html>
