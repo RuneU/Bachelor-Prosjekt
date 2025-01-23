@@ -1,0 +1,46 @@
+
+
+nav {
+    background-color: #333;
+    padding: 10px 0;
+    text-align: center;
+}
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+}
+nav ul li {
+    display: inline;
+    margin: 0 15px;
+}
+nav ul li a {
+    text-decoration: none;
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    transition: color 0.3s ease;
+}
+nav ul li a:hover {
+    color: #ffcc00;
+}
+
+html, body {
+    height: 100%;  /* Ensure the full height of the page */
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;  /* Allows main content to expand and push the footer down */
+}
+
+footer {
+    text-align: center;
+    background-color: #333;  /* Optional: Add a background color */
+    color: white;  /* Optional: Text color */
+    padding: 10px 0;
+    width: 100%;
+}
