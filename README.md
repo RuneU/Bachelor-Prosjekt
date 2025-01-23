@@ -25,3 +25,6 @@ Initialiser tailwind med ```npx tailwindcss init```
 Installer flowbite npm install ```flowbite```
 
 Ferdig
+
+Link flask nettside: https://flask.palletsprojects.com/en/stable/installation/
+Link til Flowbite for tailwind og flowbite: https://flowbite.com/docs/getting-started/flask/
