@@ -3,26 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="css/index.css">
+    <script src="https://cdn.tailwindcss.com"></script>
     <title>Min Nettsted</title>
 </head>
-<body>
-    <header>
-        <nav>
-            <ul>
-                <li><a href="https://norwegiankiwi-glitch.github.io/bachelor-gruppe" target="_blank">Om oss</a></li>
-                <li><a href="#tjenester">Tjenester</a></li>
-                <li><a href="https://norwegiankiwi-glitch.github.io/bachelor-gruppe/#kontakt-oss" target="_blank">Kontakt oss</a></li>
+<body class="bg-gray-900 text-gray-200 font-sans flex flex-col min-h-screen">
+
+    <!-- Header Section -->
+    <header class="bg-gray-800 shadow-md">
+        <nav class="container mx-auto flex justify-between items-center py-4 px-6">
+            <ul class="flex space-x-8 text-lg">
+                <li>
+                    <a href="https://norwegiankiwi-glitch.github.io/bachelor-gruppe" 
+                       target="_blank" 
+                       class="text-blue-400 hover:text-blue-300 transition duration-300">
+                        Om oss
+                    </a>
+                </li>
+                <li>
+                    <a href="#tjenester" 
+                       class="text-blue-400 hover:text-blue-300 transition duration-300">
+                        Tjenester
+                    </a>
+                </li>
+                <li>
+                    <a href="https://norwegiankiwi-glitch.github.io/bachelor-gruppe/#kontakt-oss" 
+                       target="_blank" 
+                       class="text-blue-400 hover:text-blue-300 transition duration-300">
+                        Kontakt oss
+                    </a>
+                </li>
             </ul>
         </nav>
-        <h1>Velkommen til mitt nettsted</h1>
     </header>
-    <main>
-         <p>Velkommen til gruppe 4 sitt bacheloreprosjekt for 2024.</p>
-         <p> Dette prosjektet er utviklet over vår semesteret 2025 med CIEM som oppdragsgiver</p>   
+
+    <!-- Main Content -->
+    <main class="container mx-auto text-center py-20 px-6 flex-grow">
+        <h1 class="text-4xl font-bold text-blue-400 mb-6">
+            Velkommen til Gruppe 4 sitt prosjekt
+        </h1>
+        <p class="text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
+            Velkommen til gruppe 4 sitt bachelorprosjekt for 2025. 
+            Dette prosjektet er utviklet over vårsemesteret 2025 med CIEM som oppdragsgiver.
+        </p>
     </main>
-    <footer>
-        <p>&copy; <span id="year"></span> Mitt Nettsted. Alle rettigheter reservert.</p>
+
+    <!-- Footer Section -->
+    <footer class="bg-gray-800 text-gray-400 text-center py-6">
+        <p>&copy; <span id="year"></span> Gruppe 4. Alle rettigheter reservert.</p>
     </footer>
 
     <script>
