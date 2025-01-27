@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Registreringsside</title>
+</head>
+<body class="bg-gray-900 text-gray-200 font-sans flex flex-col min-h-screen">
+
+    <!-- Header Section -->
+    <header class="bg-gray-800 shadow-md">
+        <nav class="container mx-auto flex justify-between items-center py-4 px-6">
+            <button class="bg-yellow-300 text-black font-bold py-2 px-4 rounded">Admin</button>
+            <h1 class="text-lg font-bold">Registrering</h1>
+            <span>Innlogget</span>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto py-10 px-6 flex-grow bg-gray-100 text-gray-800 rounded-lg">
+        <h2 class="text-center font-bold text-lg mb-4">Status</h2>
+        <div class="flex justify-center mb-6">
+            <select class="bg-yellow-300 text-black p-2 rounded">
+                <option value="">Velg status</option>
+                <option value="aktiv">Aktiv</option>
+                <option value="inaktiv">Inaktiv</option>
+            </select>
+        </div>
+
+        <div class="mb-6">
+            <label class="block font-bold mb-2">Personlig Informasjon</label>
+            <div class="flex space-x-2">
+                <input type="text" placeholder="Fornavn" class="border rounded p-2 w-full">
+                <input type="text" placeholder="Mellomnavn" class="border rounded p-2 w-full">
+                <input type="text" placeholder="Etternavn" class="border rounded p-2 w-full">
+            </div>
+            <div class="flex space-x-2 mt-4">
+                <label class="mt-2">Tlf:</label>
+                <input type="tel" placeholder="Telefonnummer" class="border rounded p-2 w-full">
+                <input type="text" placeholder="Adresse" class="border rounded p-2 w-full">
+            </div>
+        </div>
+
+        <div class="mb-6">
+            <label class="block bg-gray-300 text-gray-700 rounded p-2">Lokasjon:</label>
+        </div>
+
+        <div class="mb-6">
+            <label class="block font-bold mb-2">Pårørende Info</label>
+            <div class="flex space-x-2">
+                <input type="text" placeholder="Fornavn" class="border rounded p-2 w-full">
+                <input type="text" placeholder="Mellomnavn" class="border rounded p-2 w-full">
+                <input type="text" placeholder="Etternavn" class="border rounded p-2 w-full">
+            </div>
+            <div class="flex space-x-2 mt-4">
+                <label class="mt-2">Tlf:</label>
+                <input type="tel" placeholder="Telefonnummer" class="border rounded p-2 w-full">
+                <input type="text" placeholder="Adresse" class="border rounded p-2 w-full">
+            </div>
+        </div>
+
+        <div class="mb-6">
+            <table class="border-collapse border border-gray-400 w-full">
+                <caption class="font-bold mb-2">Registrerings logg</caption>
+                <thead>
+                    <tr>
+                        <th class="border border-gray-400 px-4 py-2">Lokasjon</th>
+                        <th class="border border-gray-400 px-4 py-2">Klokke</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="border border-gray-400 px-4 py-2"></td>
+                        <td class="border border-gray-400 px-4 py-2"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-center">
+            <button class="bg-gray-700 text-white px-6 py-2 rounded">Bekreft</button>
+        </div>
+    </main>
+
+</body>
+</html>
