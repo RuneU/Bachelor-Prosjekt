@@ -1,16 +1,19 @@
 # kilde: https://www.youtube.com/watch?v=BgkcKCvuCMM&ab_channel=TechwithHitch
 # from connection import connection_string
+from dotenv import load_dotenv # pip install python-dotenv
+import os
 import pyodbc # pip install && https://learn.microsoft.com/en-us/sql/connect/python/pyodbc/step-1-configure-development-environment-for-pyodbc-python-development?view=sql-server-ver16&tabs=windows
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Convert db_config dictionary to a connection string
 connection_string = (
-    "DRIVER={ODBC Driver 18 for SQL Server};"
-    "SERVER=krisedb.database.windows.net;"
-    "DATABASE=krisesdb;"
-    "UID=sysadmin;"
-    "PWD=NcbbQkB6nej8E8B;"
-    # "Encrypt=yes;"  # Required for Azure, optional for on-premises
-    # "TrustServerCertificate=yes;"  # Only for testing environments
+    f"DRIVER={os.getenv('DB_DRIVER')};"
+    f"SERVER={os.getenv('DB_SERVER')};"
+    f"DATABASE={os.getenv('DB_DATABASE')};"
+    f"UID={os.getenv('DB_UID')};"
+    f"PWD={os.getenv('DB_PWD')};"
 )
 
 
@@ -29,17 +32,15 @@ def run_query(x):
         if 'conn' in locals():
             conn.close()
 
-# run_query("INSERT INTO Evakuerte (Fornavn) VALUES ('Johannes')")  # Add data
+# run_query("INSERT INTO Evakuerte (Fornavn) VALUES ('Simon')")  # Add data
 
 # run_query("DELETE FROM Evakuerte WHERE Fornavn = 'Simon'")  # Delete data
-
-# run_query("SELECT * FROM Krise") # Display data
 
 # Fetch and print data from the database
 try:
     conn = pyodbc.connect(connection_string)
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM Johannes")  # SQL query
+    cursor.execute("SELECT * FROM Evakuerte")  # SQL query
     rows = cursor.fetchall()
     
     for row in rows:
