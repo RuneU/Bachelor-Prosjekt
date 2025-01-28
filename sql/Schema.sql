@@ -4,6 +4,7 @@ CREATE TABLE Krise (
     KriseSituasjonType VARCHAR(256) NULL,
     KriseNavn VARCHAR(256) NULL,
     Lokasjon VARCHAR(256) NOT NULL,
+    Tekstboks TEXT NULL,
     PRIMARY KEY (KriseID)
 );
 
