@@ -5,10 +5,10 @@ import pyodbc # pip install && https://learn.microsoft.com/en-us/sql/connect/pyt
 # Convert db_config dictionary to a connection string
 connection_string = (
     "DRIVER={ODBC Driver 18 for SQL Server};"
-    "SERVER=.database.windows.net;"
-    "DATABASE=;"
-    "UID=;"
-    "PWD=;"
+    "SERVER=krisedb.database.windows.net;"
+    "DATABASE=krisesdb;"
+    "UID=sysadmin;"
+    "PWD=NcbbQkB6nej8E8B;"
     # "Encrypt=yes;"  # Required for Azure, optional for on-premises
     # "TrustServerCertificate=yes;"  # Only for testing environments
 )
@@ -29,15 +29,17 @@ def run_query(x):
         if 'conn' in locals():
             conn.close()
 
-# run_query("INSERT INTO Evakuerte (Fornavn) VALUES ('Simon')")  # Add data
+# run_query("INSERT INTO Evakuerte (Fornavn) VALUES ('Johannes')")  # Add data
 
-run_query("DELETE FROM Evakuerte WHERE Fornavn = 'Simon'")  # Delete data
+# run_query("DELETE FROM Evakuerte WHERE Fornavn = 'Simon'")  # Delete data
+
+# run_query("SELECT * FROM Krise") # Display data
 
 # Fetch and print data from the database
 try:
     conn = pyodbc.connect(connection_string)
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM Evakuerte")  # SQL query
+    cursor.execute("SELECT * FROM Johannes")  # SQL query
     rows = cursor.fetchall()
     
     for row in rows:

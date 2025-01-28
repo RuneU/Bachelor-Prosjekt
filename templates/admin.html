@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Admin Side</title>
+    <header class="bg-gray-800 p-4 flex justify-between items-center">
+        <!-- Left Section: Buttons -->
+        <div class="flex items-center space-x-2">
+            <button class="bg-yellow-300 text-black font-bold py-2 px-4 rounded">Log ut</button>
+            <a href="{{ url_for('index') }}">
+                <button class="bg-yellow-300 text-black font-bold py-2 px-4 rounded">Returner</button>
+            </a>
+        </div>
+    
+        <!-- Right Section: Admin Watermark and Innlogget -->
+        <div class="flex items-center space-x-4">
+            <span class="text-lg font-bold">Innlogget</span>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <!-- Integration and functional logic will arrive later-->
+    <main class="container mx-auto py-10 px-6 flex-grow bg-gray-100 text-gray-800 rounded-lg">
+        
+        <div class="relative flex justify-center mb-6">
+            <form action="/search" method="GET" class="w-full max-w-md">
+                <input 
+                    type="text" 
+                    name="query" 
+                    placeholder="Søk:" 
+                    class="w-full p-2 border rounded bg-gray-200 text-gray-600" 
+                >
+                <button 
+                    type="submit" 
+                    class="absolute right-0 top-0 h-full bg-yellow-300 text-black px-4 rounded-r"
+                >
+                    Søk
+                </button>
+            </form>
+        </div>
+
+        <!-- User List -->
+        <div class="space-y-4">
+            <div class="bg-white p-4 rounded shadow flex justify-between items-center">
+                <span class="font-bold">IDnr:#00003</span>
+                <span>Navn: Ola Normann</span>
+                <span>Status: <span class="bg-green-500 text-white px-2 py-1 rounded">●</span></span>
+            </div>
+            
+            <div class="bg-white p-4 rounded shadow flex justify-between items-center">
+                <span class="font-bold">IDnr:#00002</span>
+                <span>Navn</span>
+                <span>Status</span>
+            </div>
+            
+            <div class="bg-white p-4 rounded shadow">
+                <div class="flex justify-between items-center">
+                    <span class="font-bold">IDnr:#00001</span>
+                    <span>Navn</span>
+                    <span>Status</span>
+                </div>
+                <div class="mt-4 border-t pt-2 text-sm text-gray-700">
+                    <p><strong>Navn:</strong> Kari Normann</p>
+                    <p><strong>Telefon:</strong> 99694200</p>
+                    <p><strong>Adresse:</strong> Karls gate 420</p>
+                    <p><strong>Status:</strong></p>
+                    <p><strong>Sist registrert lokasjon:</strong> Evakuerings lokasjon</p>
+                    <p><strong>Klokkeslett registrert:</strong></p>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
