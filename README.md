@@ -27,6 +27,31 @@ Initialiser tailwind med ```npx tailwindcss init```
 
 Installer flowbite ```npm install flowbite```
 
+## Database tilkobling
+Opprett en env fil i root directory som heter ```.env```
+
+I ```.env``` filen legg til koden under. Bytt ut plassholder informasjon med den ekte database informasjonen
+
+```
+DB_DRIVER={ODBC Driver 18 for SQL Server}
+DB_SERVER=<server.database.windows.net>
+DB_DATABASE=<databaseNavn>
+DB_UID=<brukerID>
+DB_PWD=<Passord>
+```
+
+Installer dotenv 
+```
+pip install python-dotenv
+```
+
+
+Installer `pyodbc` driveren for din maskin med å klikke [her](https://learn.microsoft.com/en-us/sql/connect/python/pyodbc/step-1-configure-development-environment-for-pyodbc-python-development?view=sql-server-ver16&tabs=windows)
+
+```
+pip install pyodbc
+```
+
 Ferdig
 
 Link flask nettside: https://flask.palletsprojects.com/en/stable/installation/
