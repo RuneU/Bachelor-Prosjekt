@@ -1,18 +1,20 @@
-# kilde: https://www.youtube.com/watch?v=BgkcKCvuCMM&ab_channel=TechwithHitch
-# from connection import connection_string
-import pyodbc # pip install && https://learn.microsoft.com/en-us/sql/connect/python/pyodbc/step-1-configure-development-environment-for-pyodbc-python-development?view=sql-server-ver16&tabs=windows
+from dotenv import load_dotenv
+import os
+import pyodbc
+
+# Load environment variables from .env file
+load_dotenv()
 
 # Convert db_config dictionary to a connection string
 connection_string = (
     "DRIVER={ODBC Driver 18 for SQL Server};"
-    "SERVER=krisedb.database.windows.net;"
-    "DATABASE=krisesdb;"
-    "UID=sysadmin;"
-    "PWD=NcbbQkB6nej8E8B;"
+    "SERVER=.database.windows.net;"
+    "DATABASE=;"
+    "UID=;"
+    "PWD=;"
     # "Encrypt=yes;"  # Required for Azure, optional for on-premises
     # "TrustServerCertificate=yes;"  # Only for testing environments
 )
-
 
 # Redigere data i db
 def run_query(x):
@@ -31,13 +33,13 @@ def run_query(x):
 
 # run_query("INSERT INTO Evakuerte (Fornavn) VALUES ('Seb')")  # Add data
 
-run_query("DELETE FROM Evakuerte WHERE Fornavn = 'Seb'")  # Delete data
+run_query("DELETE FROM Evakuerte WHERE Fornavn = 'Simon'")  # Delete data
 
 # Fetch and print data from the database
 try:
     conn = pyodbc.connect(connection_string)
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM Evakuerte")  # SQL query
+    cursor.execute("SELECT * FROM Evakuerte")
     rows = cursor.fetchall()
     
     for row in rows:
