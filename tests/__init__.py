@@ -1,0 +1,1 @@
+# Lar testene se utenfor mappen "tests"

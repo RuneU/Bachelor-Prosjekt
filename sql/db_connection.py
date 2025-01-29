@@ -1,8 +1,6 @@
-# kilde: https://www.youtube.com/watch?v=BgkcKCvuCMM&ab_channel=TechwithHitch
-# from connection import connection_string
-from dotenv import load_dotenv # pip install python-dotenv
+from dotenv import load_dotenv
 import os
-import pyodbc # pip install && https://learn.microsoft.com/en-us/sql/connect/python/pyodbc/step-1-configure-development-environment-for-pyodbc-python-development?view=sql-server-ver16&tabs=windows
+import pyodbc
 
 # Load environment variables from .env file
 load_dotenv()
@@ -15,7 +13,6 @@ connection_string = (
     f"UID={os.getenv('DB_UID')};"
     f"PWD={os.getenv('DB_PWD')};"
 )
-
 
 # Redigere data i db
 def run_query(x):
@@ -40,7 +37,7 @@ def run_query(x):
 try:
     conn = pyodbc.connect(connection_string)
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM Evakuerte")  # SQL query
+    cursor.execute("SELECT * FROM Evakuerte")
     rows = cursor.fetchall()
     
     for row in rows:
