@@ -33,7 +33,7 @@ def run_query(x):
 
 # run_query("INSERT INTO Evakuerte (Fornavn) VALUES ('Seb')")  # Add data
 
-run_query("DELETE FROM Evakuerte WHERE Fornavn = 'Simon'")  # Delete data
+# run_query("DELETE FROM Evakuerte WHERE Fornavn = 'Simon'")  # Delete data
 
 # Fetch and print data from the database
 try:
