@@ -54,5 +54,12 @@ pip install pyodbc
 
 Ferdig
 
+## Tester
+For å kjøre testene i prosjekte bruk kommandoen under
+
+```
+python -m unittest discover test
+```
+
 Link flask nettside: https://flask.palletsprojects.com/en/stable/installation/
 Link til Flowbite for tailwind og flowbite: https://flowbite.com/docs/getting-started/flask/
