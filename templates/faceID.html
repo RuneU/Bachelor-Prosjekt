@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FaceID</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-white">
+    <div class="min-h-screen flex flex-col items-center justify-center p-4">
+        <!-- Title -->
+        <h1 class="text-4xl font-bold text-gray-800 mb-8">Face ID</h1>
+
+        <!-- Container for Video and Info -->
+        <div class="flex flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-6">
+            <!-- Video Feed -->
+            <div class="bg-gray-100 p-6 rounded-lg shadow-md max-w-md w-full">
+                <img src="{{ url_for('video_feed') }}" alt="Camera Feed" class="w-full h-auto rounded-lg">
+            </div>
+
+            <!-- Info Section -->
+            <div class="max-w-md w-full text-center md:text-left">
+                <div class="text-xl font-medium text-black">Hvordan ta bilde</div>
+                <p class="text-gray-500">bildet skal vise ansiktet til innehaveren slik vedkommende ser ut i dag uten hodebekledning eller lignende</p>
+                <p class="text-gray-500">begge øynene og ørene skal være helt synlige</p>
+                <p class="text-gray-500">blikket skal være rettet mot kameraets linse</p>
+                <p class="text-gray-500">ansiktsuttrykket skal være nøytralt og munnen skal være lukket</p>
+                <p class="text-gray-500">bakgrunnen skal være lys uten skygger</p>
+                <p class="text-gray-500">ansiktet skal være jevnt belyst</p>
+                <p class="text-gray-500">briller skal ikke benyttes.</p>
+            </div>
+        </div>
+
+        <!-- Button -->
+        <button class="mt-8 bg-violet-500 text-white font-semibold py-3 px-6 rounded-lg hover:bg-violet-600 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:bg-violet-700 transition duration-200">
+            Logg inn med ansikt
+        </button>
+    </div>
+</body>
+</html>
