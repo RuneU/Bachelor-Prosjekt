@@ -1,6 +1,6 @@
-import pyodbc
 from dotenv import load_dotenv
 import os
+import pyodbc
 
 # Load environment variables from .env file
 load_dotenv()
@@ -13,6 +13,9 @@ connection_string = (
     f"UID={os.getenv('DB_UID')};"
     f"PWD={os.getenv('DB_PWD')};"
 )
+
+# Redigere data i db
+def run_query(x):
 
 # Function to fetch the status data
 def fetch_status_data():
@@ -51,22 +54,22 @@ def run_query(query):
         if 'conn' in locals():
             conn.close()
 
-# Function to fetch data from the Evakuerte table
-def fetch_evakuerte_data():
-    try:
-        conn = pyodbc.connect(connection_string)
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM Evakuerte")
-        rows = cursor.fetchall()
+# run_query("INSERT INTO Evakuerte (Fornavn) VALUES ('Simon')")  # Add data
+
+# run_query("DELETE FROM Evakuerte WHERE Fornavn = 'Simon'")  # Delete data
+
+# Fetch and print data from the database
+try:
+    conn = pyodbc.connect(connection_string)
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM Evakuerte")  # SQL query
+    rows = cursor.fetchall()
+    
+    for row in rows:
+        print(row)
         
-        return [dict(zip([column[0] for column in cursor.description], row)) for row in rows]
-    
-    except pyodbc.Error as e:
-        print(f"Error: {e}")
-        return []
-    
-    finally:
-        if 'cursor' in locals():
-            cursor.close()
-        if 'conn' in locals():
-            conn.close()
+except pyodbc.Error as e:
+    print(f"Error: {e}")
+finally:
+    if 'conn' in locals():
+        conn.close()
