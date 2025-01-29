@@ -17,28 +17,56 @@ connection_string = (
 # Function to fetch the status data
 def fetch_status_data():
     try:
-        # Connect to the database
         conn = pyodbc.connect(connection_string)
         cursor = conn.cursor()
-
-        # Execute the query to fetch data from the Status table
         cursor.execute("SELECT Status, Lokasjon, EvakuertID FROM Status")
-
-        # Fetch all the rows from the result
         rows = cursor.fetchall()
-
-        # Return the result as a list of dictionaries
-        statuses = [
-            {'Status': row[0], 'Lokasjon': row[1], 'EvakuertID': row[2]}
-            for row in rows
-        ]
-
-        return statuses
-
+        
+        return [{'Status': row[0], 'Lokasjon': row[1], 'EvakuertID': row[2]} for row in rows]
+    
     except pyodbc.Error as e:
         print(f"Error: {e}")
         return []
-
+    
     finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
+# Function to run an SQL query (e.g., insert, update, delete)
+def run_query(query):
+    try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+        cursor.execute(query)
+        conn.commit()
+    
+    except pyodbc.Error as e:
+        print(f"An error occurred: {e}")
+    
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
+# Function to fetch data from the Evakuerte table
+def fetch_evakuerte_data():
+    try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM Evakuerte")
+        rows = cursor.fetchall()
+        
+        return [dict(zip([column[0] for column in cursor.description], row)) for row in rows]
+    
+    except pyodbc.Error as e:
+        print(f"Error: {e}")
+        return []
+    
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
         if 'conn' in locals():
             conn.close()
