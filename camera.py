@@ -3,8 +3,6 @@ import cv2
 
 app = Flask(__name__)
 
-
-
 def generate_frames():
     camera = cv2.VideoCapture(0)  
     while True:
@@ -25,32 +23,6 @@ def video_feed():
 @app.route('/faceID')
 def faceID():
     return render_template('faceID.html')
-
-
-@app.route("/")
-@app.route("/index")
-def index():
-    return render_template("index.html")
-
-@app.route("/register")
-def register():
-    return render_template("register.html")
-
-
-@app.route("/iot")
-def iot():
-    return render_template("iot.html")
-
-@app.route("/startID")
-def startID():
-    return render_template("startID.html")
-
-
-
-@app.route("/admin")
-def admin():
-    return render_template("admin.html")
-
 
 if __name__ == '__main__':
     app.run(debug=True)
