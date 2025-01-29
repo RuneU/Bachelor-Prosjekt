@@ -1,21 +1,32 @@
-import os
-import sys
 import unittest
-from flask import Flask
+import sys
+import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from app import app  # Replace "your_flask_app" with your actual Flask app file
+from app import app
 
-class TestFlaskRoutes(unittest.TestCase):
+class FlaskRoutesTestCase(unittest.TestCase):
     def setUp(self):
-        # Create a test client for your Flask app
+        """Set up the test client."""
         self.app = app.test_client()
-        self.app.testing = True  # Enable testing mode
+        self.app.testing = True
 
-    def test_home_route(self):
-        # Test if the "home" route (/) works
-        response = self.app.get('/index')
-        self.assertEqual(response.status_code, 200)  # Check if the "door" opens (status 200 = OK)
-        self.assertIn(b'Welcome', response.data)  # Check if the word "Welcome" is on the page
+    def test_index_route(self):
+        """Test if '/' and '/index' return the correct page."""
+        response = self.app.get('/')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Velkommen til Gruppe 4 sitt prosjekt', response.data)  # Check actual content
+
+    def test_register_route(self):
+        """Test if '/register' returns the correct page."""
+        response = self.app.get('/register')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Registrering', response.data)  # Check actual content
+
+    def test_admin_route(self):
+        """Test if '/admin' returns the correct page."""
+        response = self.app.get('/admin')
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(b'Admin Side', response.data)  # Check actual content
 
 if __name__ == '__main__':
     unittest.main()

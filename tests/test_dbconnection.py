@@ -2,12 +2,8 @@ import os
 import sys
 import unittest
 import pyodbc
-from dotenv import load_dotenv
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from sql.db_connection import connection_string
-
-# Load environment variables
-load_dotenv()
 
 class TestAzureMySQLConnection(unittest.TestCase):
     def test_database_connection(self):
