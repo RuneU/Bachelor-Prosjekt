@@ -2,30 +2,65 @@
 <html lang="no">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Registreringsside</title>
+    <link rel="stylesheet" href="{{url_for('static',filename='dist/css/output.css')}}">
 </head>
-<body class="bg-gray-900 text-gray-200 font-sans flex flex-col min-h-screen">
+<body class="bg-uiared text-gray-200 font-sans flex flex-col min-h-screen">
 
     <!-- Header Section -->
-    <header class="bg-gray-800 shadow-md">
+    <header class="bg-uiared shadow-md">
         <nav class="container mx-auto flex justify-between items-center py-4 px-6">
-            <button class="bg-yellow-300 text-black font-bold py-2 px-4 rounded">Admin</button>
+            <div>
+            <button id="adminButton" class="bg-yellow-300 text-black font-bold py-2 px-4 rounded">Admin</button>
+            </div>
             <h1 class="text-lg font-bold">Registrering</h1>
             <span>Innlogget</span>
         </nav>
     </header>
+    <!-- Admin Login Model (Popup) -->
+    <div id="adminModel" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center z-50">
+        <div class="absolute top-20 left-1/2 transform -translate-x-1/2 bg-white text-black rounded-lg shadow-lg w-96 p-6">
+            <h2 class="text-xl font-bold text-center mb-4">Admin Login</h2>
+
+            <!-- Login Form -->
+            <form id="loginForm">
+                <div class="mb-4">
+                    <label class="block font-bold mb-1">Username</label>
+                    <input type="text" id="username" class="w-full p-2 border border-gray-300 rounded" placeholder="Enter your username">
+                </div>
+                <div class="mb-4">
+                    <label class="block font-bold mb-1">Password</label>
+                    <input type="password" id="password" class="w-full p-2 border border-gray-300 rounded" placeholder="Enter your password">
+                </div>
+
+                <div class="flex justify-between items-center">
+                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">Login</button>
+                    <button id="closeModel" type="button" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">Close</button>
+                </div>
+            </form>
+
+            <!-- Error Message -->
+            <p id="errorMessage" class="text-red-500 text-center mt-4 hidden">Invalid login credentials</p>
+        </div>
+    </div>
 
     <!-- Main Content -->
     <main class="container mx-auto py-10 px-6 flex-grow bg-gray-100 text-gray-800 rounded-lg">
         <h2 class="text-center font-bold text-lg mb-4">Status</h2>
-        <div class="flex justify-center mb-6">
-            <select class="bg-yellow-300 text-black p-2 rounded">
-                <option value="">Velg status</option>
-                <option value="aktiv">Aktiv</option>
-                <option value="inaktiv">Inaktiv</option>
-            </select>
+        <div class="relative flex justify-center mb-6">
+            <div class="relative">
+                <button id="dropdownButton" type="button" class="h-12 w-48 px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition">
+                    Velg en farge
+                </button>                
+                <ul id="dropdownMenu" class="hidden absolute mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <li class="h-12 px-4 py-2 text-sm bg-green-700 text-white hover:bg-green-600 cursor-pointer" data-color="bg-green-700"></li>
+                    <li class="h-12 px-4 py-2 text-sm bg-yellow-600 text-white hover:bg-yellow-500 cursor-pointer" data-color="bg-yellow-600"></li>
+                    <li class="h-12 px-4 py-2 text-sm bg-red-700 text-white hover:bg-red-600 cursor-pointer" data-color="bg-red-700"></li>
+                </ul>
+            </div>
         </div>
 
         <div class="mb-6">
@@ -41,11 +76,6 @@
                 <input type="text" placeholder="Adresse" class="border rounded p-2 w-full">
             </div>
         </div>
-
-        <div class="mb-6">
-            <label class="block bg-gray-300 text-gray-700 rounded p-2">Lokasjon:</label>
-        </div>
-
         <div class="mb-6">
             <label class="block font-bold mb-2">Pårørende Info</label>
             <div class="flex space-x-2">
@@ -60,28 +90,83 @@
             </div>
         </div>
 
-        <div class="mb-6">
-            <table class="border-collapse border border-gray-400 w-full">
-                <caption class="font-bold mb-2">Registrerings logg</caption>
-                <thead>
-                    <tr>
-                        <th class="border border-gray-400 px-4 py-2">Lokasjon</th>
-                        <th class="border border-gray-400 px-4 py-2">Klokke</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td class="border border-gray-400 px-4 py-2"></td>
-                        <td class="border border-gray-400 px-4 py-2"></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
         <div class="text-center">
             <button class="bg-gray-700 text-white px-6 py-2 rounded">Bekreft</button>
         </div>
     </main>
+    <script>
+        const adminButton = document.getElementById('adminButton');
+        const adminModel = document.getElementById('adminModel');
+        const closeModel = document.getElementById('closeModel');
+        const loginForm = document.getElementById('loginForm');
+        const errorMessage = document.getElementById('errorMessage');
+        const dropdownButton = document.getElementById('dropdownButton');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+        const dropdownOptions = dropdownMenu.querySelectorAll('li');
 
+                
+        dropdownButton.addEventListener('click', () => {
+            dropdownMenu.classList.toggle('hidden');
+        });
+    
+        document.addEventListener('click', (event) => {
+            if (!dropdownButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+                dropdownMenu.classList.add('hidden');
+            }
+        });
+    
+        dropdownOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                const colorClass = option.getAttribute('data-color');
+                const colorName = option.textContent;
+    
+                // Update the button background color and text
+                dropdownButton.className = `w-48 h-12 px-4 py-2 text-white border border-gray-300 rounded-md shadow-sm ${colorClass}`;
+                dropdownButton.textContent = colorName;
+    
+                dropdownMenu.classList.add('hidden');
+            });
+        });
+
+
+// Show the model when clicking "Admin"
+adminButton.addEventListener('click', () => {
+            adminModel.classList.remove('hidden');
+            dropdownButton.classList.add('bg-gray-500', 'text-white');
+        });
+
+        // Close the model when clicking "Close" button
+        closeModel.addEventListener('click', () => {
+            adminModel.classList.add('hidden');
+            droppdownButton.classList.remove('bg-gray-500', 'text-white');
+        });
+
+        // Close the model when clicking outside the model
+        adminModel.addEventListener('click', (event) => {
+            if (event.target === adminModel) {
+                adminModel.classList.add('hidden');
+                dropdownButton.classList.remove('bg-gray-500', 'text-white');
+            }
+        });
+
+        // Handle login form submission
+        loginForm.addEventListener('submit', (event) => {
+            event.preventDefault(); // Prevent page reload
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Simple hardcoded authentication check (replace with backend logic)
+            if (username === "admin" && password === "password123") {
+                alert("Login successful!");
+                adminModal.classList.add('hidden'); // Close model after successful login
+            } else {
+                errorMessage.classList.remove('hidden'); // Show error message
+            }
+        });
+    
+
+
+    </script>
 </body>
 </html>
