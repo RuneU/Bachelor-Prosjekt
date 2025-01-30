@@ -7,11 +7,13 @@ load_dotenv()
 
 # Database connection string setup
 connection_string = (
-    f"DRIVER={os.getenv('DB_DRIVER')};"
-    f"SERVER={os.getenv('DB_SERVER')};"
-    f"DATABASE={os.getenv('DB_DATABASE')};"
-    f"UID={os.getenv('DB_UID')};"
-    f"PWD={os.getenv('DB_PWD')};"
+    "DRIVER={ODBC Driver 18 for SQL Server};"
+    "SERVER=.database.windows.net;"
+    "DATABASE=;"
+    "UID=;"
+    "PWD=;"
+    # "Encrypt=yes;"  # Required for Azure, optional for on-premises
+    # "TrustServerCertificate=yes;"  # Only for testing environments
 )
 
 # Redigere data i db
@@ -54,7 +56,7 @@ def run_query(query):
         if 'conn' in locals():
             conn.close()
 
-# run_query("INSERT INTO Evakuerte (Fornavn) VALUES ('Simon')")  # Add data
+# run_query("INSERT INTO Evakuerte (Fornavn) VALUES ('Seb')")  # Add data
 
 # run_query("DELETE FROM Evakuerte WHERE Fornavn = 'Simon'")  # Delete data
 

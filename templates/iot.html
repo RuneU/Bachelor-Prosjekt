@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin</title>
+    <!-- Correct Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom CSS for hover effects */
+        .hover-effect:hover {
+            transform: translateY(-5px);
+            transition: transform 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-slate-900">
+    <h1 class="text-3xl font-bold text-center my-6 text-black dark:text-white">Velg hvordan du vil registere deg</h1>
+
+    <!-- Parent container for buttons -->
+    <div class="flex flex-wrap justify-center gap-6 p-4">
+        <!-- Button 1 -->
+        <button onclick="handleButtonClick('Fjes og Finger')" class="hover-effect max-w-sm rounded-xl bg-white p-6 shadow-lg outline outline-black/5 dark:bg-slate-800 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10 transform transition duration-300 hover:shadow-xl">
+            <div class="flex items-center gap-x-4">
+                <img class="size-12 shrink-0" src="{{ url_for('static', filename='img/id.png') }}" alt="id Logo" />
+                <div>
+                    <div class="text-xl font-medium text-black dark:text-white">Fjes og Finger</div>
+                    <p class="text-gray-500 dark:text-gray-400">Registrer med ansikt og fingeravtrykk</p>
+                </div>
+            </div>
+        </button>
+
+        <!-- Button 2 -->
+        <button onclick="handleButtonClick('Bare fjes')" class="hover-effect max-w-sm rounded-xl bg-white p-6 shadow-lg outline outline-black/5 dark:bg-slate-800 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10 transform transition duration-300 hover:shadow-xl">
+            <div class="flex items-center gap-x-4">
+                <img class="size-12 shrink-0" src="{{ url_for('static', filename='img/smile.png') }}" alt="Smile Logo" />
+                <div>
+                    <div class="text-xl font-medium text-black dark:text-white">Bare fjes</div>
+                    <p class="text-gray-500 dark:text-gray-400">Registrer kun med ansikt</p>
+                </div>
+            </div>
+            <ul class="flex flex-col p-4 mt-4 space-x-8 md:flex-row md:mt-0 text-lg">
+                <li><a href="{{ url_for('faceID') }}" class="text-blue-400 hover:text-blue-300 transition duration-300">faceID</a></li>
+            </ul>
+        </button>
+
+        <!-- Button 3 -->
+        <button onclick="handleButtonClick('Bare finger')" class="hover-effect max-w-sm rounded-xl bg-white p-6 shadow-lg outline outline-black/5 dark:bg-slate-800 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10 transform transition duration-300 hover:shadow-xl">
+            <div class="flex items-center gap-x-4">
+                <img class="size-12 shrink-0" src="{{ url_for('static', filename='img/fingerprint.png') }}" alt="Finger Logo" />
+                <div>
+                    <div class="text-xl font-medium text-black dark:text-white">Bare finger</div>
+                    <p class="text-gray-500 dark:text-gray-400">Registrer kun med fingeravtrykk</p>
+                </div>
+            </div>
+        </button>
+
+        <!-- Button 4 -->
+        <button onclick="handleButtonClick('Ingenting')" class="hover-effect max-w-sm rounded-xl bg-white p-6 shadow-lg outline outline-black/5 dark:bg-slate-800 dark:shadow-none dark:-outline-offset-1 dark:outline-white/10 transform transition duration-300 hover:shadow-xl">
+            <div class="flex items-center gap-x-4">
+                <img class="size-12 shrink-0" src="{{ url_for('static', filename='img/sad.png') }}" alt="nothing Logo" />
+                <div>
+                    <div class="text-xl font-medium text-black dark:text-white">Ingenting</div>
+                    <p class="text-gray-500 dark:text-gray-400">Registrer uten biometri</p>
+                </div>
+            </div>
+        </button>
+    </div>
+
+    <script>
+        // JavaScript function to handle button clicks
+        function handleButtonClick(option) {
+            alert(`Du valgte: ${option}`);
+            // You can add more functionality here, like redirecting to another page or sending data to a server
+        }
+    </script>
+</body>
+</html>
