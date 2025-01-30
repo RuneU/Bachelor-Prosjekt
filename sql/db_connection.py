@@ -7,19 +7,18 @@ load_dotenv()
 
 # Database connection string setup
 connection_string = (
-    "DRIVER={ODBC Driver 18 for SQL Server};"
-    "SERVER=.database.windows.net;"
-    "DATABASE=;"
-    "UID=;"
-    "PWD=;"
-    # "Encrypt=yes;"  # Required for Azure, optional for on-premises
-    # "TrustServerCertificate=yes;"  # Only for testing environments
+    f"DRIVER={os.getenv('DB_DRIVER')};"
+    f"SERVER={os.getenv('DB_SERVER')};"
+    f"DATABASE={os.getenv('DB_DATABASE')};"
+    f"UID={os.getenv('DB_UID')};"
+    f"PWD={os.getenv('DB_PWD')};"
 )
 
-# Redigere data i db
-def run_query(x):
 
-# Function to fetch the status data
+# Redigere data i db
+# def run_query(x):
+
+# Function to fetch status data
 def fetch_status_data():
     try:
         conn = pyodbc.connect(connection_string)
