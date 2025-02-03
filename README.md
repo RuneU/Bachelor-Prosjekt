@@ -27,6 +27,8 @@ Initialiser tailwind med ```npx tailwindcss init```
 
 Installer flowbite ```npm install flowbite```
 
+Lagt til requirements.txt, for dependencies slik som flask, odbc og videre kjør kommando:```pip install -r requirements.txt```
+
 ## Database tilkobling
 Opprett en env fil i root directory som heter ```.env```
 
@@ -69,3 +71,5 @@ python -m unittest discover test
 
 Link flask nettside: https://flask.palletsprojects.com/en/stable/installation/
 Link til Flowbite for tailwind og flowbite: https://flowbite.com/docs/getting-started/flask/
+
+
