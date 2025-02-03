@@ -1,5 +1,6 @@
 import os
 import sys
+sys.dont_write_bytecode = True
 from flask import Flask, Response, render_template
 import cv2
 
