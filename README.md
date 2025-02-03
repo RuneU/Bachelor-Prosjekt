@@ -57,6 +57,12 @@ Ferdig
 ## Tester
 For å kjøre testene i prosjekte bruk kommandoen under
 
+## Ekstra packages som kan være nødvendig for IoT funksjonalitet
+
+ pip install opencv-python 
+
+ pip install opencv-python-headless   
+
 ```
 python -m unittest discover test
 ```
