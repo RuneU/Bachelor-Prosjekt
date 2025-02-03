@@ -63,12 +63,13 @@
             </div>
         </div>
 
-        <div class="mb-6">
+        <div class="grid gap-6 mb-6 md:grid-cols-2">
             <label class="block font-bold mb-2">Personlig Informasjon</label>
-            <div class="flex space-x-2">
-                <input type="text" placeholder="Fornavn" class="border rounded p-2 w-full">
-                <input type="text" placeholder="Mellomnavn" class="border rounded p-2 w-full">
-                <input type="text" placeholder="Etternavn" class="border rounded p-2 w-full">
+            <div>
+            <label for="fornavn" class="block mb-2 text-sm font-medium text-gray-900">Navn</label>
+                <input type="text" id="fornavn" placeholder="Fornavn" class="border rounded p-2 w-full">
+                <input type="text" id="mellomnavn" placeholder="Mellomnavn" class="border rounded p-2 w-full">
+                <input type="text" id="etternavn" placeholder="Etternavn" class="border rounded p-2 w-full">
             </div>
             <div class="flex space-x-2 mt-4">
                 <label class="mt-2">Tlf:</label>
