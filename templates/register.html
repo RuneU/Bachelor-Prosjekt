@@ -62,38 +62,51 @@
                 </ul>
             </div>
         </div>
-
+<form>
+    <label class="block font-bold mb-2">Personlig Informasjon</label>
         <div class="grid gap-6 mb-6 md:grid-cols-2">
-            <label class="block font-bold mb-2">Personlig Informasjon</label>
             <div>
-            <label for="fornavn" class="block mb-2 text-sm font-medium text-gray-900">Navn</label>
-                <input type="text" id="fornavn" placeholder="Fornavn" class="border rounded p-2 w-full">
-                <input type="text" id="mellomnavn" placeholder="Mellomnavn" class="border rounded p-2 w-full">
-                <input type="text" id="etternavn" placeholder="Etternavn" class="border rounded p-2 w-full">
+                <label for="fornavn" class="block mb-2 text-sm font-medium text-gray-900">Fornavn</label>
+                <input type="text" id="fornavn" class="bg-gray-50   text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ola"/>
             </div>
-            <div class="flex space-x-2 mt-4">
-                <label class="mt-2">Tlf:</label>
-                <input type="tel" placeholder="Telefonnummer" class="border rounded p-2 w-full">
-                <input type="text" placeholder="Adresse" class="border rounded p-2 w-full">
+            <div>
+                <label for="etternavn" class="block mb-2 text-sm font-medium text-gray-900">Etternavn</label>
+                <input type="text" id="etternavn" class="  text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Normann" />
             </div>
-        </div>
-        <div class="mb-6">
-            <label class="block font-bold mb-2">Pårørende Info</label>
-            <div class="flex space-x-2">
-                <input type="text" placeholder="Fornavn" class="border rounded p-2 w-full">
-                <input type="text" placeholder="Mellomnavn" class="border rounded p-2 w-full">
-                <input type="text" placeholder="Etternavn" class="border rounded p-2 w-full">
+            <div>
+                <label for="fodselsdato" class="block mb-2 text-sm font-medium text-gray-900">Fødselsdato</label>
+                <input type="date" id="fodselsdato" class="bg-gray-50   text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="01.01.2000"/>
             </div>
-            <div class="flex space-x-2 mt-4">
-                <label class="mt-2">Tlf:</label>
-                <input type="tel" placeholder="Telefonnummer" class="border rounded p-2 w-full">
-                <input type="text" placeholder="Adresse" class="border rounded p-2 w-full">
+            <div>
+                <label for="adresse" class="block mb-2 text-sm font-medium text-gray-900">Adresse</label>
+                <input type="text" id="adresse" class="  text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Osloveien 1" />
+            </div>
+        <div class="grid gap-6 mb-6 md:grid-cols-2">
+            <div>
+            <label class="font-bold mb-6">Pårørende Info</label>
+            </div>
+            <div>
+                <label for="fornavn" class="block mb-2 text-sm font-medium text-gray-900">Fornavn</label>
+                <input type="text" id="fornavn" class="bg-gray-50   text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Ola"/>
+            </div>
+            <div>
+                <label for="etternavn" class="block mb-2 text-sm font-medium text-gray-900">Etternavn</label>
+                <input type="text" id="etternavn" class="  text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Normann" />
+            </div>
+            <div>
+                <label for="telefon" class="block mb-2 text-sm font-medium text-gray-900">Telefon nummer</label>
+                <input type="tel" id="telefon" class="bg-gray-50   text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="+47"/>
+            </div>
+            <div>
+                <label for="adresse" class="block mb-2 text-sm font-medium text-gray-900">Adresse</label>
+                <input type="text" id="adresse" class="  text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="Osloveien 1" />
             </div>
         </div>
 
         <div class="text-center">
             <button class="bg-gray-700 text-white px-6 py-2 rounded">Bekreft</button>
         </div>
+    </form>
     </main>
     <script>
         const adminButton = document.getElementById('adminButton');
