@@ -52,13 +52,10 @@
         {% endif %}
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-gray-400 text-center py-6">
-        <p>&copy; <span id="year"></span> Admin Panel. Alle rettigheter reservert.</p>
-    </footer>
+    <!-- Include Footer Component -->
+    {% include 'footer.html' %}
 
     <script>
-        document.getElementById("year").textContent = new Date().getFullYear();
         document.querySelectorAll('.statusToggleBtn').forEach(button => {
             button.addEventListener('click', function() {
                 const statusFields = this.parentElement.nextElementSibling;
