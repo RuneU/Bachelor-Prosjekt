@@ -24,7 +24,7 @@ CREATE TABLE Evakuerte (
 CREATE TABLE KontaktPerson (
     KontaktPersonID INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
     Fornavn VARCHAR(256) NULL,
-    MellomNavn VARCHAR(256) NULL
+    MellomNavn VARCHAR(256) NULL,
     Etternavn VARCHAR(256) NULL,
     Telefonnummer INT NULL,
     EvakuertID INT NULL,

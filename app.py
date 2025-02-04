@@ -61,15 +61,9 @@ def startID():
 
 @app.route("/admin")
 def admin():
-    try:
         statuses = fetch_status_data()  # Hent data fra databasen
         print("Statuses hentet fra DB:", statuses)  # Debug print
-    except Exception as e:
-        print("Feil ved henting av statusdata:", e)
-        statuses = []  # Hvis en feil oppstår, send tom liste
-
-    return render_template("admin.html", statuses=statuses)
-
+        return render_template("admin.html", statuses=statuses)
 
 if __name__ == '__main__':
     app.run(debug=True)
