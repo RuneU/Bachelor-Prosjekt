@@ -20,96 +20,93 @@
     </header>
 
     <main class="container mx-auto py-10 px-6 flex-grow bg-gray-100 text-gray-800 rounded-lg">
-        <!-- Informasjon om krisen -->
-        <h2 class="text-center font-bold text-lg mb-4">Status</h2>
-        <div class="relative flex justify-center mb-6">
-            <div class="relative">
-                <button id="dropdownButton" type="button" class="h-12 w-48 px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition">
-                    Velg en farge
-                </button>                
-                <ul id="dropdownMenu" class="hidden absolute mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                    <li class="h-12 px-4 py-2 text-sm bg-green-700 text-white hover:bg-green-600 cursor-pointer" data-color="bg-green-700"></li>
-                    <li class="h-12 px-4 py-2 text-sm bg-yellow-600 text-white hover:bg-yellow-500 cursor-pointer" data-color="bg-yellow-600"></li>
-                    <li class="h-12 px-4 py-2 text-sm bg-red-700 text-white hover:bg-red-600 cursor-pointer" data-color="bg-red-700"></li>
-                </ul>
+        <form method="POST" action="{{ url_for('handle_form') }}"></form>
+            <!-- Informasjon om krisen -->
+            <h2 class="text-center font-bold text-lg mb-4">Status</h2>
+            <div class="relative flex justify-center mb-6">
+                <div class="relative">
+                    <button id="dropdownButton" type="button" class="h-12 w-48 px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition">
+                        Velg Status
+                    </button>                
+                    <ul id="dropdownMenu" class="hidden absolute mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        <li class="h-12 px-4 py-2 text-sm bg-green-700 text-white hover:bg-green-600 cursor-pointer" data-color="bg-green-700">krise ferdig</li>
+                        <li class="h-12 px-4 py-2 text-sm bg-yellow-600 text-white hover:bg-yellow-500 cursor-pointer" data-color="bg-yellow-600">krise pågående</li>
+                        <li class="h-12 px-4 py-2 text-sm bg-red-700 text-white hover:bg-red-600 cursor-pointer" data-color="bg-red-700">krise ny</li>
+                    </ul>
+                    <input type="hidden" id="selected-status" name="status">
+                </div>
             </div>
-        </div>
 
-        <div class="mb-6">
-            <label for="default-input" class="mt-2">Krise type</label>
-            <input type="text" id="default-input" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-        </div>
-
-        <div class="mb-6">
-            <label for="default-input" class="mt-2">Krise navn</label>
-            <input type="text" id="default-input" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-        </div>
-        
-        <div class="mb-6">
-            <label for="default-input" class="mt-2">Lokasjon</label>
-            <input type="text" id="default-input" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-        </div>
-
-        <div>
-            <label for="message" class="mt-2">Annen informasjon:</label>
-            <textarea id="message" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Skriv informasjon om krisen som ikke passer i de andre feltene"></textarea>
-        </div>
-
-        <div>
-            <hr class="my-12 h-0.5 border-t-0 bg-black" />
-        </div>
-
-        <!-- Evakuertes info-->
-        <div class="mb-6">
-            <label class="block font-bold mb-2">Personlig Informasjon</label>
-            <div class="flex space-x-2">
-                <label class="mt-2">Fornavn:</label>
-                <input type="text" placeholder="Ola" class="border rounded p-2 w-full">
-                <label class="mt-2">Mellomnavn:</label>
-                <input type="text" placeholder="sylvert" class="border rounded p-2 w-full">
-                <label class="mt-2">Etternavn:</label>
-                <input type="text" placeholder="Nordmann" class="border rounded p-2 w-full">
+            <div class="mb-6">
+                <label for="kris-type" class="mt-2">Krise type</label>
+                <input type="text" id="krise-type" name="krise-type" placeholder="flåm" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
             </div>
-            <div class="flex space-x-2 mt-4">
-                <label class="mt-2">Tlf:</label>
-                <input type="tel" placeholder="Telefonnummer" class="border rounded p-2 w-full">
-                <label class="mt-2">Adresse:</label>
-                <input type="text" placeholder="Adresse" class="border rounded p-2 w-full">
+
+            <div class="mb-6">
+                <label for="krise-navn" class="mt-2">Krise navn</label>
+                <input type="text" id="krise-navn" name="krise-navn" placeholder="flåm Odda 2019" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
             </div>
-        </div>
-
-        </div>
-
-        <div>
-            <hr class="my-12 h-0.5 border-t-0 bg-black" />
-        </div>
-
-        <!-- Kontakt person infor-->
-        <div class="mb-6">
-            <label class="block font-bold mb-2">Pårørende Info</label>
-            <div class="flex space-x-2">
-                <label class="mt-2">Fornavn:</label>
-                <input type="text" placeholder="Ola" class="border rounded p-2 w-full">
-                <label class="mt-2">Mellomnavn:</label>
-                <input type="text" placeholder="Mellomnavn" class="border rounded p-2 w-full">
-                <label class="mt-2">Etternavn:</label>
-                <input type="text" placeholder="Etternavn" class="border rounded p-2 w-full">
+            
+            <div class="mb-6">
+                <label for="lokasjon" class="mt-2">Lokasjon</label>
+                <input type="text" id="lokasjon" name="lokasjon" placeholder="Odda sentrum" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
             </div>
-            <div class="flex space-x-2 mt-4">
-                <label class="mt-2">Tlf:</label>
-                <input type="tel" placeholder="Telefonnummer" class="border rounded p-2 w-full">
-                <label class="mt-2">Adresse:</label>
-                <input type="text" placeholder="Adresse" class="border rounded p-2 w-full">
+
+            <div>
+                <label for="annen-info" class="mt-2">Annen informasjon:</label>
+                <textarea id="annen-info" name="annen-info" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Skriv informasjon om krisen som ikke passer i de andre feltene"></textarea>
             </div>
-        </div>
 
-        <div class="text-center">
-            <button class="bg-gray-700 text-white px-6 py-2 rounded">Bekreft</button>
-        </div>
+            <div>
+                <hr class="my-12 h-0.5 border-t-0 bg-black" />
+            </div>
 
-        </div>
+            <!-- Evakuertes info-->
+            <div class="mb-6">
+                <label class="block font-bold mb-2">Personlig Informasjon</label>
+                <div class="flex space-x-2">
+                    <label for="evak-fnavn" class="mt-2">Fornavn:</label>
+                    <input id="evak-fnavn" type="text" name="evak-fnavn" placeholder="Ola" class="border rounded p-2 w-full">
+                    <label for="evak-mnavn" class="mt-2">Mellomnavn:</label>
+                    <input id="evak-mnavn" type="text" name="evak-mnavn" placeholder="sylvert" class="border rounded p-2 w-full">
+                    <label for="evak-enavn" class="mt-2">Etternavn:</label>
+                    <input id="evak-enavn" type="text" name="evak-fnavn" placeholder="Nordmann" class="border rounded p-2 w-full">
+                </div>
+                <div class="flex space-x-2 mt-4">
+                    <label for="evak-tlf" class="mt-2">Tlf:</label>
+                    <input id="evak-tlf" type="tel" name="evak-tlf" placeholder="Telefonnummer" class="border rounded p-2 w-full">
+                    <label for="evak-adresse" class="mt-2">Adresse:</label>
+                    <input id="evak-adresse" type="text" name="evak-adresse" placeholder="Adresse" class="border rounded p-2 w-full">
+                </div>
+            </div>
 
-        
+            <div>
+                <hr class="my-12 h-0.5 border-t-0 bg-black" />
+            </div>
+
+            <!-- kontaktperson informasjon -->
+            <div class="mb-6">
+                <label class="block font-bold mb-2">Pårørende Info</label>
+                <div class="flex space-x-2">
+                    <label for="kon-fnavn" class="mt-2">Fornavn:</label>
+                    <input id="kon-fnavn" type="text" name="kon-fnavn" placeholder="Ola" class="border rounded p-2 w-full">
+                    <label for="kon-mnavn" class="mt-2">Mellomnavn:</label>
+                    <input id="kon-mnavn" type="text" name="kon-mnavn" placeholder="Mellomnavn" class="border rounded p-2 w-full">
+                    <label for="kon-enavn" class="mt-2">Etternavn:</label>
+                    <input id="kon-enavn" type="text" name="kon-mnavn" placeholder="Etternavn" class="border rounded p-2 w-full">
+                </div>
+                <div class="flex space-x-2 mt-4">
+                    <label for="kon-tlf" class="mt-2">Tlf:</label>
+                    <input id="kon-tlf" type="tel" name="kon-tlf" placeholder="Telefonnummer" class="border rounded p-2 w-full">
+                    <label for="kon-adresse" class="mt-2">Adresse:</label>
+                    <input id="kon-adresse" type="text" name="kon-adresse" placeholder="Adresse" class="border rounded p-2 w-full">
+                </div>
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="bg-gray-700 text-white px-6 py-2 rounded">Bekreft</button>
+            </div>
+        </form>
     </main>
 
     <script>
@@ -143,6 +140,14 @@
                 dropdownButton.textContent = colorName;
     
                 dropdownMenu.classList.add('hidden');
+            });
+        });
+
+        // Add this to your existing JavaScript
+        dropdownOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                const statusValue = option.getAttribute('data-color').replace('bg-', '');
+                document.getElementById('selected-status').value = statusValue;
             });
         });
     </script>
