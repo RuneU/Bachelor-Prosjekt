@@ -2,16 +2,13 @@ import os
 import sys
 sys.dont_write_bytecode = True
 from flask import Flask, Response, render_template
-import cv2
 
 # Legg til 'sql' mappen i sys.path for å finne db_connection.py
 sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
+from db_connection import fetch_status_data  # No try-except needed here
+import cv2
 
-try:
-    from db_connection import fetch_status_data  # Importer databasefunksjonen
-except ImportError as e:
-    print("Feil ved import av db_connection:", e)
-    fetch_status_data = lambda: []  # Returner tom liste hvis import feiler
+
 
 app = Flask(__name__)
 
@@ -21,6 +18,7 @@ def index():
     return render_template("index.html")
 
 @app.route("/register")
+
 def register():
     return render_template("register.html")
 
