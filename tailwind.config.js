@@ -10,7 +10,7 @@ module.exports = {
       colors: {
         uiablue: "#191A39",
         uiared: "#C8102E",
-        uiagray: "##F8EDDD",
+        uiagray: "#F8EDDD",
       }
     },
   },

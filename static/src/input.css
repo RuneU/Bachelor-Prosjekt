@@ -1,3 +1,18 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
+@import "tailwindcss";
+
+@plugin "flowbite/plugin";
+
+@source "../node_modules/flowbite";
+
+@theme {
+    --color-uiagray: "#F8EDDD";
+    --color-uiablue: "#191A39";
+    --color-uialightblue: "#E1EDF9";
+    --color-uiared: "#C8102E";
+    
+}
