@@ -16,6 +16,7 @@ connection_string = (
 
 
 # Redigere data i db
+# def run_query(x):
 
 # Function to fetch status data
 def fetch_status_data():
@@ -36,15 +37,7 @@ def fetch_status_data():
             cursor.close()
         if 'conn' in locals():
             conn.close()
-    
-    # Handle potential import failures
-try:
-    fetch_status_data  # Ensure function exists
-except NameError as e:
-    print("Feil ved definisjon av fetch_status_data:", e)
-    fetch_status_data = lambda: []  # Return empty list if function is undefined
-    
-    
+
 # Function to run an SQL query (e.g., insert, update, delete)
 def run_query(query):
     try:
