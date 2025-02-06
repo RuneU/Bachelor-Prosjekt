@@ -15,6 +15,20 @@ except ImportError as e:
 
 app = Flask(__name__)
 
+@app.route("/")
+@app.route("/index")
+def index():
+    return render_template("index.html")
+
+@app.route("/register")
+def register():
+    return render_template("register.html")
+
+@app.route("/admin")
+def admin():
+        statuses = fetch_status_data()  # Hent data fra databasen
+        print("Statuses hentet fra DB:", statuses)  # Debug print
+        return render_template("admin.html", statuses=statuses)
 
 
 def generate_frames():
@@ -38,17 +52,6 @@ def video_feed():
 def faceID():
     return render_template('faceID.html')
 
-
-@app.route("/")
-@app.route("/index")
-def index():
-    return render_template("index.html")
-
-@app.route("/register")
-def register():
-    return render_template("register.html")
-
-
 @app.route("/iot")
 def iot():
     return render_template("iot.html")
@@ -56,14 +59,6 @@ def iot():
 @app.route("/startID")
 def startID():
     return render_template("startID.html")
-
-
-
-@app.route("/admin")
-def admin():
-        statuses = fetch_status_data()  # Hent data fra databasen
-        print("Statuses hentet fra DB:", statuses)  # Debug print
-        return render_template("admin.html", statuses=statuses)
 
 if __name__ == '__main__':
     app.run(debug=True)
