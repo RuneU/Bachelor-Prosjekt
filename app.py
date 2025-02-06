@@ -19,6 +19,15 @@ def index():
 def register():
     return render_template("register.html")
 
+
+
+@app.route("/admin")
+def admin():
+        statuses = fetch_status_data()  # Hent data fra databasen
+        print("Statuses hentet fra DB:", statuses)  # Debug print
+        return render_template("admin.html", statuses=statuses)
+
+
 @app.route("/admin")
 def admin():
         statuses = fetch_status_data()  # Hent data fra databasen
