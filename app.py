@@ -7,8 +7,6 @@ from db_connection import fetch_status_data  # No try-except needed here
 import cv2
 from flask import Flask, Response, render_template
 
-
-
 app = Flask(__name__)
 
 @app.route("/")
