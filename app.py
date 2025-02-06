@@ -41,7 +41,6 @@ def video_feed():
 def faceID():
     return render_template('faceID.html')
 
-
 @app.route("/")
 @app.route("/index")
 def index():
@@ -59,8 +58,6 @@ def iot():
 @app.route("/startID")
 def startID():
     return render_template("startID.html")
-
-
 
 @app.route("/admin")
 def admin():
@@ -80,9 +77,15 @@ def adminreg():
 @app.route('/handle_form', methods=['POST'])
 def handle_form():
     if request.method == 'POST':
+        conn = None
+        cursor = None
         try:
             # Get form data
             form_data = {
+                'evakuert_id': request.form.get('evakuert_id'),
+                'krise_id': request.form.get('krise_id'),
+                'kontakt_person_id': request.form.get('kontakt_person_id'),
+                'status_id': request.form.get('status_id'),
                 'status': request.form.get('status'),
                 'krise_type': request.form.get('krise-type'),
                 'krise_navn': request.form.get('krise-navn'),
@@ -107,60 +110,124 @@ def handle_form():
             conn = connection_def()
             cursor = conn.cursor()
 
-            # 1. Insert into Krise table
-            cursor.execute("""
-                INSERT INTO Krise (KriseSituasjonType, KriseNavn, Lokasjon, Tekstboks, Status)
-                OUTPUT INSERTED.KriseID
-                VALUES (?, ?, ?, ?, ?)
-            """, (
-                form_data['krise_type'],
-                form_data['krise_navn'],
-                form_data['lokasjon'],
-                form_data['annen_info'],
-                form_data['status']
-            ))
-            krise_id = cursor.fetchval()
-            if not krise_id:
-                raise ValueError("Failed to insert into Krise table")
+            # Helper function to safely convert to int
+            def safe_int(value):
+                return int(value) if value and value.isdigit() else None
 
-            # 2. Insert into Evakuerte table
-            cursor.execute("""
-                INSERT INTO Evakuerte (Fornavn, MellomNavn, Etternavn, Telefonnummer, Adresse, KriseID)
-                OUTPUT INSERTED.EvakuertID
-                VALUES (?, ?, ?, ?, ?, ?)
-            """, (
-                form_data['evak_fnavn'],
-                form_data['evak_mnavn'],
-                form_data['evak_enavn'],
-                int(form_data['evak_tlf']) if form_data['evak_tlf'] else None,
-                form_data['evak_adresse'],
-                krise_id
-            ))
-            evakuert_id = cursor.fetchval()
-            if not evakuert_id:
-                raise ValueError("Failed to insert into Evakuerte table")
+            is_update = form_data['evakuert_id'] and form_data['evakuert_id'].isdigit()
 
-            # 3. Insert into KontaktPerson table
-            cursor.execute("""
-                INSERT INTO KontaktPerson (Fornavn, MellomNavn, Etternavn, Telefonnummer, EvakuertID)
-                VALUES (?, ?, ?, ?, ?)
-            """, (
-                form_data['kon_fnavn'],
-                form_data['kon_mnavn'],
-                form_data['kon_enavn'],
-                int(form_data['kon_tlf']) if form_data['kon_tlf'] else None,
-                evakuert_id
-            ))
+            if is_update:
+                # Update existing records
+                evakuert_id = safe_int(form_data['evakuert_id'])
+                krise_id = safe_int(form_data['krise_id'])
+                kontakt_person_id = safe_int(form_data['kontakt_person_id'])
+                status_id = safe_int(form_data['status_id'])
 
-            # 4. Insert into Status table
-            cursor.execute("""
-                INSERT INTO Status (Status, Lokasjon, EvakuertID)
-                VALUES (?, ?, ?)
-            """, (
-                form_data['status'],
-                form_data['lokasjon'],
-                evakuert_id
-            ))
+                # Update Krise table
+                cursor.execute("""
+                    UPDATE Krise 
+                    SET KriseSituasjonType = ?, KriseNavn = ?, Lokasjon = ?, Tekstboks = ?, Status = ?
+                    WHERE KriseID = ?
+                """, (
+                    form_data['krise_type'],
+                    form_data['krise_navn'],
+                    form_data['lokasjon'],
+                    form_data['annen_info'],
+                    form_data['status'],
+                    krise_id
+                ))
+
+                # Update Evakuerte table
+                cursor.execute("""
+                    UPDATE Evakuerte 
+                    SET Fornavn = ?, MellomNavn = ?, Etternavn = ?, 
+                        Telefonnummer = ?, Adresse = ?
+                    WHERE EvakuertID = ?
+                """, (
+                    form_data['evak_fnavn'],
+                    form_data['evak_mnavn'],
+                    form_data['evak_enavn'],
+                    safe_int(form_data['evak_tlf']),
+                    form_data['evak_adresse'],
+                    evakuert_id
+                ))
+
+                # Update KontaktPerson table
+                cursor.execute("""
+                    UPDATE KontaktPerson 
+                    SET Fornavn = ?, MellomNavn = ?, Etternavn = ?, Telefonnummer = ?
+                    WHERE KontaktPersonID = ?
+                """, (
+                    form_data['kon_fnavn'],
+                    form_data['kon_mnavn'],
+                    form_data['kon_enavn'],
+                    safe_int(form_data['kon_tlf']),
+                    kontakt_person_id
+                ))
+
+                # Update Status table
+                cursor.execute("""
+                    UPDATE Status 
+                    SET Status = ?, Lokasjon = ?
+                    WHERE StatusID = ?
+                """, (
+                    form_data['status'],
+                    form_data['lokasjon'],
+                    status_id
+                ))
+
+            else:
+                # Insert new records (original insert logic)
+                # 1. Insert into Krise table
+                cursor.execute("""
+                    INSERT INTO Krise (KriseSituasjonType, KriseNavn, Lokasjon, Tekstboks, Status)
+                    OUTPUT INSERTED.KriseID
+                    VALUES (?, ?, ?, ?, ?)
+                """, (
+                    form_data['krise_type'],
+                    form_data['krise_navn'],
+                    form_data['lokasjon'],
+                    form_data['annen_info'],
+                    form_data['status']
+                ))
+                krise_id = cursor.fetchval()
+
+                # 2. Insert into Evakuerte table
+                cursor.execute("""
+                    INSERT INTO Evakuerte (Fornavn, MellomNavn, Etternavn, Telefonnummer, Adresse, KriseID)
+                    OUTPUT INSERTED.EvakuertID
+                    VALUES (?, ?, ?, ?, ?, ?)
+                """, (
+                    form_data['evak_fnavn'],
+                    form_data['evak_mnavn'],
+                    form_data['evak_enavn'],
+                    safe_int(form_data['evak_tlf']),
+                    form_data['evak_adresse'],
+                    krise_id
+                ))
+                evakuert_id = cursor.fetchval()
+
+                # 3. Insert into KontaktPerson table
+                cursor.execute("""
+                    INSERT INTO KontaktPerson (Fornavn, MellomNavn, Etternavn, Telefonnummer, EvakuertID)
+                    VALUES (?, ?, ?, ?, ?)
+                """, (
+                    form_data['kon_fnavn'],
+                    form_data['kon_mnavn'],
+                    form_data['kon_enavn'],
+                    safe_int(form_data['kon_tlf']),
+                    evakuert_id
+                ))
+
+                # 4. Insert into Status table
+                cursor.execute("""
+                    INSERT INTO Status (Status, Lokasjon, EvakuertID)
+                    VALUES (?, ?, ?)
+                """, (
+                    form_data['status'],
+                    form_data['lokasjon'],
+                    evakuert_id
+                ))
 
             conn.commit()
             return redirect(url_for('success_page'))
@@ -184,16 +251,31 @@ def adminreg_with_id(evakuert_id):
 
     try:
         cursor.execute("""
-            SELECT e.Fornavn, e.MellomNavn, e.Etternavn, e.Telefonnummer, e.Adresse,
-                k.Fornavn AS kon_fornavn, k.MellomNavn AS kon_mellomnavn, k.Etternavn AS kon_etternavn, k.Telefonnummer AS kon_tlf,
-                kr.KriseSituasjonType, kr.KriseNavn, kr.Lokasjon, kr.Tekstboks, s.Status
+            SELECT 
+                e.EvakuertID, 
+                e.KriseID, 
+                kp.KontaktPersonID,  -- Changed alias from k to kp
+                s.StatusID,
+                e.Fornavn, 
+                e.MellomNavn, 
+                e.Etternavn, 
+                e.Telefonnummer, 
+                e.Adresse,
+                kp.Fornavn AS kon_fornavn, 
+                kp.MellomNavn AS kon_mellomnavn, 
+                kp.Etternavn AS kon_etternavn, 
+                kp.Telefonnummer AS kon_tlf,
+                kr.KriseSituasjonType, 
+                kr.KriseNavn, 
+                kr.Lokasjon, 
+                kr.Tekstboks, 
+                s.Status
             FROM Evakuerte e
-            LEFT JOIN KontaktPerson k ON e.EvakuertID = k.EvakuertID
+            LEFT JOIN KontaktPerson kp ON e.EvakuertID = kp.EvakuertID
             LEFT JOIN Krise kr ON e.KriseID = kr.KriseID
             LEFT JOIN Status s ON e.EvakuertID = s.EvakuertID
             WHERE e.EvakuertID = ?
         """, (evakuert_id,))
-
         
         data = cursor.fetchone()
         
@@ -201,12 +283,21 @@ def adminreg_with_id(evakuert_id):
             return "Evakuert not found", 404
 
         evakuert_data = {
-            "evak_fnavn": data[0], "evak_mnavn": data[1], "evak_enavn": data[2], 
-            "evak_tlf": data[3], "evak_adresse": data[4], 
-            "kon_fnavn": data[5], "kon_mnavn": data[6], "kon_enavn": data[7], 
-            "kon_tlf": data[8], 
-            "krise_type": data[9], "krise_navn": data[10], "lokasjon": data[11], 
-            "annen_info": data[12], "status": data[13]
+            
+            "status": data[17], "krise_type": data[13], "evak_enavn": data[6],
+            "evak_tlf": data[7], "evak_adresse": data[8], 
+            "kon_fnavn": data[9], "kon_mnavn": data[5], "kon_enavn": data[11], 
+            "kon_tlf": data[12], 
+            "evak_mnavn": data[5], "krise_navn": data[14], "lokasjon": data[15], 
+            "annen_info": data[16], "evak_fnavn": data[4],
+            "EvakuertID": data[0], "KriseID": data[1], "KontaktPersonID": data[2],
+            "StatusID": data[3]
+            # 0: EvakuertID
+            # 1: KriseID på evakuerte
+            # 2: kontaktpersonID
+            # 3: StatusID
+            # 13: krise type
+
         }
 
         return render_template("admin-reg.html", evakuert=evakuert_data)

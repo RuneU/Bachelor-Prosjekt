@@ -21,6 +21,12 @@
 
     <main class="container mx-auto py-10 px-6 flex-grow bg-gray-100 text-gray-800 rounded-lg">
         <form method="POST" action="{{ url_for('handle_form') }}">
+
+            <input type="hidden" name="evakuert_id" value="{{ evakuert.EvakuertID if evakuert else '' }}">
+            <input type="hidden" name="krise_id" value="{{ evakuert.KriseID if evakuert else '' }}">
+            <input type="hidden" name="kontakt_person_id" value="{{ evakuert.KontaktPersonID if evakuert else '' }}">
+            <input type="hidden" name="status_id" value="{{ evakuert.StatusID if evakuert else '' }}">
+
             <!-- Informasjon om krisen -->
             <h2 class="text-center font-bold text-lg mb-4">Status</h2>
             <div class="relative flex justify-center mb-6">
@@ -36,30 +42,25 @@
                     <input type="hidden" id="selected-status" name="status">
                 </div>
             </div>
-
             <div class="mb-6">
                 <label for="kris-type" class="mt-2">Krise type</label>
                 <input type="text" id="krise-type" name="krise-type" placeholder="flåm" 
                     class="input-field" value="{{ evakuert.krise_type if evakuert else '' }}">
             </div>
-
             <div class="mb-6">
                 <label for="krise-navn" class="mt-2">Krise navn</label>
                 <input type="text" id="krise-navn" name="krise-navn" placeholder="flåm Odda 2019" 
                     class="input-field" value="{{ evakuert.krise_navn if evakuert else '' }}">
             </div>
-            
             <div class="mb-6">
                 <label for="lokasjon" class="mt-2">Lokasjon</label>
                 <input type="text" id="lokasjon" name="lokasjon" placeholder="Odda sentrum" 
                     class="input-field" value="{{ evakuert.lokasjon if evakuert else '' }}">
             </div>
-
             <div>
                 <label for="annen-info" class="mt-2">Annen informasjon:</label>
                 <textarea id="annen-info" name="annen-info" rows="4" class="input-field">{{ evakuert.annen_info if evakuert else '' }}</textarea>
             </div>
-
             <div>
                 <hr class="my-12 h-0.5 border-t-0 bg-black" />
             </div>
@@ -105,19 +106,6 @@
                     <input id="kon-adresse" type="text" name="kon-adresse" placeholder="Adresse" class="input-field" value="{{ evakuert.kon_adresse if evakuert else '' }}">
                 </div>
             </div>
-
-            {% if evakuert %}
-                <h2 class="text-xl font-bold text-center mb-4">Evakuert Informasjon</h2>
-                <div class="bg-white shadow-md rounded-lg p-6">
-                    <p><strong>Evakuert ID:</strong> {{ evakuert.EvakuertID }}</p>
-                    <p><strong>Navn:</strong> {{ evakuert.Fornavn }} {{ evakuert.MellomNavn }} {{ evakuert.Etternavn }}</p>
-                    <p><strong>Telefonnummer:</strong> {{ evakuert.Telefonnummer }}</p>
-                    <p><strong>Adresse:</strong> {{ evakuert.Adresse }}</p>
-                </div>
-            {% else %}
-                <p class="text-center text-red-500">Ingen evakuert funnet med denne ID-en.</p>
-            {% endif %}
-
 
             <div class="text-center">
                 <button type="submit" class="bg-gray-700 text-white px-6 py-2 rounded">Bekreft</button>
