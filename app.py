@@ -30,7 +30,6 @@ def admin():
         print("Statuses hentet fra DB:", statuses)  # Debug print
         return render_template("admin.html", statuses=statuses)
 
-
 def generate_frames():
     camera = cv2.VideoCapture(0)  
     while True:
