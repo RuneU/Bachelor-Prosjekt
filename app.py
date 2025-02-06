@@ -1,7 +1,6 @@
 import os
 import sys
 sys.dont_write_bytecode = True
-<<<<<<< HEAD
 # Legg til 'sql' mappen i sys.path for å finne db_connection.py
 sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
 from db_connection import fetch_status_data  # No try-except needed here
@@ -9,19 +8,6 @@ import cv2
 from flask import Flask, Response, render_template
 
 
-=======
-from flask import Flask, Response, render_template
-import cv2
-
-# Legg til 'sql' mappen i sys.path for å finne db_connection.py
-sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
-
-try:
-    from db_connection import fetch_status_data  # Importer databasefunksjonen
-except ImportError as e:
-    print("Feil ved import av db_connection:", e)
-    fetch_status_data = lambda: []  # Returner tom liste hvis import feiler
->>>>>>> Develop
 
 app = Flask(__name__)
 
@@ -40,10 +26,6 @@ def admin():
         print("Statuses hentet fra DB:", statuses)  # Debug print
         return render_template("admin.html", statuses=statuses)
 
-<<<<<<< HEAD
-=======
-
->>>>>>> Develop
 def generate_frames():
     camera = cv2.VideoCapture(0)  
     while True:
