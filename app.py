@@ -1,14 +1,14 @@
 import os
 import sys
 sys.dont_write_bytecode = True
-from flask import Flask, Response, render_template
+from flask import Flask, Response, render_template, request, redirect, url_for
 import cv2
 
 # Legg til 'sql' mappen i sys.path for å finne db_connection.py
 sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
 
 try:
-    from db_connection import fetch_status_data  # Importer databasefunksjonen
+    from db_connection import fetch_status_data, run_query  # Importer databasefunksjonen
 except ImportError as e:
     print("Feil ved import av db_connection:", e)
     fetch_status_data = lambda: []  # Returner tom liste hvis import feiler
@@ -20,15 +20,47 @@ app = Flask(__name__)
 def index():
     return render_template("index.html")
 
-@app.route("/register")
+@app.route("/register", methods=["GET", "POST"])
 def register():
+    if request.method == "POST":
+        try:
+            fornavn = request.form.get("fornavn")
+            etternavn = request.form.get("etternavn")
+            adresse = request.form.get("adresse")
+            telefonnummer = request.form.get("telefonnummer")
+            parorende_fornavn = request.form.get("parorende_fornavn")
+            parorende_etternavn = request.form.get("parorende_etternavn")
+            parorende_telefonnummer = request.form.get("parorende_telefonnummer")
+
+            # Insert data into the database
+            query = f"""
+                INSERT INTO Evakuerte (Fornavn, Etternavn, Adresse, Telefonnummer)
+                VALUES ('{fornavn}', '{etternavn}', '{adresse}', '{telefonnummer}');
+            """
+            run_query(query)
+
+            # Get the last inserted EvakuertID
+            evakuert_id = get_last_inserted_id()
+
+            # Insert data into the KontaktPerson table
+            query = f"""
+                INSERT INTO KontaktPerson (Fornavn, Etternavn, Telefonnummer, EvakuertID)
+                VALUES ('{parorende_fornavn}', '{parorende_etternavn}', '{parorende_telefonnummer}', {evakuert_id});
+            """
+            run_query(query)
+
+            return redirect(url_for("index"))
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return "An error occurred while processing your request."
+
     return render_template("register.html")
 
 @app.route("/admin")
 def admin():
-        statuses = fetch_status_data()  # Hent data fra databasen
-        print("Statuses hentet fra DB:", statuses)  # Debug print
-        return render_template("admin.html", statuses=statuses)
+    statuses = fetch_status_data()  # Hent data fra databasen
+    print("Statuses hentet fra DB:", statuses)  # Debug print
+    return render_template("admin.html", statuses=statuses)
 
 
 def generate_frames():

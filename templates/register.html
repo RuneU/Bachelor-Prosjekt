@@ -56,78 +56,78 @@
 
     <!-- Main Content -->
     <main class="container mx-auto py-10 px-6 flex-grow bg-gray-100 text-gray-800 rounded-lg">
-        <form>
-        <h2 class="text-center font-bold text-lg mb-4">Status</h2>
-        <div class="relative flex justify-center mb-6">
-            <div class="relative">
-                <button id="dropdownButton" type="button"
-                    class="h-12 w-48 px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition">
-                    Velg en farge
-                </button>
-                <ul id="dropdownMenu"
-                    class="hidden absolute mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                    <li class="h-12 px-4 py-2 text-sm rounded-lg bg-green-700 text-white hover:bg-green-600 cursor-pointer"
-                        data-color="bg-green-700"></li>
-                    <li class="h-12 px-4 py-2 text-sm rounded-lg bg-yellow-600 text-white hover:bg-yellow-500 cursor-pointer"
-                        data-color="bg-yellow-600"></li>
-                    <li class="h-12 px-4 py-2 text-sm rounded-lg bg-red-700 text-white hover:bg-red-600 cursor-pointer"
-                        data-color="bg-red-700"></li>
-                </ul>
+        <form method="POST" action="{{ url_for('register') }}">
+            <h2 class="text-center font-bold text-lg mb-4">Status</h2>
+            <div class="relative flex justify-center mb-6">
+                <div class="relative">
+                    <button id="dropdownButton" type="button"
+                        class="h-12 w-48 px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition">
+                        Velg en farge
+                    </button>
+                    <ul id="dropdownMenu"
+                        class="hidden absolute mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        <li class="h-12 px-4 py-2 text-sm rounded-lg bg-green-700 text-white hover:bg-green-600 cursor-pointer"
+                            data-color="bg-green-700"></li>
+                        <li class="h-12 px-4 py-2 text-sm rounded-lg bg-yellow-600 text-white hover:bg-yellow-500 cursor-pointer"
+                            data-color="bg-yellow-600"></li>
+                        <li class="h-12 px-4 py-2 text-sm rounded-lg bg-red-700 text-white hover:bg-red-600 cursor-pointer"
+                            data-color="bg-red-700"></li>
+                    </ul>
+                </div>
             </div>
-        </div>
-        
+            
             <label class="block font-bold mb-2">Personlig Informasjon</label>
             <div class="grid gap-6 mb-6 md:grid-cols-2">
                 <div>
                     <label for="fornavn" class="block mb-2 text-sm font-medium text-gray-900">Fornavn</label>
-                    <input type="text" id="fornavn"
-                        class="bg-gray-50   text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                    <input type="text" id="fornavn" name="fornavn"
+                        class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                         placeholder="Ola" />
                 </div>
                 <div>
                     <label for="etternavn" class="block mb-2 text-sm font-medium text-gray-900">Etternavn</label>
-                    <input type="text" id="etternavn"
-                        class="  text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                    <input type="text" id="etternavn" name="etternavn"
+                        class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                         placeholder="Normann" />
                 </div>
                 <div>
-                    <label for="fodselsdato" class="block mb-2 text-sm font-medium text-gray-900">Fødselsdato</label>
-                    <input type="date" id="fodselsdato"
-                        class="bg-gray-50   text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        placeholder="01.01.2000" />
+                    <label for="adresse" class="block mb-2 text-sm font-medium text-gray-900">Adresse</label>
+                    <input type="text" id="adresse" name="adresse"
+                        class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                        placeholder="Osloveien 1" />
                 </div>
                 <div>
-                    <label for="adresse" class="block mb-2 text-sm font-medium text-gray-900">Adresse</label>
-                    <input type="text" id="adresse"
-                        class="  text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        placeholder="Osloveien 1" />
+                    <label for="telefonnummer" class="block mb-2 text-sm font-medium text-gray-900">Telefonnummer</label>
+                    <input type="tel" id="telefonnummer" name="telefonnummer"
+                        class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                        placeholder="+47" />
                 </div>
             </div>
             <!-- Pårørende Info Section -->
             <label class="block font-bold mb-2">Pårørende Informasjon</label>
             <div class="grid gap-6 mb-6 md:grid-cols-2">
                 <div>
-                    <label for="fornavn" class="block mb-2 text-sm font-medium text-gray-900">Fornavn</label>
-                    <input type="text" id="fornavn"
+                    <label for="parorende_fornavn" class="block mb-2 text-sm font-medium text-gray-900">Fornavn</label>
+                    <input type="text" id="parorende_fornavn" name="parorende_fornavn"
                         class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                         placeholder="Ola" />
                 </div>
                 <div>
-                    <label for="etternavn" class="block mb-2 text-sm font-medium text-gray-900">Etternavn</label>
-                    <input type="text" id="etternavn"
+                    <label for="parorende_etternavn" class="block mb-2 text-sm font-medium text-gray-900">Etternavn</label>
+                    <input type="text" id="parorende_etternavn" name="parorende_etternavn"
                         class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                         placeholder="Normann" />
                 </div>
                 <div>
-                    <label for="telefon" class="block mb-2 text-sm font-medium text-gray-900">Telefonnummer</label>
-                    <input type="tel" id="telefon"
+                    <label for="parorende_telefonnummer" class="block mb-2 text-sm font-medium text-gray-900">Telefonnummer</label>
+                    <input type="tel" id="parorende_telefonnummer" name="parorende_telefonnummer"
                         class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                         placeholder="+47" />
                 </div>
             </div>
 
             <div class="text-center">
-                <button class="bg-gray-700 text-white px-6 py-2 rounded">Bekreft</button>
+                <button type="submit" class="bg-gray-700 text-white px-6 py-2 rounded">Bekreft</button>
             </div>
         </form>
     </main>
