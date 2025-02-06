@@ -8,8 +8,6 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
 from db_connection import fetch_status_data  # No try-except needed here
 import cv2
 
-
-
 app = Flask(__name__)
 
 @app.route("/")
@@ -18,7 +16,6 @@ def index():
     return render_template("index.html")
 
 @app.route("/register")
-
 def register():
     return render_template("register.html")
 
