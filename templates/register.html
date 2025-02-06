@@ -67,17 +67,18 @@
                     <ul id="dropdownMenu"
                         class="hidden absolute mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                         <li class="h-12 px-4 py-2 text-sm rounded-lg bg-green-700 text-white hover:bg-green-600 cursor-pointer"
-                            data-color="bg-green-700"></li>
+                            data-color="bg-green-700" data-value="1"></li>
                         <li class="h-12 px-4 py-2 text-sm rounded-lg bg-yellow-600 text-white hover:bg-yellow-500 cursor-pointer"
-                            data-color="bg-yellow-600"></li>
+                            data-color="bg-yellow-600" data-value="2"></li>
                         <li class="h-12 px-4 py-2 text-sm rounded-lg bg-red-700 text-white hover:bg-red-600 cursor-pointer"
-                            data-color="bg-red-700"></li>
+                            data-color="bg-red-700" data-value="3"></li>
                     </ul>
+                    <input type="hidden" id="status" name="status" value="">
                 </div>
             </div>
             
             <label class="block font-bold mb-2">Personlig Informasjon</label>
-            <div class="grid gap-6 mb-6 md:grid-cols-2">
+            <div class="grid gap-6 mb-6 md:grid-cols-3">
                 <div>
                     <label for="fornavn" class="block mb-2 text-sm font-medium text-gray-900">Fornavn</label>
                     <input type="text" id="fornavn" name="fornavn"
@@ -85,11 +86,19 @@
                         placeholder="Ola" />
                 </div>
                 <div>
+                    <label for="mellomnavn" class="block mb-2 text-sm font-medium text-gray-900">Mellomnavn</label>
+                    <input type="text" id="mellomnavn" name="mellomnavn"
+                        class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                        placeholder="Mellomnavn" />
+                </div>
+                <div>
                     <label for="etternavn" class="block mb-2 text-sm font-medium text-gray-900">Etternavn</label>
                     <input type="text" id="etternavn" name="etternavn"
                         class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                         placeholder="Normann" />
                 </div>
+            </div>
+            <div class="grid gap-6 mb-6 md:grid-cols-2">
                 <div>
                     <label for="adresse" class="block mb-2 text-sm font-medium text-gray-900">Adresse</label>
                     <input type="text" id="adresse" name="adresse"
@@ -105,7 +114,7 @@
             </div>
             <!-- Pårørende Info Section -->
             <label class="block font-bold mb-2">Pårørende Informasjon</label>
-            <div class="grid gap-6 mb-6 md:grid-cols-2">
+            <div class="grid gap-6 mb-6 md:grid-cols-3">
                 <div>
                     <label for="parorende_fornavn" class="block mb-2 text-sm font-medium text-gray-900">Fornavn</label>
                     <input type="text" id="parorende_fornavn" name="parorende_fornavn"
@@ -113,11 +122,19 @@
                         placeholder="Ola" />
                 </div>
                 <div>
+                    <label for="parorende_mellomnavn" class="block mb-2 text-sm font-medium text-gray-900">Mellomnavn</label>
+                    <input type="text" id="parorende_mellomnavn" name="parorende_mellomnavn"
+                        class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                        placeholder="Mellomnavn" />
+                </div>
+                <div>
                     <label for="parorende_etternavn" class="block mb-2 text-sm font-medium text-gray-900">Etternavn</label>
                     <input type="text" id="parorende_etternavn" name="parorende_etternavn"
                         class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                         placeholder="Normann" />
                 </div>
+            </div>
+            <div class="grid gap-6 mb-6 md:grid-cols-2">
                 <div>
                     <label for="parorende_telefonnummer" class="block mb-2 text-sm font-medium text-gray-900">Telefonnummer</label>
                     <input type="tel" id="parorende_telefonnummer" name="parorende_telefonnummer"
@@ -140,7 +157,7 @@
         const dropdownButton = document.getElementById('dropdownButton');
         const dropdownMenu = document.getElementById('dropdownMenu');
         const dropdownOptions = dropdownMenu.querySelectorAll('li');
-
+        const statusInput = document.getElementById('status');
 
         dropdownButton.addEventListener('click', () => {
             dropdownMenu.classList.toggle('hidden');
@@ -155,16 +172,19 @@
         dropdownOptions.forEach(option => {
             option.addEventListener('click', () => {
                 const colorClass = option.getAttribute('data-color');
+                const colorValue = option.getAttribute('data-value');
                 const colorName = option.textContent;
 
                 // Update the button background color and text
                 dropdownButton.className = `w-48 h-12 px-4 py-2 text-white border border-gray-300 rounded-md shadow-sm ${colorClass}`;
                 dropdownButton.textContent = colorName;
 
+                // Set the hidden input value
+                statusInput.value = colorValue;
+
                 dropdownMenu.classList.add('hidden');
             });
         });
-
 
         // Show the model when clicking "Admin"
         adminButton.addEventListener('click', () => {
@@ -175,7 +195,7 @@
         // Close the model when clicking "Close" button
         closeModel.addEventListener('click', () => {
             adminModel.classList.add('hidden');
-            droppdownButton.classList.remove('bg-gray-500', 'text-white');
+            dropdownButton.classList.remove('bg-gray-500', 'text-white');
         });
 
         // Close the model when clicking outside the model
@@ -201,9 +221,6 @@
                 errorMessage.classList.remove('hidden'); // Show error message
             }
         });
-
-
-
     </script>
 </body>
 

@@ -8,7 +8,7 @@ import cv2
 sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
 
 try:
-    from db_connection import fetch_status_data, run_query  # Importer databasefunksjonen
+    from db_connection import fetch_status_data, run_query, get_last_inserted_id  # Importer databasefunksjonen
 except ImportError as e:
     print("Feil ved import av db_connection:", e)
     fetch_status_data = lambda: []  # Returner tom liste hvis import feiler
@@ -25,17 +25,20 @@ def register():
     if request.method == "POST":
         try:
             fornavn = request.form.get("fornavn")
+            mellomnavn = request.form.get("mellomnavn")
             etternavn = request.form.get("etternavn")
             adresse = request.form.get("adresse")
             telefonnummer = request.form.get("telefonnummer")
+            status = request.form.get("status")
             parorende_fornavn = request.form.get("parorende_fornavn")
+            parorende_mellomnavn = request.form.get("parorende_mellomnavn")
             parorende_etternavn = request.form.get("parorende_etternavn")
             parorende_telefonnummer = request.form.get("parorende_telefonnummer")
 
             # Insert data into the database
             query = f"""
-                INSERT INTO Evakuerte (Fornavn, Etternavn, Adresse, Telefonnummer)
-                VALUES ('{fornavn}', '{etternavn}', '{adresse}', '{telefonnummer}');
+                INSERT INTO Evakuerte (Fornavn, MellomNavn, Etternavn, Adresse, Telefonnummer)
+                VALUES ('{fornavn}', '{mellomnavn}', '{etternavn}', '{adresse}', '{telefonnummer}');
             """
             run_query(query)
 
@@ -44,8 +47,15 @@ def register():
 
             # Insert data into the KontaktPerson table
             query = f"""
-                INSERT INTO KontaktPerson (Fornavn, Etternavn, Telefonnummer, EvakuertID)
-                VALUES ('{parorende_fornavn}', '{parorende_etternavn}', '{parorende_telefonnummer}', {evakuert_id});
+                INSERT INTO KontaktPerson (Fornavn, MellomNavn, Etternavn, Telefonnummer, EvakuertID)
+                VALUES ('{parorende_fornavn}', '{parorende_mellomnavn}', '{parorende_etternavn}', '{parorende_telefonnummer}', {evakuert_id});
+            """
+            run_query(query)
+
+            # Insert data into the Status table
+            query = f"""
+                INSERT INTO Status (Status, Lokasjon, EvakuertID)
+                VALUES ('{status}', '{adresse}', {evakuert_id});
             """
             run_query(query)
 
