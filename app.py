@@ -18,8 +18,6 @@ except ImportError as e:
 
 app = Flask(__name__)
 
-
-
 def generate_frames():
     camera = cv2.VideoCapture(0)  
     while True:
@@ -230,7 +228,7 @@ def handle_form():
                 ))
 
             conn.commit()
-            return redirect(url_for('success_page'))
+            return redirect(url_for('index'))
 
         except ValueError as ve:
             conn.rollback()
@@ -284,20 +282,12 @@ def adminreg_with_id(evakuert_id):
 
         evakuert_data = {
             
-            "status": data[17], "krise_type": data[13], "evak_enavn": data[6],
-            "evak_tlf": data[7], "evak_adresse": data[8], 
-            "kon_fnavn": data[9], "kon_mnavn": data[5], "kon_enavn": data[11], 
-            "kon_tlf": data[12], 
-            "evak_mnavn": data[5], "krise_navn": data[14], "lokasjon": data[15], 
-            "annen_info": data[16], "evak_fnavn": data[4],
             "EvakuertID": data[0], "KriseID": data[1], "KontaktPersonID": data[2],
-            "StatusID": data[3]
-            # 0: EvakuertID
-            # 1: KriseID på evakuerte
-            # 2: kontaktpersonID
-            # 3: StatusID
-            # 13: krise type
-
+            "StatusID": data[3], "evak_fnavn": data[4], "evak_mnavn": data[5],
+            "evak_enavn": data[6], "evak_tlf": data[7], "evak_adresse": data[8], 
+            "kon_fnavn": data[9], "kon_mnavn": data[10], "kon_enavn": data[11], 
+            "kon_tlf": data[12], "krise_type": data[13], "krise_navn": data[14], 
+            "lokasjon": data[15], "annen_info": data[16], "status": data[17]
         }
 
         return render_template("admin-reg.html", evakuert=evakuert_data)
@@ -309,11 +299,10 @@ def adminreg_with_id(evakuert_id):
         cursor.close()
         conn.close()
 
-
+# Kan brukes for å sjekke at data blir sendt til server. Slettes før produksjon
 @app.route('/success')
 def success_page():
     return "Data successfully submitted!"
-
 
 if __name__ == '__main__':
     app.run(debug=True)
