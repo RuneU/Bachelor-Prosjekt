@@ -5,7 +5,8 @@ sys.dont_write_bytecode = True
 sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
 from db_connection import fetch_status_data  # No try-except needed here
 import cv2
-from flask import Flask, Response, render_template
+from flask import Flask, render_template, request, redirect, url_for
+from sql.db_connection import fetch_status_data, update_status
 
 app = Flask(__name__)
 
@@ -21,8 +22,15 @@ def register():
 @app.route("/admin")
 def admin():
         statuses = fetch_status_data()  # Hent data fra databasen
-        print("Statuses hentet fra DB:", statuses)  # Debug print
         return render_template("admin.html", statuses=statuses)
+
+@app.route('/update_status/<int:evakuert_id>', methods=['POST'])
+def update_status_route(evakuert_id):
+    status = request.form['status']
+    lokasjon = request.form['lokasjon']
+    update_status(evakuert_id, status, lokasjon)
+    return redirect(url_for('admin'))
+
 
 def generate_frames():
     camera = cv2.VideoCapture(0)  
