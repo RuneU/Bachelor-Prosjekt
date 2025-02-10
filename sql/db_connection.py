@@ -2,6 +2,8 @@ from dotenv import load_dotenv
 import os
 import pyodbc
 
+
+
 # Load environment variables from .env file
 load_dotenv()
 
@@ -13,6 +15,7 @@ connection_string = (
     f"UID={os.getenv('DB_UID')};"
     f"PWD={os.getenv('DB_PWD')};"
 )
+
 
 # Function to fetch status data
 def fetch_status_data():
@@ -33,6 +36,28 @@ def fetch_status_data():
             cursor.close()
         if 'conn' in locals():
             conn.close()
+
+# Function to update status data
+def update_status(evakuert_id, status, lokasjon):
+    try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE Status
+            SET Status = ?, Lokasjon = ?
+            WHERE EvakuertID = ?
+        """, (status, lokasjon, evakuert_id))
+        conn.commit()
+    
+    except pyodbc.Error as e:
+        print(f"An error occurred: {e}")
+    
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
 
 # Function to run an SQL query (e.g., insert, update, delete)
 def run_query(query):

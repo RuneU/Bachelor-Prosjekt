@@ -1,17 +1,13 @@
 import os
 import sys
 sys.dont_write_bytecode = True
-from flask import Flask, Response, render_template, request, redirect, url_for
-import cv2
-
 # Legg til 'sql' mappen i sys.path for å finne db_connection.py
 sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
+from db_connection import fetch_status_data  # No try-except needed here
+import cv2
+from flask import Flask, render_template, request, redirect, url_for
+from sql.db_connection import fetch_status_data, update_status
 
-try:
-    from db_connection import fetch_status_data, run_query, get_last_inserted_id  # Importer databasefunksjonen
-except ImportError as e:
-    print("Feil ved import av db_connection:", e)
-    fetch_status_data = lambda: []  # Returner tom liste hvis import feiler
 
 app = Flask(__name__)
 
@@ -68,9 +64,16 @@ def register():
 
 @app.route("/admin")
 def admin():
-    statuses = fetch_status_data()  # Hent data fra databasen
-    print("Statuses hentet fra DB:", statuses)  # Debug print
-    return render_template("admin.html", statuses=statuses)
+        statuses = fetch_status_data()  # Hent data fra databasen
+        return render_template("admin.html", statuses=statuses)
+
+
+@app.route('/update_status/<int:evakuert_id>', methods=['POST'])
+def update_status_route(evakuert_id):
+    status = request.form['status']
+    lokasjon = request.form['lokasjon']
+    update_status(evakuert_id, status, lokasjon)
+    return redirect(url_for('admin'))
 
 
 def generate_frames():
