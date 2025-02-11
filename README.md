@@ -64,9 +64,6 @@ Ferdig
 
 ## Tester
 For å kjøre testene i prosjekte bruk kommandoen under
-```
-python -m unittest discover test
-```
 
 ## Ekstra packages som kan være nødvendig for IoT funksjonalitet
 
@@ -78,6 +75,9 @@ python -m unittest discover test
  pip install opencv-python-headless   
 ```
 
+```
+python -m unittest discover test
+```
 
 Link flask nettside: https://flask.palletsprojects.com/en/stable/installation/
 
