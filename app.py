@@ -3,6 +3,7 @@ import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
 from sql.db_connection import fetch_status_data  # No try-except needed here
 import cv2
+sys.dont_write_bytecode = True 
 from flask import Flask, render_template, request, redirect, url_for
 from sql.db_connection import fetch_status_data, update_status
 from blueprints.admin_reg import admin_reg_bp
