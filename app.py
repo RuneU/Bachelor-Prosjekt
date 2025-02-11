@@ -1,7 +1,5 @@
 import os
 import sys
-sys.dont_write_bytecode = True
-# Legg til 'sql' mappen i sys.path for å finne db_connection.py
 sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
 from sql.db_connection import fetch_status_data  # No try-except needed here
 import cv2
@@ -105,6 +103,24 @@ def iot():
 @app.route("/startID")
 def startID():
     return render_template("startID.html")
+
+@app.route("/admin")
+def admin():
+    try:
+        statuses = fetch_status_data()  # Hent data fra databasen
+        print("Statuses hentet fra DB:", statuses)  # Debug print
+    except Exception as e:
+        print("Feil ved henting av statusdata:", e)
+        statuses = []  # Hvis en feil oppstår, send tom liste
+
+    return render_template("admin.html", statuses=statuses)
+
+app.register_blueprint(admin_reg_bp, url_prefix='/admin-reg')
+
+@app.route("/admin-reg")
+def adminreg():
+    return render_template("admin-reg.html")
+
 
 if __name__ == '__main__':
     app.run(debug=True)

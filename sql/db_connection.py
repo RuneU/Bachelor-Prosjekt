@@ -16,6 +16,18 @@ connection_string = (
     f"PWD={os.getenv('DB_PWD')};"
 )
 
+# Creates a callable connection function
+def connection_def():
+    """Returns a new database connection."""
+    conn_str = (
+        f"DRIVER={os.getenv('DB_DRIVER')};"
+        f"SERVER={os.getenv('DB_SERVER')};"
+        f"DATABASE={os.getenv('DB_DATABASE')};"
+        f"UID={os.getenv('DB_UID')};"
+        f"PWD={os.getenv('DB_PWD')};"
+    )
+    
+    return pyodbc.connect(conn_str)  # Establish and return connection
 
 # Funksjon for å fange data fra Status-tabellen
 def fetch_status_data():
