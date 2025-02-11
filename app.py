@@ -1,7 +1,7 @@
 import os
 import sys
 sys.dont_write_bytecode = True
-from flask import Flask, Response, render_template
+from flask import Flask, Response, request, render_template, jsonify
 import cv2
 
 # Legg til 'sql' mappen i sys.path for å finne db_connection.py
@@ -13,26 +13,35 @@ except ImportError as e:
     print("Feil ved import av db_connection:", e)
     fetch_status_data = lambda: []  # Returner tom liste hvis import feiler
 
+try:
+    from camera import generate_frames, save_face
+except ImportError as e:
+    print("Feil ved import av camera.py:", e)
+
 app = Flask(__name__)
 
-
-
-def generate_frames():
-    camera = cv2.VideoCapture(0)  
-    while True:
-        success, frame = camera.read()  
-        if not success:
-            break
-        else:
-            ret, buffer = cv2.imencode('.jpg', frame)  
-            frame = buffer.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')  
-
+# 🎥 **Video Feed Route**
 @app.route('/video_feed')
 def video_feed():
     return Response(generate_frames(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
+
+# 📷 **Save Face Route**
+@app.route('/save_face', methods=['POST'])
+def save_face_route():
+    data = request.get_json()
+    user_id = data.get("user_id")
+
+    if not user_id:
+        return jsonify({"error": "User ID is required"}), 400
+
+    result = save_face(user_id)
+    return jsonify(result)
+
+# ✅ Route to Serve Saved Images
+@app.route('/static/faces/<filename>')
+def serve_face_image(filename):
+    return send_from_directory("static/faces", filename)
 
 @app.route('/faceID')
 def faceID():
@@ -57,7 +66,13 @@ def iot():
 def startID():
     return render_template("startID.html")
 
+@app.route("/newuser")
+def newuser():
+    return render_template("newuser.html")
 
+@app.route("/iot_login")
+def iot_login():
+    return render_template("iot_login.html")
 
 @app.route("/admin")
 def admin():

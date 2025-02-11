@@ -57,6 +57,8 @@ def run_query(query):
 
 # run_query("INSERT INTO Evakuerte (Fornavn) VALUES ('Seb')")  # Add data
 
+# run_query("ALTER TABLE Evakuerte ADD AzureFaceID NVARCHAR(100) NULL, PhotoURL NVARCHAR(500) NULL;") 
+
 # run_query("DELETE FROM Evakuerte WHERE Fornavn = 'Simon'")  # Delete data
 
 # Fetch and print data from the database
