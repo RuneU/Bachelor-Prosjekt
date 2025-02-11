@@ -5,29 +5,34 @@ Bruksanvisning for installering av prosjekt:
 Installer npm: https://nodejs.org/en
 Installer Python: https://www.python.org/downloads/
 
+
+## venv
+Hvis venv skal ignoreres, ignoreres denne delen og hopper rett til ``` pip install flask ```.
+
 Installering og aktivering av flask i venv enviroment. 
 
-Hvis venv skal ignoreres, ignoreres denne delen og hopper rett til ``` pip install flask ```. For å installere i venv enviroment som brukes i VS Code må og python extention installeres i VS Code som den finner automatisk og spør om installering når du klikker inn i app.py
+ For å installere i venv enviroment som brukes i VS Code må og python extention installeres i VS Code som den finner automatisk og spør om installering når du klikker inn i app.py
 
 Gå inn i Bachelor-Prosjekt mappen i CLI. Kjør kommando Linux:``` python3 -m venv .venv ``` Windows: ``` py -3 -m venv .venv ```
 
-
 Aktiver så venv med Windows: ``` .venv\Scripts\activate ``` Linux: ```. .venv/bin/activate```
 
-Venv er nå aktivert. Kjør nå ``` pip install flask ``` 
+Venv er nå aktivert.
 
 Start ny CLI i samme mappe da den du er i nå er i Venv enviroment
 
-kjør ```python app.py``` for å sjekke at det fungerer. 
+## start
+ Kjør nå ``` pip install flask ``` 
+
+Lagt til requirements.txt, for dependencies slik som flask, odbc og videre kjør kommando:```pip install -r requirements.txt```
 
 Installer tailwind css med ```npm install -D tailwindcss``` 
 
 Initialiser tailwind med ```npx tailwindcss init``` 
 
-
 Installer flowbite ```npm install flowbite```
 
-Lagt til requirements.txt, for dependencies slik som flask, odbc og videre kjør kommando:```pip install -r requirements.txt```
+kjør ```python app.py``` for å sjekke at det fungerer.
 
 ## Database tilkobling
 Opprett en env fil i root directory som heter ```.env```
@@ -50,6 +55,7 @@ pip install python-dotenv
 
 Installer `pyodbc` driveren for din maskin med å klikke [her](https://learn.microsoft.com/en-us/sql/connect/python/pyodbc/step-1-configure-development-environment-for-pyodbc-python-development?view=sql-server-ver16&tabs=windows)
 
+Husk å installere driveren
 ```
 pip install pyodbc
 ```
@@ -64,11 +70,15 @@ python -m unittest discover test
 
 ## Ekstra packages som kan være nødvendig for IoT funksjonalitet
 
+```
  pip install opencv-python 
+```
 
+```
  pip install opencv-python-headless   
+```
+
 
 Link flask nettside: https://flask.palletsprojects.com/en/stable/installation/
+
 Link til Flowbite for tailwind og flowbite: https://flowbite.com/docs/getting-started/flask/
-
-
