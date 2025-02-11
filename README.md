@@ -46,7 +46,9 @@ Installer dotenv
 ```
 pip install python-dotenv
 ```
-
+#Bruker flask_alchemy et sql toolkit for Flask
+pip install flask_sqlalchemy
+```
 
 Installer `pyodbc` driveren for din maskin med å klikke [her](https://learn.microsoft.com/en-us/sql/connect/python/pyodbc/step-1-configure-development-environment-for-pyodbc-python-development?view=sql-server-ver16&tabs=windows)
 

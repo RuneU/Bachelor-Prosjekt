@@ -3,7 +3,7 @@ import sys
 sys.dont_write_bytecode = True
 # Legg til 'sql' mappen i sys.path for å finne db_connection.py
 sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
-from db_connection import fetch_status_data  # No try-except needed here
+from sql.db_connection import fetch_status_data  # No try-except needed here
 import cv2
 from flask import Flask, render_template, request, redirect, url_for
 from sql.db_connection import fetch_status_data, update_status
@@ -62,12 +62,13 @@ def register():
 
     return render_template("register.html")
 
+# Hent data fra databasen og route til Admin page
 @app.route("/admin")
 def admin():
-        statuses = fetch_status_data()  # Hent data fra databasen
+        statuses = fetch_status_data()  
         return render_template("admin.html", statuses=statuses)
 
-
+#Status for evakuerte på admin page
 @app.route('/update_status/<int:evakuert_id>', methods=['POST'])
 def update_status_route(evakuert_id):
     status = request.form['status']
