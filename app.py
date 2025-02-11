@@ -5,7 +5,7 @@ from sql.db_connection import fetch_status_data  # No try-except needed here
 import cv2
 from flask import Flask, render_template, request, redirect, url_for
 from sql.db_connection import fetch_status_data, update_status
-
+from blueprints.admin_reg import admin_reg_bp
 
 app = Flask(__name__)
 
@@ -104,16 +104,6 @@ def iot():
 def startID():
     return render_template("startID.html")
 
-@app.route("/admin")
-def admin():
-    try:
-        statuses = fetch_status_data()  # Hent data fra databasen
-        print("Statuses hentet fra DB:", statuses)  # Debug print
-    except Exception as e:
-        print("Feil ved henting av statusdata:", e)
-        statuses = []  # Hvis en feil oppstår, send tom liste
-
-    return render_template("admin.html", statuses=statuses)
 
 app.register_blueprint(admin_reg_bp, url_prefix='/admin-reg')
 
