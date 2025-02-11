@@ -98,7 +98,6 @@ def video_feed():
     return Response(generate_frames(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
-
 @app.route('/save_face', methods=['POST'])
 def save_face_route():
     data = request.get_json()
@@ -109,7 +108,6 @@ def save_face_route():
 
     result = save_face(user_id)
     return jsonify(result)
-
 
 @app.route('/static/faces/<filename>')
 def serve_face_image(filename):
@@ -136,11 +134,6 @@ def newuser():
 def iot_login():
     return render_template("iot_login.html")
 
-app.register_blueprint(admin_reg_bp, url_prefix='/admin-reg')
-
-@app.route("/admin-reg")
-def adminreg():
-    return render_template("admin-reg.html")
 
 
 
