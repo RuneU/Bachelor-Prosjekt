@@ -62,12 +62,13 @@ def register():
 
     return render_template("register.html")
 
+# Hent data fra databasen og route til Admin page
 @app.route("/admin")
 def admin():
-        statuses = fetch_status_data()  # Hent data fra databasen
+        statuses = fetch_status_data()  
         return render_template("admin.html", statuses=statuses)
 
-
+#Status for evakuerte på admin page
 @app.route('/update_status/<int:evakuert_id>', methods=['POST'])
 def update_status_route(evakuert_id):
     status = request.form['status']

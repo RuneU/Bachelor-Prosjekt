@@ -46,6 +46,7 @@ Installer dotenv
 ```
 pip install python-dotenv
 ```
+#Bruker flask_alchemy et sql toolkit for Flask
 pip install flask_sqlalchemy
 ```
 
