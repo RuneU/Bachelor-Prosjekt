@@ -99,11 +99,11 @@ def get_last_inserted_id():
 
 # run_query("DELETE FROM Evakuerte WHERE Fornavn = 'Simon'")  # Delete data
 
-# Fetch and print data from the database
+# Fetch and print data from the Status table
 try:
     conn = pyodbc.connect(connection_string)
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM Evakuerte")  # SQL query
+    cursor.execute("SELECT * FROM Status")  # SQL query
     rows = cursor.fetchall()
     
     for row in rows:
