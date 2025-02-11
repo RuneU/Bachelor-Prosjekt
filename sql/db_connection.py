@@ -17,7 +17,7 @@ connection_string = (
 )
 
 
-# Function to fetch status data
+# Funksjon for å fange data fra Status-tabellen
 def fetch_status_data():
     try:
         conn = pyodbc.connect(connection_string)
