@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .hover-effect:hover {
+      transform: translateY(-5px);
+      transition: transform 0.3s ease;
+    }
+  </style>
+</head>
+<body class="bg-white p-4 flex flex-col items-center justify-center min-h-screen">
+  <div class="flex flex-col md:flex-row gap-4 w-full max-w-4xl">
+    <div class="flex-1 max-w-md p-6 bg-white rounded-lg shadow-lg border border-red-500">
+      <label for="numberInput" class="block text-sm font-medium text-red-500 mb-2">
+        Ikke registert fra før av
+      </label>
+      <input
+        type="text"
+        id="numberInput"
+        name="ID"
+        class="w-full px-4 py-2 border border-red-500 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 hover:border-red-400"
+      />
+      <button class="mt-4 w-full bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 active:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">
+        <a href="{{ url_for('iot') }}">Neste side</a>
+      </button>
+      <p class="mt-2 text-sm text-red-500">
+        Legg til ID som du har fått fra registeringen eller skriv inn ditt fulle navn med fornavn og etternavn
+      </p>
+    </div>
+
+    <!-- Numeric Keypad (outside the unregistered box) -->
+    <div class="max-w-xs p-6 bg-white rounded-lg shadow-lg border border-red-500">
+      <p class="text-red-500 font-medium mb-2 text-center">Tastatur</p>
+      <div class="grid grid-cols-3 gap-2">
+        <!-- Numbers 1 to 9 -->
+        <button type="button" class="bg-blue-500 text-white font-bold py-2 px-4 rounded" onclick="appendNumber('1')">1</button>
+        <button type="button" class="bg-blue-500 text-white font-bold py-2 px-4 rounded" onclick="appendNumber('2')">2</button>
+        <button type="button" class="bg-blue-500 text-white font-bold py-2 px-4 rounded" onclick="appendNumber('3')">3</button>
+        <button type="button" class="bg-blue-500 text-white font-bold py-2 px-4 rounded" onclick="appendNumber('4')">4</button>
+        <button type="button" class="bg-blue-500 text-white font-bold py-2 px-4 rounded" onclick="appendNumber('5')">5</button>
+        <button type="button" class="bg-blue-500 text-white font-bold py-2 px-4 rounded" onclick="appendNumber('6')">6</button>
+        <button type="button" class="bg-blue-500 text-white font-bold py-2 px-4 rounded" onclick="appendNumber('7')">7</button>
+        <button type="button" class="bg-blue-500 text-white font-bold py-2 px-4 rounded" onclick="appendNumber('8')">8</button>
+        <button type="button" class="bg-blue-500 text-white font-bold py-2 px-4 rounded" onclick="appendNumber('9')">9</button>
+        <!-- Utility row: Clear, 0, Backspace -->
+        <button type="button" class="bg-blue-500 text-white font-bold py-2 px-4 rounded" onclick="clearInput()">Clear</button>
+        <button type="button" class="bg-blue-500 text-white font-bold py-2 px-4 rounded" onclick="appendNumber('0')">0</button>
+        <button type="button" class="bg-blue-500 text-white font-bold py-2 px-4 rounded" onclick="backspaceInput()">⌫</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript for keypad functionality -->
+  <script>
+    function appendNumber(num) {
+      const input = document.getElementById("numberInput");
+      if (input) {
+        input.value += num;
+      }
+    }
+
+    function clearInput() {
+      const input = document.getElementById("numberInput");
+      if (input) {
+        input.value = "";
+      }
+    }
+
+    function backspaceInput() {
+      const input = document.getElementById("numberInput");
+      if (input) {
+        input.value = input.value.slice(0, -1);
+      }
+    }
+  </script>
+</body>
+</html>
