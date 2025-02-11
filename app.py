@@ -8,6 +8,7 @@ import cv2
 from flask import Flask, render_template, request, redirect, url_for
 from sql.db_connection import fetch_status_data, update_status
 
+
 app = Flask(__name__)
 
 @app.route("/")
@@ -15,18 +16,58 @@ app = Flask(__name__)
 def index():
     return render_template("index.html")
 
-@app.route("/register")
+@app.route("/register", methods=["GET", "POST"])
 def register():
+    if request.method == "POST":
+        try:
+            fornavn = request.form.get("fornavn")
+            mellomnavn = request.form.get("mellomnavn")
+            etternavn = request.form.get("etternavn")
+            adresse = request.form.get("adresse")
+            telefonnummer = request.form.get("telefonnummer")
+            status = request.form.get("status")
+            parorende_fornavn = request.form.get("parorende_fornavn")
+            parorende_mellomnavn = request.form.get("parorende_mellomnavn")
+            parorende_etternavn = request.form.get("parorende_etternavn")
+            parorende_telefonnummer = request.form.get("parorende_telefonnummer")
+
+            # Insert data into the database
+            query = f"""
+                INSERT INTO Evakuerte (Fornavn, MellomNavn, Etternavn, Adresse, Telefonnummer)
+                VALUES ('{fornavn}', '{mellomnavn}', '{etternavn}', '{adresse}', '{telefonnummer}');
+            """
+            run_query(query)
+
+            # Get the last inserted EvakuertID
+            evakuert_id = get_last_inserted_id()
+
+            # Insert data into the KontaktPerson table
+            query = f"""
+                INSERT INTO KontaktPerson (Fornavn, MellomNavn, Etternavn, Telefonnummer, EvakuertID)
+                VALUES ('{parorende_fornavn}', '{parorende_mellomnavn}', '{parorende_etternavn}', '{parorende_telefonnummer}', {evakuert_id});
+            """
+            run_query(query)
+
+            # Insert data into the Status table
+            query = f"""
+                INSERT INTO Status (Status, Lokasjon, EvakuertID)
+                VALUES ('{status}', '{adresse}', {evakuert_id});
+            """
+            run_query(query)
+
+            return redirect(url_for("index"))
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            return "An error occurred while processing your request."
+
     return render_template("register.html")
 
-
-# Hent data fra databasen og vis i admin.htmø
 @app.route("/admin")
 def admin():
-        statuses = fetch_status_data()  
+        statuses = fetch_status_data()  # Hent data fra databasen
         return render_template("admin.html", statuses=statuses)
 
-# Oppdater status i datbasen og rediriger til admin.html
+
 @app.route('/update_status/<int:evakuert_id>', methods=['POST'])
 def update_status_route(evakuert_id):
     status = request.form['status']

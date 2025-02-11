@@ -17,8 +17,6 @@ connection_string = (
 )
 
 
-
-
 # Function to fetch status data
 def fetch_status_data():
     try:
@@ -71,6 +69,25 @@ def run_query(query):
     
     except pyodbc.Error as e:
         print(f"An error occurred: {e}")
+    
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
+# Function to get the last inserted ID
+def get_last_inserted_id():
+    try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+        cursor.execute("SELECT @@IDENTITY AS ID")
+        row = cursor.fetchone()
+        return row.ID if row else None
+    
+    except pyodbc.Error as e:
+        print(f"An error occurred: {e}")
+        return None
     
     finally:
         if 'cursor' in locals():
