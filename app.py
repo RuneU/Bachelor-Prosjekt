@@ -7,13 +7,13 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
 from sql.db_connection import fetch_status_data, update_status
 from blueprints.admin_reg import admin_reg_bp
 
-
 try:
     from camera import generate_frames, save_face
 except ImportError as e:
     print("Feil ved import av camera.py:", e)
 
 app = Flask(__name__)
+
 
 @app.route("/")
 @app.route("/index")
