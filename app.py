@@ -1,11 +1,17 @@
 import os
 import sys
-sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
-from sql.db_connection import fetch_status_data  # No try-except needed here
 import cv2
-from flask import Flask, render_template, request, redirect, url_for
+sys.dont_write_bytecode = True
+from flask import Flask, Response, request, render_template, jsonify, redirect, url_for
+sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
 from sql.db_connection import fetch_status_data, update_status
+from blueprints.admin_reg import admin_reg_bp
 
+
+try:
+    from camera import generate_frames, save_face
+except ImportError as e:
+    print("Feil ved import av camera.py:", e)
 
 app = Flask(__name__)
 
@@ -66,7 +72,7 @@ def admin():
         statuses = fetch_status_data()  
         return render_template("admin.html", statuses=statuses)
 
-#Status for evakuerte på admin page
+# Status for evakuerte på admin page
 @app.route('/update_status/<int:evakuert_id>', methods=['POST'])
 def update_status_route(evakuert_id):
     status = request.form['status']
@@ -92,6 +98,21 @@ def video_feed():
     return Response(generate_frames(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
+@app.route('/save_face', methods=['POST'])
+def save_face_route():
+    data = request.get_json()
+    user_id = data.get("user_id")
+
+    if not user_id:
+        return jsonify({"error": "User ID is required"}), 400
+
+    result = save_face(user_id)
+    return jsonify(result)
+
+@app.route('/static/faces/<filename>')
+def serve_face_image(filename):
+    return send_from_directory("static/faces", filename)
+
 @app.route('/faceID')
 def faceID():
     return render_template('faceID.html')
@@ -104,23 +125,13 @@ def iot():
 def startID():
     return render_template("startID.html")
 
-@app.route("/admin")
-def admin():
-    try:
-        statuses = fetch_status_data()  # Hent data fra databasen
-        print("Statuses hentet fra DB:", statuses)  # Debug print
-    except Exception as e:
-        print("Feil ved henting av statusdata:", e)
-        statuses = []  # Hvis en feil oppstår, send tom liste
+@app.route("/newuser")
+def newuser():
+    return render_template("newuser.html")
 
-    return render_template("admin.html", statuses=statuses)
-
-app.register_blueprint(admin_reg_bp, url_prefix='/admin-reg')
-
-@app.route("/admin-reg")
-def adminreg():
-    return render_template("admin-reg.html")
-
+@app.route("/iot_login")
+def iot_login():
+    return render_template("iot_login.html")
 
 if __name__ == '__main__':
     app.run(debug=True)

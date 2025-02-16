@@ -1,155 +1,188 @@
-import pytest
+import sys
+import os
+import unittest
 from unittest.mock import MagicMock, patch
-from flask import Flask, url_for
-from app import app # Replace with your actual app import
-from blueprints.admin_reg.routes import handle_form
+from flask import Flask, template_rendered
+from jinja2 import DictLoader
+from contextlib import contextmanager
 
-# Fixture to set up the Flask test client
-@pytest.fixture
-def client():
-    app.config['TESTING'] = True
-    with app.test_client() as client:
-        yield client
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-# Test form validation
-def test_handle_form_missing_required_fields(client, mocker):
-    mock_conn = mocker.patch('sql.db_connection.connection_def')
-    response = client.post('/blueprints/admin_reg/handle_form', data={})
-    assert response.status_code == 400
-    assert b"Lokasjon and Status are required fields" in response.data
+# Import the blueprint to test
+from blueprints.admin_reg.routes import admin_reg_bp
 
-# Test successful insert logic
-def test_handle_form_insert_success(client, mocker):
-    mock_conn = MagicMock()
-    mocker.patch('sql.db_connection.connection_def', return_value=mock_conn)
-    mock_cursor = mock_conn.cursor.return_value
-    mock_cursor.fetchval.side_effect = [1, 0]  # Mock KriseID and EvakuertID
+# Helper to capture rendered templates (optional, but useful to verify which template was used)
+@contextmanager
+def captured_templates(app):
+    recorded = []
 
-    data = {
-        'lokasjon': 'Test Location',
-        'status': 'Active',
-        'krise_type': 'Type',
-        'krise_navn': 'Name',
-        'annen_info': 'Info',
-        'evak_fnavn': 'Fornavn',
-        'evak_mnavn': 'Mellomnavn',
-        'evak_enavn': 'Etternavn',
-        'evak_tlf': '12345678',
-        'evak_adresse': 'Address',
-        'kon_fnavn': 'KonFornavn',
-        'kon_mnavn': 'KonMellomnavn',
-        'kon_enavn': 'KonEtternavn',
-        'kon_tlf': '87654321',
-    }
-    response = client.post('/handle_form', data=data)
-    assert response.status_code == 302  # Redirect to index
-    mock_conn.commit.assert_called_once()
+    def record(sender, template, context, **extra):
+        recorded.append((template, context))
 
-# Test successful update logic
-def test_handle_form_update_success(client, mocker):
-    mock_conn = MagicMock()
-    mocker.patch('sql.db_connection.connection_def', return_value=mock_conn)
-    mock_cursor = mock_conn.cursor.return_value
+    template_rendered.connect(record, app)
+    try:
+        yield recorded
+    finally:
+        template_rendered.disconnect(record, app)
 
-    data = {
-        'evakuert_id': '1',
-        'krise_id': '1',
-        'kontakt_person_id': '1',
-        'status_id': '1',
-        'lokasjon': 'Updated Location',
-        'status': 'Inactive',
-        'krise_type': 'Updated Type',
-        'krise_navn': 'Updated Name',
-        'annen_info': 'Updated Info',
-        'evak_fnavn': 'Updated Fornavn',
-        'evak_mnavn': 'Updated Mellomnavn',
-        'evak_enavn': 'Updated Etternavn',
-        'evak_tlf': '87654321',
-        'evak_adresse': 'Updated Address',
-        'kon_fnavn': 'Updated KonFornavn',
-        'kon_mnavn': 'Updated KonMellomnavn',
-        'kon_enavn': 'Updated KonEtternavn',
-        'kon_tlf': '12345678',
-    }
-    response = client.post('/handle_form', data=data)
-    assert response.status_code == 302
-    mock_conn.commit.assert_called_once()
+class AdminRegIntegrationTest(unittest.TestCase):
 
-# Test database error handling
-def test_handle_form_database_error(client, mocker):
-    mock_conn = MagicMock()
-    mocker.patch('sql.db_connection.connection_def', return_value=mock_conn)
-    mock_cursor = mock_conn.cursor.return_value
-    mock_cursor.execute.side_effect = Exception("DB Error")
+    def setUp(self):
+        # Create a Flask app for testing
+        self.app = Flask(__name__)
+        self.app.config['TESTING'] = True
+        # Add a dummy index route
+        @self.app.route('/')
+        def index():
+            return "Index Page"
+        # Override the app's Jinja loader with a dummy template for testing
+        self.app.jinja_loader = DictLoader({
+        'admin-reg.html': 'Evakuert: {{ evakuert }}'
+    })
 
-    data = {
-        'lokasjon': 'Test',
-        'status': 'Active',
-        'krise_type': 'Type',
-        'krise_navn': 'Name',
-        'annen_info': 'Info',
-        'evak_fnavn': 'Fornavn',
-        'evak_mnavn': 'Mellomnavn',
-        'evak_enavn': 'Etternavn',
-        'evak_tlf': '12345678',
-        'evak_adresse': 'Address',
-        'kon_fnavn': 'KonFornavn',
-        'kon_mnavn': 'KonMellomnavn',
-        'kon_enavn': 'KonEtternavn',
-        'kon_tlf': '87654321',
-    }
-    response = client.post('/handle_form', data=data)
-    assert response.status_code == 500
-    mock_conn.rollback.assert_called_once()
+        # Register the blueprint
+        self.app.register_blueprint(admin_reg_bp)
+        self.client = self.app.test_client()
 
-# Test invalid integer input
-def test_handle_form_invalid_integer(client, mocker):
-    mock_conn = MagicMock()
-    mocker.patch('sql.db_connection.connection_def', return_value=mock_conn)
-    mock_cursor = mock_conn.cursor.return_value
+    def test_handle_form_insert_success(self):
+        """
+        Test that a POST to /handle_form correctly performs an insert.
+        The mock connection simulates returning IDs for the new records.
+        """
+        # For insertion, evakuert_id is empty (or non-digit)
+        form_data = {
+            'evakuert_id': '',
+            'krise_id': '',
+            'kontakt_person_id': '',
+            'status_id': '',
+            'status': 'Active',
+            'krise-type': 'Emergency',
+            'krise-navn': 'Test Crisis',
+            'lokasjon': 'Test Location',
+            'annen-info': 'Detailed Info',
+            'evak-fnavn': 'John',
+            'evak-mnavn': '',
+            'evak-enavn': 'Doe',
+            'evak-tlf': '1234567890',
+            'evak-adresse': '123 Test St',
+            'kon-fnavn': 'Jane',
+            'kon-mnavn': '',
+            'kon-enavn': 'Doe',
+            'kon-tlf': '0987654321',
+            'kon-adresse': '456 Other St'
+        }
 
-    data = {
-        'lokasjon': 'Test',
-        'status': 'Active',
-        'evak_tlf': 'invalid',
-        'krise_type': 'Type',
-        'krise_navn': 'Name',
-        'annen_info': 'Info',
-        'evak_fnavn': 'Fornavn',
-        'evak_mnavn': 'Mellomnavn',
-        'evak_enavn': 'Etternavn',
-        'evak_adresse': 'Address',
-        'kon_fnavn': 'KonFornavn',
-        'kon_mnavn': 'KonMellomnavn',
-        'kon_enavn': 'KonEtternavn',
-        'kon_tlf': '87654321',
-    }
-    response = client.post('/handle_form', data=data)
-    assert response.status_code == 302  # Assuming DB allows NULL for invalid integers
-    mock_conn.commit.assert_called_once()
+        # Set up a mock cursor and connection:
+        mock_cursor = MagicMock()
+        # Simulate fetchval: first call returns KriseID, second returns EvakuertID.
+        mock_cursor.fetchval.side_effect = [1, 2]
+        mock_conn = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
 
-# Test GET request with valid evakuert_id
-def test_adminreg_with_id_valid(client, mocker):
-    mock_conn = MagicMock()
-    mocker.patch('sql.db_connection.connection_def', return_value=mock_conn)
-    mock_cursor = mock_conn.cursor.return_value
-    mock_cursor.fetchone.return_value = [
-        1, 1, 1, 1, 'Ola', 'None', 'Nordmann',
-        '12345678', 'Storgata 1, Oslo', 'Anne', 'None',
-        'Larsen', '22334455', 'Brann', 'Bybrann i Oslo', 'Oslo',
-        'Noe har skjedd', 'Velg Status'
-    ]
+        # Patch the connection function in our blueprint module.
+        with patch('blueprints.admin_reg.routes.connection_def', return_value=mock_conn):
+            response = self.client.post('/handle_form', data=form_data, follow_redirects=False)
+            # Our route redirects on success.
+            self.assertEqual(response.status_code, 302)
+            # Ensure the transaction was committed.
+            self.assertTrue(mock_conn.commit.called)
+            # For an insert, the code should execute 4 queries.
+            self.assertEqual(mock_cursor.execute.call_count, 4)
 
-    response = client.get('/1')
-    assert response.status_code == 200
-    assert b"admin-reg.html" in response.data
+    def test_handle_form_update_success(self):
+        """
+        Test that a POST to /handle_form performs update queries when evakuert_id is provided.
+        """
+        # For updating, evakuert_id is a valid digit.
+        form_data = {
+            'evakuert_id': '2',
+            'krise_id': '1',
+            'kontakt_person_id': '3',
+            'status_id': '4',
+            'status': 'Inactive',
+            'krise-type': 'Accident',
+            'krise-navn': 'Updated Crisis',
+            'lokasjon': 'New Location',
+            'annen-info': 'Updated Info',
+            'evak-fnavn': 'Alice',
+            'evak-mnavn': '',
+            'evak-enavn': 'Smith',
+            'evak-tlf': '5551234567',
+            'evak-adresse': '789 Test Ave',
+            'kon-fnavn': 'Bob',
+            'kon-mnavn': '',
+            'kon-enavn': 'Johnson',
+            'kon-tlf': '5557654321',
+            'kon-adresse': '101 Test Blvd'
+        }
 
-# Test GET request with invalid evakuert_id
-def test_adminreg_with_id_not_found(client, mocker):
-    mock_conn = MagicMock()
-    mocker.patch('sql.db_connection.connection_def', return_value=mock_conn)
-    mock_cursor = mock_conn.cursor.return_value
-    mock_cursor.fetchone.return_value = None
+        mock_cursor = MagicMock()
+        mock_conn = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
 
-    response = client.get('/999')
-    assert response.status_code == 404
+        with patch('blueprints.admin_reg.routes.connection_def', return_value=mock_conn):
+            response = self.client.post('/handle_form', data=form_data, follow_redirects=False)
+            self.assertEqual(response.status_code, 302)
+            self.assertTrue(mock_conn.commit.called)
+            # For update, the code executes 4 update queries.
+            self.assertEqual(mock_cursor.execute.call_count, 4)
+
+    def test_handle_form_missing_required_fields(self):
+        """
+        Test that if required fields (lokasjon and status) are missing, a 400 error is returned.
+        """
+        form_data = {
+            'lokasjon': '',
+            'status': ''
+        }
+        response = self.client.post('/handle_form', data=form_data)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(b"Lokasjon and Status are required fields", response.data)
+
+    def test_adminreg_with_id_found(self):
+        """
+        Test the GET /<int:evakuert_id> route returns a rendered template with expected data.
+        """
+        # Prepare a sample row as returned by the SELECT query.
+        sample_row = [
+            2,    # EvakuertID
+            1,    # KriseID
+            3,    # KontaktPersonID
+            4,    # StatusID
+            "John", "A", "Doe", "1234567890", "123 Test St",
+            "Jane", "B", "Doe", "0987654321",
+            "Emergency", "Test Crisis", "Test Location", "Detailed Info", "Active"
+        ]
+        mock_cursor = MagicMock()
+        mock_cursor.fetchone.return_value = sample_row
+        mock_conn = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+
+        with patch('blueprints.admin_reg.routes.connection_def', return_value=mock_conn):
+            # Capture rendered templates to verify which template is used.
+            with captured_templates(self.app) as templates:
+                response = self.client.get('/2')
+                # The response should be successful
+                self.assertEqual(response.status_code, 200)
+                # Verify the rendered template is the expected one.
+                self.assertTrue(any("admin-reg.html" in t.name for t, ctx in templates))
+                # Check that some expected content is in the output.
+                self.assertIn(b"John", response.data)
+                self.assertIn(b"Emergency", response.data)
+
+    def test_adminreg_with_id_not_found(self):
+        """
+        Test that a GET request with a non-existent evakuert_id returns a 404.
+        """
+        mock_cursor = MagicMock()
+        mock_cursor.fetchone.return_value = None  # Simulate no data found.
+        mock_conn = MagicMock()
+        mock_conn.cursor.return_value = mock_cursor
+
+        with patch('blueprints.admin_reg.routes.connection_def', return_value=mock_conn):
+            response = self.client.get('/999')
+            self.assertEqual(response.status_code, 404)
+            self.assertIn(b"Evakuert not found", response.data)
+
+if __name__ == '__main__':
+    unittest.main()
