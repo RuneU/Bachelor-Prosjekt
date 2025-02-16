@@ -2,9 +2,6 @@ from dotenv import load_dotenv
 import os
 import pyodbc
 
-
-
-# Load environment variables from .env file
 load_dotenv()
 
 # Database connection string setup
@@ -27,7 +24,7 @@ def connection_def():
         f"PWD={os.getenv('DB_PWD')};"
     )
     
-    return pyodbc.connect(conn_str)  # Establish and return connection
+    return pyodbc.connect(conn_str) # Establish and return connection
 
 # Funksjon for å fange data fra Status-tabellen
 def fetch_status_data():

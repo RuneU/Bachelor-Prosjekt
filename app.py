@@ -72,7 +72,7 @@ def admin():
         statuses = fetch_status_data()  
         return render_template("admin.html", statuses=statuses)
 
-#Status for evakuerte på admin page
+# Status for evakuerte på admin page
 @app.route('/update_status/<int:evakuert_id>', methods=['POST'])
 def update_status_route(evakuert_id):
     status = request.form['status']
@@ -129,13 +129,9 @@ def startID():
 def newuser():
     return render_template("newuser.html")
 
-
 @app.route("/iot_login")
 def iot_login():
     return render_template("iot_login.html")
-
-
-
 
 if __name__ == '__main__':
     app.run(debug=True)
