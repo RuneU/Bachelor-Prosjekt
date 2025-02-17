@@ -38,7 +38,7 @@ def fetch_status_data():
         """)
         rows = cursor.fetchall()
         
-        return [
+        data = [
             {
                 'Status': row[0],
                 'Lokasjon': row[1],
@@ -48,6 +48,10 @@ def fetch_status_data():
             }
             for row in rows
         ]
+        
+        print(data)  # Debug print statement to verify the data
+        
+        return data
     
     except pyodbc.Error as e:
         print(f"Error: {e}")
