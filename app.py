@@ -4,7 +4,7 @@ import cv2
 sys.dont_write_bytecode = True
 from flask import Flask, Response, request, render_template, jsonify, redirect, url_for
 sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
-from sql.db_connection import fetch_status_data, update_status
+from sql.db_connection import fetch_status_data, update_status, fetch_all_kriser, get_last_inserted_id, run_query
 from blueprints.admin_reg import admin_reg_bp
 
 try:
@@ -64,7 +64,8 @@ def register():
             print(f"An error occurred: {e}")
             return "An error occurred while processing your request."
 
-    return render_template("register.html")
+    kriser = fetch_all_kriser()  # Fetch all kriser from the database
+    return render_template('register.html', kriser=kriser)
 
 # Hent data fra databasen og route til Admin page
 @app.route("/admin")
