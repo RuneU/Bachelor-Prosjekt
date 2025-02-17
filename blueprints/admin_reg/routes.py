@@ -27,22 +27,23 @@ def handle_form():
             'status': request.form.get('status'),
             'krise_type': request.form.get('krise-type'),
             'krise_navn': request.form.get('krise-navn'),
-            'lokasjon': request.form.get('lokasjon'),
+            'krise_lokasjon': request.form.get('krise-lokasjon'),
             'annen_info': request.form.get('annen-info'),
             'evak_fnavn': request.form.get('evak-fnavn'),
             'evak_mnavn': request.form.get('evak-mnavn'),
             'evak_enavn': request.form.get('evak-enavn'),
             'evak_tlf': request.form.get('evak-tlf'),
             'evak_adresse': request.form.get('evak-adresse'),
+            'evak_lokasjon': request.form.get('evak-lokasjon'),
             'kon_fnavn': request.form.get('kon-fnavn'),
             'kon_mnavn': request.form.get('kon-mnavn'),
             'kon_enavn': request.form.get('kon-enavn'),
             'kon_tlf': request.form.get('kon-tlf'),
-            'kon_adresse': request.form.get('kon-adresse')
+            # 'kon_adresse': request.form.get('kon-adresse')
         }
 
         # Validate required fields
-        if not all([form_data['lokasjon'], form_data['status']]):
+        if not all([form_data['krise_lokasjon'], form_data['status']]):
             return "Lokasjon and Status are required fields", 400
 
         conn = connection_def()
@@ -66,7 +67,7 @@ def handle_form():
             """, (
                 form_data['krise_type'],
                 form_data['krise_navn'],
-                form_data['lokasjon'],
+                form_data['krise_lokasjon'],
                 form_data['annen_info'],
                 form_data['status'],
                 krise_id
@@ -104,7 +105,7 @@ def handle_form():
                 WHERE StatusID = ?
             """, (
                 form_data['status'],
-                form_data['lokasjon'],
+                form_data['evak_lokasjon'],
                 status_id
             ))
         else:
@@ -117,7 +118,7 @@ def handle_form():
             """, (
                 form_data['krise_type'],
                 form_data['krise_navn'],
-                form_data['lokasjon'],
+                form_data['krise_lokasjon'],
                 form_data['annen_info'],
                 form_data['status']
             ))
@@ -153,7 +154,7 @@ def handle_form():
                 VALUES (?, ?, ?)
             """, (
                 form_data['status'],
-                form_data['lokasjon'],
+                form_data['evak_lokasjon'],
                 evakuert_id
             ))
         conn.commit()
@@ -196,7 +197,8 @@ def adminreg_with_id(evakuert_id):
                 kr.KriseNavn, 
                 kr.Lokasjon, 
                 kr.Tekstboks, 
-                s.Status
+                s.Status,
+                s.Lokasjon
             FROM Evakuerte e
             LEFT JOIN KontaktPerson kp ON e.EvakuertID = kp.EvakuertID
             LEFT JOIN Krise kr ON e.KriseID = kr.KriseID
@@ -216,7 +218,8 @@ def adminreg_with_id(evakuert_id):
             "evak_enavn": data[6], "evak_tlf": data[7], "evak_adresse": data[8], 
             "kon_fnavn": data[9], "kon_mnavn": data[10], "kon_enavn": data[11], 
             "kon_tlf": data[12], "krise_type": data[13], "krise_navn": data[14], 
-            "lokasjon": data[15], "annen_info": data[16], "status": data[17]
+            "krise_lokasjon": data[15], "annen_info": data[16], "status": data[17],
+            "evak_lokasjon": data[18]
         }
 
         return render_template("admin-reg.html", evakuert=evakuert_data)
