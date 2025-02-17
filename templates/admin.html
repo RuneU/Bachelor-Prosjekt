@@ -32,27 +32,26 @@
         </div>
 
         <!-- User Details with Collapsible Dropdown -->
-        {% if statuses %}
-            {% for status in statuses %}
-                <div class="bg-gray-700 p-4 rounded shadow mb-4">
-                    <div class="flex justify-between items-center">
-                        <span class="font-bold text-blue-400">EvakuertID:#{{ status['EvakuertID'] if status['EvakuertID'] else 'No data' }}</span>
-                        <span class="text-gray-300">{{ status['Status'] }}</span>
-                        <button class="text-blue-400 hover:text-blue-300 focus:outline-none statusToggleBtn">Status</button>
-                    </div>
-                    <div class="mt-4 border-t border-gray-600 pt-2 text-sm text-gray-300 statusFields" style="display: none;">
-                        <form action="{{ url_for('update_status_route', evakuert_id=status['EvakuertID']) }}" method="POST">
-                            <p><strong>Status:</strong> <input type="text" name="status" value="{{ status['Status'] }}" class="bg-gray-800 text-gray-300 p-2 rounded"></p>
-                            <p><strong>Lokasjon:</strong> <input type="text" name="lokasjon" value="{{ status['Lokasjon'] }}" class="bg-gray-800 text-gray-300 p-2 rounded"></p>
-                            <p><strong>EvakuertID:</strong> {{ status['EvakuertID'] }}</p>
-                            <button type="submit" class="mt-2 bg-blue-700 text-white px-4 py-2 rounded">Oppdater</button>
-                        </form>
-                    </div>
-                </div>
-            {% endfor %}
-        {% else %}
-            <p class="text-center text-gray-400">Ingen statusdata funnet.</p>
-        {% endif %}
+        <!-- User Details with Collapsible Dropdown -->
+{% if statuses %}
+{% for status in statuses %}
+    <div class="bg-gray-700 p-4 rounded shadow mb-4">
+        <div class="flex justify-between items-center">
+            <span class="font-bold text-blue-400">{{ status['Fornavn'] }} {{ status['Etternavn'] }}</span>
+            <span class="text-gray-300">{{ status['Status'] }}</span>
+            <button class="text-blue-400 hover:text-blue-300 focus:outline-none statusToggleBtn">Status</button>
+        </div>
+        <div class="mt-4 border-t border-gray-600 pt-2 text-sm text-gray-300 statusFields" style="display: none;">
+            <p><strong>Status:</strong> <input type="text" name="status" value="{{ status['Status'] }}" class="bg-gray-800 text-gray-300 p-2 rounded"></p>
+            <p><strong>Lokasjon:</strong> <input type="text" name="lokasjon" value="{{ status['Lokasjon'] }}" class="bg-gray-800 text-gray-300 p-2 rounded"></p>
+            <p><strong>EvakuertID:</strong> <span class="font-bold text-blue-500">{{ status['EvakuertID'] if status['EvakuertID'] else 'No data' }}</span></p>
+            <button type="submit" class="mt-2 bg-blue-700 text-white px-4 py-2 rounded">Oppdater</button>
+        </div>
+    </div>
+{% endfor %}
+{% else %}
+<p class="text-center text-gray-400">Ingen statusdata funnet.</p>
+{% endif %}
     </main>
 
     <!-- Include Footer Component -->
