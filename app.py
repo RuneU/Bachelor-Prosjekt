@@ -1,6 +1,7 @@
 import os
 import sys
 import cv2
+import logging
 sys.dont_write_bytecode = True
 from flask import Flask, Response, request, render_template, jsonify, redirect, url_for
 sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
@@ -11,6 +12,9 @@ try:
     from camera import generate_frames, save_face
 except ImportError as e:
     print("Feil ved import av camera.py:", e)
+
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 
@@ -67,10 +71,20 @@ def register():
     return render_template("register.html")
 
 # Hent data fra databasen og route til Admin page
-@app.route("/admin")
+@app.route("/admin", methods=['GET'])
 def admin():
-        statuses = fetch_status_data()  
-        return render_template("admin.html", statuses=statuses)
+    try:
+        query = request.args.get('query')
+        statuses = fetch_status_data()
+        if query:
+            query = query.lower()
+            filtered_statuses = [status for status in statuses if query in (status['Fornavn'] + ' ' + status['Etternavn']).lower()]
+        else:
+            filtered_statuses = statuses
+        return render_template("admin.html", statuses=filtered_statuses)
+    except Exception as e:
+        logging.error(f"An error occurred: {e}")
+        return "An error occurred while processing your request.", 500
 
 # Status for evakuerte på admin page
 @app.route('/update_status/<int:evakuert_id>', methods=['POST'])

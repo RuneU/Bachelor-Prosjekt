@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{url_for('static',filename='dist/css/output.css')}}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/output.css') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Admin Side</title>
 </head>
@@ -25,7 +25,7 @@
     <!-- Main Content -->
     <main class="container mx-auto py-10 px-6 flex-grow bg-gray-900 text-gray-200 rounded-lg shadow-lg">
         <div class="relative flex justify-center mb-6">
-            <form action="/search" method="GET" class="w-full max-w-md">
+            <form action="/admin" method="GET" class="w-full max-w-md">
                 <input type="text" name="query" placeholder="Søk:" class="w-full p-2 border rounded bg-gray-700 text-gray-300">
                 <button type="submit" class="absolute right-0 top-0 h-full bg-blue-700 text-white px-4 rounded-r">Søk</button>
             </form>
