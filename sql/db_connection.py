@@ -31,10 +31,23 @@ def fetch_status_data():
     try:
         conn = pyodbc.connect(connection_string)
         cursor = conn.cursor()
-        cursor.execute("SELECT Status, Lokasjon, EvakuertID FROM Status")
+        cursor.execute("""
+            SELECT s.Status, s.Lokasjon, s.EvakuertID, e.Fornavn, e.Etternavn
+            FROM Status s
+            JOIN Evakuerte e ON s.EvakuertID = e.EvakuertID
+        """)
         rows = cursor.fetchall()
         
-        return [{'Status': row[0], 'Lokasjon': row[1], 'EvakuertID': row[2]} for row in rows]
+        return [
+            {
+                'Status': row[0],
+                'Lokasjon': row[1],
+                'EvakuertID': row[2],
+                'Fornavn': row[3],
+                'Etternavn': row[4]
+            }
+            for row in rows
+        ]
     
     except pyodbc.Error as e:
         print(f"Error: {e}")
