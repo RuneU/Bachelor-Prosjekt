@@ -3,9 +3,15 @@ from sql.db_connection import connection_def
 
 admin_reg_bp = Blueprint('admin_reg', __name__, template_folder='../templates')
 
+@admin_reg_bp.route('/')
+def admin_reg():
+    return render_template("admin-reg.html")
+
 def safe_int(value):
     """Helper function to safely convert to integer"""
     return int(value) if value and value.isdigit() else None
+
+
 
 @admin_reg_bp.route('/handle_form', methods=['POST'])
 def handle_form():
