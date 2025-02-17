@@ -7,6 +7,10 @@ def safe_int(value):
     """Helper function to safely convert to integer"""
     return int(value) if value and value.isdigit() else None
 
+@admin_reg_bp.route('/')
+def admin_reg():
+    return render_template("admin-reg.html")
+
 @admin_reg_bp.route('/handle_form', methods=['POST'])
 def handle_form():
     conn = None

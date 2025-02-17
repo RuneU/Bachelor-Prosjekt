@@ -35,7 +35,7 @@ Installer flowbite ```npm install flowbite```
 kjør ```python app.py``` for å sjekke at det fungerer.
 
 ## Database tilkobling
-Opprett en env fil i root directory som heter ```.env```
+Opprett en env fil i root directory av prosjektet som heter ```.env```
 
 I ```.env``` filen legg til koden under. Bytt ut plassholder informasjon med den ekte database informasjonen
 
@@ -64,6 +64,9 @@ Ferdig
 
 ## Tester
 For å kjøre testene i prosjekte bruk kommandoen under
+```
+python -m unittest discover test
+```
 
 ## Ekstra packages som kan være nødvendig for IoT funksjonalitet
 
@@ -73,10 +76,6 @@ For å kjøre testene i prosjekte bruk kommandoen under
 
 ```
  pip install opencv-python-headless   
-```
-
-```
-python -m unittest discover test
 ```
 
 Link flask nettside: https://flask.palletsprojects.com/en/stable/installation/
