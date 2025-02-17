@@ -80,6 +80,7 @@ def update_status_route(evakuert_id):
     update_status(evakuert_id, status, lokasjon)
     return redirect(url_for('admin'))
 
+app.register_blueprint(admin_reg_bp, url_prefix='/admin-reg')
 
 def generate_frames():
     camera = cv2.VideoCapture(0)  
