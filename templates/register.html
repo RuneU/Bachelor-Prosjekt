@@ -66,12 +66,12 @@
                     </button>
                     <ul id="dropdownMenu"
                         class="hidden absolute mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                        <li class="h-12 px-4 py-2 text-sm rounded-lg bg-green-700 text-white hover:bg-green-600 cursor-pointer"
-                            data-color="bg-green-700" data-value="1"></li>
-                        <li class="h-12 px-4 py-2 text-sm rounded-lg bg-yellow-600 text-white hover:bg-yellow-500 cursor-pointer"
-                            data-color="bg-yellow-600" data-value="2"></li>
-                        <li class="h-12 px-4 py-2 text-sm rounded-lg bg-red-700 text-white hover:bg-red-600 cursor-pointer"
-                            data-color="bg-red-700" data-value="3"></li>
+                        <li class="h-12 px-4 py-2 text-sm outline-green-700 text-white  cursor-pointer"
+                            data-color="bg-green-700" data-value="1">Ok</li>
+                        <li class="h-12 px-4 py-2 text-sm bg-yellow-600 text-white hover:bg-yellow-500 cursor-pointer"
+                            data-color="bg-yellow-600" data-value="2">Mindre skader</li>
+                        <li class="h-12 px-4 py-2 text-sm  bg-red-700 text-white hover:bg-red-600 cursor-pointer"
+                            data-color="bg-red-700" data-value="3">Hard Skadet</li>
                     </ul>
                     <input type="hidden" id="status" name="status" value="">
                 </div>
@@ -111,6 +111,10 @@
                         class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                         placeholder="+47" />
                 </div>
+                
+            </div>
+            <div>
+                <hr class="my-12 h-0.5 border-t-0 bg-black" />
             </div>
             <!-- Pårørende Info Section -->
             <label class="block font-bold mb-2">Pårørende Informasjon</label>
@@ -131,7 +135,7 @@
                     <label for="parorende_etternavn" class="block mb-2 text-sm font-medium text-gray-900">Etternavn</label>
                     <input type="text" id="parorende_etternavn" name="parorende_etternavn"
                         class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        placeholder="Normann" />
+                        placeholder="Normann"/>
                 </div>
             </div>
             <div class="grid gap-6 mb-6 md:grid-cols-2">
