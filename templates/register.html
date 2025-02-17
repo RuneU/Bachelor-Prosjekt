@@ -64,22 +64,7 @@
 
             <h2 class="text-center font-bold text-lg mb-4">Status</h2>
             <div class="relative flex justify-center mb-6">
-                <div class="relative">
-                    <button id="dropdownButton" type="button"
-                        class="h-12 w-48 px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition">
-                        Velg en farge
-                    </button>
-                    <ul id="dropdownMenu"
-                        class="hidden absolute mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                        <li class="h-12 px-4 py-2 text-sm border-2 border-green-700 text-black cursor-pointer"
-                            data-color="border-green-700" data-value="1">Ok</li>
-                        <li class="h-12 px-4 py-2 text-sm border-2 border-yellow-600 text-black cursor-pointer"
-                            data-color="border-yellow-600" data-value="2">Mindre skader</li>
-                        <li class="h-12 px-4 py-2 text-sm border-2 border-red-700 text-black cursor-pointer"
-                            data-color="border-red-700" data-value="3">Hard Skadet</li>
-                    </ul>
-                    <input type="hidden" id="status" name="status" value="">
-                </div>
+                
             </div>
             <!-- Informasjon om krisen -->
             <div class="mb-6">
@@ -100,7 +85,22 @@
                 <hr class="my-12 h-0.5 border-t-0 bg-black" />
             <div>
             </div>
-            
+            <div class="relative justify-center mb-6">
+                <button id="dropdownButton" type="button"
+                    class="h-12 w-48 px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition">
+                    Velg en farge
+                </button>
+                <ul id="dropdownMenu"
+                    class="hidden absolute mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <li class="h-12 px-4 py-2 text-sm border-2 border-green-700 text-black cursor-pointer"
+                        data-color="border-green-700" data-value="1">Ok</li>
+                    <li class="h-12 px-4 py-2 text-sm border-2 border-yellow-600 text-black cursor-pointer"
+                        data-color="border-yellow-600" data-value="2">Mindre skader</li>
+                    <li class="h-12 px-4 py-2 text-sm border-2 border-red-700 text-black cursor-pointer"
+                        data-color="border-red-700" data-value="3">Hard Skadet</li>
+                </ul>
+                <input type="hidden" id="status" name="status" value="">
+            </div>
             <label class="block font-bold mb-2">Personlig Informasjon</label>
             <div class="grid gap-6 mb-6 md:grid-cols-3">
                 <div>
