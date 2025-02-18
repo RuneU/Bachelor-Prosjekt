@@ -120,6 +120,42 @@ def get_last_inserted_id():
         if 'conn' in locals():
             conn.close()
 
+# Function to search statuses based on a query
+def search_statuses(query):
+    try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+        search_query = f"""
+            SELECT s.Status, s.Lokasjon, s.EvakuertID, e.Fornavn, e.Etternavn
+            FROM Status s
+            JOIN Evakuerte e ON s.EvakuertID = e.EvakuertID
+            WHERE s.Status LIKE ? OR s.Lokasjon LIKE ? OR e.Fornavn LIKE ? OR e.Etternavn LIKE ?
+        """
+        cursor.execute(search_query, (f'%{query}%', f'%{query}%', f'%{query}%', f'%{query}%'))
+        rows = cursor.fetchall()
+        data = [
+            {
+                'Status': row[0],
+                'Lokasjon': row[1],
+                'EvakuertID': row[2],
+                'Fornavn': row[3],
+                'Etternavn': row[4]
+            }
+            for row in rows
+        ]
+        
+        print(data)  # Debug print statement to verify the data
+        
+        return data
+    except pyodbc.Error as e:
+        print(f"Error: {e}")
+        return []
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
 # Example usage of run_query function
 # run_query("INSERT INTO Evakuerte (Fornavn) VALUES ('Seb')")  # Add data
 

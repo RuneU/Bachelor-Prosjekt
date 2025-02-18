@@ -1,20 +1,16 @@
 import os
 import sys
 import cv2
-import logging
 sys.dont_write_bytecode = True
-from flask import Flask, Response, request, render_template, jsonify, redirect, url_for
+from flask import Flask, Response, request, render_template, jsonify, redirect, send_from_directory, url_for
 sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
-from sql.db_connection import fetch_status_data, update_status
+from sql.db_connection import fetch_status_data, get_last_inserted_id, run_query, update_status, search_statuses
 from blueprints.admin_reg import admin_reg_bp
 
 try:
     from camera import generate_frames, save_face
 except ImportError as e:
     print("Feil ved import av camera.py:", e)
-
-# Configure logging
-logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 
@@ -71,20 +67,10 @@ def register():
     return render_template("register.html")
 
 # Hent data fra databasen og route til Admin page
-@app.route("/admin", methods=['GET'])
+@app.route("/admin")
 def admin():
-    try:
-        query = request.args.get('query')
-        statuses = fetch_status_data()
-        if query:
-            query = query.lower()
-            filtered_statuses = [status for status in statuses if query in (status['Fornavn'] + ' ' + status['Etternavn']).lower()]
-        else:
-            filtered_statuses = statuses
-        return render_template("admin.html", statuses=filtered_statuses)
-    except Exception as e:
-        logging.error(f"An error occurred: {e}")
-        return "An error occurred while processing your request.", 500
+        statuses = fetch_status_data()  
+        return render_template("admin.html", statuses=statuses)
 
 # Status for evakuerte på admin page
 @app.route('/update_status/<int:evakuert_id>', methods=['POST'])
@@ -93,6 +79,16 @@ def update_status_route(evakuert_id):
     lokasjon = request.form['lokasjon']
     update_status(evakuert_id, status, lokasjon)
     return redirect(url_for('admin'))
+
+@app.route("/search", methods=["GET"])
+def search():
+    query = request.args.get("query")
+    if query:
+        statuses = search_statuses(query)
+    else:
+        statuses = fetch_status_data()
+    
+    return render_template("admin.html", statuses=statuses)
 
 app.register_blueprint(admin_reg_bp, url_prefix='/admin-reg')
 
