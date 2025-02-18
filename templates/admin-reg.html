@@ -27,7 +27,20 @@
             <input type="hidden" name="kontakt_person_id" value="{{ evakuert.KontaktPersonID if evakuert else '' }}">
             <input type="hidden" name="status_id" value="{{ evakuert.StatusID if evakuert else '' }}">
 
-            <!-- Informasjon om krisen -->
+            <div class="mb-6">
+                <h2 class="text-center font-bold text-lg mb-4">Krise status</h2>
+                <div class="relative flex justify-center mb-6">
+                    <button id="krise-status" type="button" class="w-48 h-12 px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition">
+                        {{ evakuert.krise_status if evakuert and evakuert.krise_status else "Velg Status" }}
+                    </button>
+                    <ul id="kriseDropdownMenu" class="hidden absolute mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
+                        <li class="h-12 px-4 py-2 text-sm hover:bg-gray-200 cursor-pointer" data-value="Ny krise">Ferdig</li>
+                        <li class="h-12 px-4 py-2 text-sm hover:bg-gray-200 cursor-pointer" data-value="Pågående">Pågående</li>
+                        <li class="h-12 px-4 py-2 text-sm hover:bg-gray-200 cursor-pointer" data-value="Ferdig">Ny krise</li>
+                    </ul>
+                    <input type="hidden" id="selected-krise-status" name="krise-status" value="{{ evakuert.krise_status if evakuert and evakuert.krise_status else '' }}">
+                </div>
+            </div>
             <div class="mb-6">
                 <label for="kris-type" class="mt-2">Krise type</label>
                 <input type="text" id="krise-type" name="krise-type" placeholder="flåm" 
@@ -53,18 +66,18 @@
 
             <!-- Evakuertes info-->
             <label class="block font-bold mb-2">Personlig Informasjon</label>
-            <h2 class="text-center font-bold text-lg mb-4">Status</h2>
+            <h2 class="text-center font-bold text-lg mb-4">Evakuert status</h2>
             <div class="relative flex justify-center mb-6">
                 <div class="relative">
-                    <button id="dropdownButton" type="button" class="h-12 w-48 px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition">
-                        Velg Status
+                    <button id="evak_status" type="button" class="h-12 w-48 px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition">
+                        {{ evakuert.evak_status if evakuert and evakuert.evak_status else "Velg Status" }}
                     </button>                
-                    <ul id="dropdownMenu" class="hidden absolute mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <ul id="dropdownMenu" class="hidden absolute mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
                         <li class="h-12 px-4 py-2 text-sm bg-green-700 text-white hover:bg-green-600 cursor-pointer" data-color="bg-green-700">OK</li>
                         <li class="h-12 px-4 py-2 text-sm bg-yellow-600 text-white hover:bg-yellow-500 cursor-pointer" data-color="bg-yellow-600">Mindre skader</li>
                         <li class="h-12 px-4 py-2 text-sm bg-red-700 text-white hover:bg-red-600 cursor-pointer" data-color="bg-red-700">Kritisk</li>
                     </ul>
-                    <input type="hidden" id="selected-status" name="status">
+                    <input type="hidden" id="selected-status" name="status" value="{{ evakuert.evak_status if evakuert and evakuert.evak_status else '' }}">
                 </div>
             </div>
 
@@ -118,17 +131,14 @@
     </main>
 
     <script>
-        const adminButton = document.getElementById('adminButton');
-        const adminModel = document.getElementById('adminModel');
-        const closeModel = document.getElementById('closeModel');
-        const loginForm = document.getElementById('loginForm');
-        const errorMessage = document.getElementById('errorMessage');
-        const dropdownButton = document.getElementById('dropdownButton');
+        // Existing dropdown for evakuert status
+        const dropdownButton = document.getElementById('evak_status');
         const dropdownMenu = document.getElementById('dropdownMenu');
         const dropdownOptions = dropdownMenu.querySelectorAll('li');
 
         document.querySelector("form").addEventListener("submit", function() {
             document.getElementById('selected-status').value = dropdownButton.textContent.trim();
+            document.getElementById('selected-krise-status').value = kriseDropdownButton.textContent.trim();
         });
                 
         dropdownButton.addEventListener('click', () => {
@@ -154,11 +164,27 @@
             });
         });
 
-        // Add this to your existing JavaScript
-        dropdownOptions.forEach(option => {
+        // New dropdown for Krise status
+        const kriseDropdownButton = document.getElementById('krise-status');
+        const kriseDropdownMenu = document.getElementById('kriseDropdownMenu');
+        const kriseDropdownOptions = kriseDropdownMenu.querySelectorAll('li');
+
+        kriseDropdownButton.addEventListener('click', () => {
+            kriseDropdownMenu.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!kriseDropdownButton.contains(event.target) && !kriseDropdownMenu.contains(event.target)) {
+                kriseDropdownMenu.classList.add('hidden');
+            }
+        });
+
+        kriseDropdownOptions.forEach(option => {
             option.addEventListener('click', () => {
-                const statusValue = option.getAttribute('data-color').replace('bg-', '');
-                document.getElementById('selected-status').value = statusValue;
+                const selectedValue = option.getAttribute('data-value');
+                kriseDropdownButton.textContent = selectedValue;
+                document.getElementById('selected-krise-status').value = selectedValue;
+                kriseDropdownMenu.classList.add('hidden');
             });
         });
     </script>

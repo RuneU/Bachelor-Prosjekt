@@ -3,6 +3,7 @@ CREATE TABLE Krise (
     KriseID INT NOT NULL IDENTITY(1,1),
     KriseSituasjonType VARCHAR(256) NULL,
     KriseNavn VARCHAR(256) NULL,
+    Status VARCHAR(256) NOT NULL,
     Lokasjon VARCHAR(256) NOT NULL,
     Tekstboks TEXT NULL,
     PRIMARY KEY (KriseID)
