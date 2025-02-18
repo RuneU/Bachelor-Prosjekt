@@ -26,7 +26,7 @@ def connection_def():
     
     return pyodbc.connect(conn_str) # Establish and return connection
 
-# Funksjon for å fange data fra Status-tabellen
+# Function to fetch data from the Status table
 def fetch_status_data():
     try:
         conn = pyodbc.connect(connection_string)
@@ -84,7 +84,6 @@ def update_status(evakuert_id, status, lokasjon):
         if 'conn' in locals():
             conn.close()
 
-
 # Function to run an SQL query (e.g., insert, update, delete)
 def run_query(query):
     try:
@@ -121,10 +120,13 @@ def get_last_inserted_id():
         if 'conn' in locals():
             conn.close()
 
+# Example usage of run_query function
 # run_query("INSERT INTO Evakuerte (Fornavn) VALUES ('Seb')")  # Add data
 
+# Example usage of run_query function to alter table
 # run_query("ALTER TABLE Evakuerte ADD AzureFaceID NVARCHAR(100) NULL, PhotoURL NVARCHAR(500) NULL;") 
 
+# Example usage of run_query function to delete data
 # run_query("DELETE FROM Evakuerte WHERE Fornavn = 'Simon'")  # Delete data
 
 # Fetch and print data from the Status table
