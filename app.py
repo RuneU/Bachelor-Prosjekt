@@ -80,6 +80,7 @@ def update_status_route(evakuert_id):
     update_status(evakuert_id, status, lokasjon)
     return redirect(url_for('admin'))
 
+#logikk for search funksjon
 @app.route("/search", methods=["GET"])
 def search():
     query = request.args.get("query")
