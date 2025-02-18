@@ -30,6 +30,7 @@ def register():
             adresse = request.form.get("adresse")
             telefonnummer = request.form.get("telefonnummer")
             status = request.form.get("status")
+            lokasjon_id = request.form.get("lokasjon")
             parorende_fornavn = request.form.get("parorende_fornavn")
             parorende_mellomnavn = request.form.get("parorende_mellomnavn")
             parorende_etternavn = request.form.get("parorende_etternavn")
@@ -54,8 +55,8 @@ def register():
 
             # Insert data into the Status table
             query = f"""
-                INSERT INTO Status (Status, Lokasjon, EvakuertID)
-                VALUES ('{status}', '{adresse}', {evakuert_id});
+                INSERT INTO Status (Status, LokasjonID, EvakuertID)
+                VALUES ('{status}', '{lokasjon_id}', {evakuert_id});
             """
             run_query(query)
 
@@ -65,7 +66,8 @@ def register():
             return "An error occurred while processing your request."
 
     kriser = fetch_all_kriser()  # Fetch all kriser from the database
-    return render_template('register.html', kriser=kriser)
+    locations = fetch_all_locations()  # Fetch all locations from the database
+    return render_template('register.html', kriser=kriser, locations=locations)
 
 # Hent data fra databasen og route til Admin page
 @app.route("/admin")
