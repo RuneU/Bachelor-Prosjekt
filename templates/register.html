@@ -62,118 +62,127 @@
             <input type="hidden" name="kontakt_person_id" value="{{ evakuert.KontaktPersonID if evakuert else '' }}">
             <input type="hidden" name="status_id" value="{{ evakuert.StatusID if evakuert else '' }}">
 
-            <h2 class="text-center font-bold text-lg mb-4">Status</h2>
-            <div class="relative flex justify-center mb-6">
-                
+
+
             </div>
             <!-- Informasjon om krisen -->
             <div class="mb-6">
                 <label for="kris-type" class="mt-2">Krise type</label>
-                <input type="text" id="krise-type" name="krise-type" placeholder="flåm" 
-                    class="input-field bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value="{{ evakuert.krise_type if evakuert else '' }}">
+                <input type="text" id="krise-type" name="krise-type" placeholder="flåm"
+                    class="input-field w-64 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 "
+                    value="{{ evakuert.krise_type if evakuert else '' }}">
             </div>
             <div class="mb-6">
                 <label for="krise-navn" class="mt-2">Krise navn</label>
-                <select id="krise-navn" name="krise-navn" 
-                    class="input-field bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+                <select id="krise-navn" name="krise-navn"
+                    class="input-field w-64 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w- p-2.5 ">
                     {% for krise in kriser %}
-                        <option value="{{ krise.KriseID }}" {% if evakuert and evakuert.krise_id == krise.KriseID %}selected{% endif %}>{{ krise.KriseNavn }}</option>
+                    <option value="{{ krise.KriseID }}" {% if evakuert and evakuert.krise_id==krise.KriseID %}selected{%
+                        endif %}>{{ krise.KriseNavn }}</option>
                     {% endfor %}
                 </select>
             </div>
             <div>
                 <hr class="my-12 h-0.5 border-t-0 bg-black" />
-            <div>
-            </div>
-            <div class="relative justify-center mb-6">
-                <button id="dropdownButton" type="button"
-                    class="h-12 w-48 px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition">
-                    Velg en farge
-                </button>
-                <ul id="dropdownMenu"
-                    class="hidden absolute mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                    <li class="h-12 px-4 py-2 text-sm border-2 border-green-700 text-black cursor-pointer"
-                        data-color="border-green-700" data-value="1">Ok</li>
-                    <li class="h-12 px-4 py-2 text-sm border-2 border-yellow-600 text-black cursor-pointer"
-                        data-color="border-yellow-600" data-value="2">Mindre skader</li>
-                    <li class="h-12 px-4 py-2 text-sm border-2 border-red-700 text-black cursor-pointer"
-                        data-color="border-red-700" data-value="3">Hard Skadet</li>
-                </ul>
-                <input type="hidden" id="status" name="status" value="">
-            </div>
-            <label class="block font-bold mb-2">Personlig Informasjon</label>
-            <div class="grid gap-6 mb-6 md:grid-cols-3">
                 <div>
-                    <label for="fornavn" class="block mb-2 text-sm font-medium text-gray-900">Fornavn</label>
-                    <input type="text" id="fornavn" name="fornavn"
-                        class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        placeholder="Ola" />
                 </div>
-                <div>
-                    <label for="mellomnavn" class="block mb-2 text-sm font-medium text-gray-900">Mellomnavn</label>
-                    <input type="text" id="mellomnavn" name="mellomnavn"
-                        class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        placeholder="Mellomnavn" />
+                <h2 class="text-center font-bold text-lg mb-4">Status</h2>
+                <div class="relative flex justify-center mb-6">
+                    <div class="relative justify-center mb-6">
+                        <button id="dropdownButton" type="button"
+                            class="h-12 w-48 px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition">
+                            Velg en farge
+                        </button>
+                        <ul id="dropdownMenu"
+                            class="hidden absolute mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none left-1/2 transform -translate-x-1/2">
+                            <li class="h-12 px-4 py-2 text-sm border-2 border-green-700 text-black cursor-pointer"
+                                data-color="border-green-700" data-value="1">Ok</li>
+                            <li class="h-12 px-4 py-2 text-sm border-2 border-yellow-600 text-black cursor-pointer"
+                                data-color="border-yellow-600" data-value="2">Mindre skader</li>
+                            <li class="h-12 px-4 py-2 text-sm border-2 border-red-700 text-black cursor-pointer"
+                                data-color="border-red-700" data-value="3">Hard Skadet</li>
+                        </ul>
+                        <input type="hidden" id="status" name="status" value="">
+                    </div>
                 </div>
-                <div>
-                    <label for="etternavn" class="block mb-2 text-sm font-medium text-gray-900">Etternavn</label>
-                    <input type="text" id="etternavn" name="etternavn"
-                        class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        placeholder="Normann" />
+                <label class="block font-bold mb-2">Personlig Informasjon</label>
+                <div class="grid gap-6 mb-6 md:grid-cols-3">
+                    <div>
+                        <label for="fornavn" class="block mb-2 text-sm font-medium text-gray-900">Fornavn</label>
+                        <input type="text" id="fornavn" name="fornavn"
+                            class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            placeholder="Ola" />
+                    </div>
+                    <div>
+                        <label for="mellomnavn" class="block mb-2 text-sm font-medium text-gray-900">Mellomnavn</label>
+                        <input type="text" id="mellomnavn" name="mellomnavn"
+                            class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            placeholder="Mellomnavn" />
+                    </div>
+                    <div>
+                        <label for="etternavn" class="block mb-2 text-sm font-medium text-gray-900">Etternavn</label>
+                        <input type="text" id="etternavn" name="etternavn"
+                            class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            placeholder="Normann" />
+                    </div>
                 </div>
-            </div>
-            <div class="grid gap-6 mb-6 md:grid-cols-2">
-                <div>
-                    <label for="adresse" class="block mb-2 text-sm font-medium text-gray-900">Adresse</label>
-                    <input type="text" id="adresse" name="adresse"
-                        class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        placeholder="Osloveien 1" />
-                </div>
-                <div>
-                    <label for="telefonnummer" class="block mb-2 text-sm font-medium text-gray-900">Telefonnummer</label>
-                    <input type="tel" id="telefonnummer" name="telefonnummer"
-                        class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        placeholder="+47" />
-                </div>
-                
-            </div>
-            <div>
-                <hr class="my-12 h-0.5 border-t-0 bg-black" />
-            </div>
-            <!-- Pårørende Info Section -->
-            <label class="block font-bold mb-2">Pårørende Informasjon</label>
-            <div class="grid gap-6 mb-6 md:grid-cols-3">
-                <div>
-                    <label for="parorende_fornavn" class="block mb-2 text-sm font-medium text-gray-900">Fornavn</label>
-                    <input type="text" id="parorende_fornavn" name="parorende_fornavn"
-                        class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        placeholder="Ola" />
-                </div>
-                <div>
-                    <label for="parorende_mellomnavn" class="block mb-2 text-sm font-medium text-gray-900">Mellomnavn</label>
-                    <input type="text" id="parorende_mellomnavn" name="parorende_mellomnavn"
-                        class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        placeholder="Mellomnavn" />
-                </div>
-                <div>
-                    <label for="parorende_etternavn" class="block mb-2 text-sm font-medium text-gray-900">Etternavn</label>
-                    <input type="text" id="parorende_etternavn" name="parorende_etternavn"
-                        class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        placeholder="Normann"/>
-                </div>
-            </div>
-            <div class="grid gap-6 mb-6 md:grid-cols-2">
-                <div>
-                    <label for="parorende_telefonnummer" class="block mb-2 text-sm font-medium text-gray-900">Telefonnummer</label>
-                    <input type="tel" id="parorende_telefonnummer" name="parorende_telefonnummer"
-                        class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        placeholder="+47" />
-                </div>
-            </div>
+                <div class="grid gap-6 mb-6 md:grid-cols-2">
+                    <div>
+                        <label for="adresse" class="block mb-2 text-sm font-medium text-gray-900">Adresse</label>
+                        <input type="text" id="adresse" name="adresse"
+                            class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            placeholder="Osloveien 1" />
+                    </div>
+                    <div>
+                        <label for="telefonnummer"
+                            class="block mb-2 text-sm font-medium text-gray-900">Telefonnummer</label>
+                        <input type="tel" id="telefonnummer" name="telefonnummer"
+                            class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            placeholder="+47" />
+                    </div>
 
-            <div class="text-center">
-                <button type="submit" class="bg-gray-700 text-white px-6 py-2 rounded">Bekreft</button>
-            </div>
+                </div>
+                <div>
+                    <hr class="my-12 h-0.5 border-t-0 bg-black" />
+                </div>
+                <!-- Pårørende Info Section -->
+                <label class="block font-bold mb-2">Pårørende Informasjon</label>
+                <div class="grid gap-6 mb-6 md:grid-cols-3">
+                    <div>
+                        <label for="parorende_fornavn"
+                            class="block mb-2 text-sm font-medium text-gray-900">Fornavn</label>
+                        <input type="text" id="parorende_fornavn" name="parorende_fornavn"
+                            class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            placeholder="Ola" value="{{ evakuert.parorende_fornavn if evakuert else '' }}" />
+                    </div>
+                    <div>
+                        <label for="parorende_mellomnavn"
+                            class="block mb-2 text-sm font-medium text-gray-900">Mellomnavn</label>
+                        <input type="text" id="parorende_mellomnavn" name="parorende_mellomnavn"
+                            class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            placeholder="Mellomnavn" />
+                    </div>
+                    <div>
+                        <label for="parorende_etternavn"
+                            class="block mb-2 text-sm font-medium text-gray-900">Etternavn</label>
+                        <input type="text" id="parorende_etternavn" name="parorende_etternavn"
+                            class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            placeholder="Normann" />
+                    </div>
+                </div>
+                <div class="grid gap-6 mb-6 md:grid-cols-2">
+                    <div>
+                        <label for="parorende_telefonnummer"
+                            class="block mb-2 text-sm font-medium text-gray-900">Telefonnummer</label>
+                        <input type="tel" id="parorende_telefonnummer" name="parorende_telefonnummer"
+                            class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            placeholder="+47" />
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="bg-gray-700 text-white px-6 py-2 rounded">Bekreft</button>
+                </div>
         </form>
     </main>
     <script>
