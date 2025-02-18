@@ -78,6 +78,10 @@ python -m unittest discover test
  pip install opencv-python-headless   
 ```
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> cf376ac67c9eece8d8169572403f4b53a947d3c1
 Link flask nettside: https://flask.palletsprojects.com/en/stable/installation/
 
 Link til Flowbite for tailwind og flowbite: https://flowbite.com/docs/getting-started/flask/

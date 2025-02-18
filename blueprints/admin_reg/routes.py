@@ -3,13 +3,15 @@ from sql.db_connection import connection_def
 
 admin_reg_bp = Blueprint('admin_reg', __name__, template_folder='../templates')
 
+@admin_reg_bp.route('/')
+def admin_reg():
+    return render_template("admin-reg.html")
+
 def safe_int(value):
     """Helper function to safely convert to integer"""
     return int(value) if value and value.isdigit() else None
 
-@admin_reg_bp.route('/')
-def admin_reg():
-    return render_template("admin-reg.html")
+
 
 @admin_reg_bp.route('/handle_form', methods=['POST'])
 def handle_form():
@@ -23,24 +25,26 @@ def handle_form():
             'kontakt_person_id': request.form.get('kontakt_person_id'),
             'status_id': request.form.get('status_id'),
             'status': request.form.get('status'),
+            'krise_status': request.form.get('krise-status'),
             'krise_type': request.form.get('krise-type'),
             'krise_navn': request.form.get('krise-navn'),
-            'lokasjon': request.form.get('lokasjon'),
+            'krise_lokasjon': request.form.get('krise-lokasjon'),
             'annen_info': request.form.get('annen-info'),
             'evak_fnavn': request.form.get('evak-fnavn'),
             'evak_mnavn': request.form.get('evak-mnavn'),
             'evak_enavn': request.form.get('evak-enavn'),
             'evak_tlf': request.form.get('evak-tlf'),
             'evak_adresse': request.form.get('evak-adresse'),
+            'evak_lokasjon': request.form.get('evak-lokasjon'),
             'kon_fnavn': request.form.get('kon-fnavn'),
             'kon_mnavn': request.form.get('kon-mnavn'),
             'kon_enavn': request.form.get('kon-enavn'),
             'kon_tlf': request.form.get('kon-tlf'),
-            'kon_adresse': request.form.get('kon-adresse')
+            # 'kon_adresse': request.form.get('kon-adresse')
         }
 
         # Validate required fields
-        if not all([form_data['lokasjon'], form_data['status']]):
+        if not all([form_data['krise_lokasjon'], form_data['status']]):
             return "Lokasjon and Status are required fields", 400
 
         conn = connection_def()
@@ -64,9 +68,9 @@ def handle_form():
             """, (
                 form_data['krise_type'],
                 form_data['krise_navn'],
-                form_data['lokasjon'],
+                form_data['krise_lokasjon'],
                 form_data['annen_info'],
-                form_data['status'],
+                form_data['krise_status'],  # new value from dropdown
                 krise_id
             ))
             # Update Evakuerte table
@@ -102,7 +106,7 @@ def handle_form():
                 WHERE StatusID = ?
             """, (
                 form_data['status'],
-                form_data['lokasjon'],
+                form_data['evak_lokasjon'],
                 status_id
             ))
         else:
@@ -115,9 +119,9 @@ def handle_form():
             """, (
                 form_data['krise_type'],
                 form_data['krise_navn'],
-                form_data['lokasjon'],
+                form_data['krise_lokasjon'],
                 form_data['annen_info'],
-                form_data['status']
+                form_data['krise_status'],
             ))
             krise_id = cursor.fetchval()
             # 2. Insert into Evakuerte table
@@ -151,11 +155,11 @@ def handle_form():
                 VALUES (?, ?, ?)
             """, (
                 form_data['status'],
-                form_data['lokasjon'],
+                form_data['evak_lokasjon'],
                 evakuert_id
             ))
         conn.commit()
-        return redirect(url_for('index'))
+        return redirect(url_for('admin'))
 
     except ValueError as ve:
         conn.rollback()
@@ -179,7 +183,7 @@ def adminreg_with_id(evakuert_id):
             SELECT 
                 e.EvakuertID, 
                 e.KriseID, 
-                kp.KontaktPersonID,  -- Changed alias from k to kp
+                kp.KontaktPersonID, 
                 s.StatusID,
                 e.Fornavn, 
                 e.MellomNavn, 
@@ -193,8 +197,10 @@ def adminreg_with_id(evakuert_id):
                 kr.KriseSituasjonType, 
                 kr.KriseNavn, 
                 kr.Lokasjon, 
-                kr.Tekstboks, 
-                s.Status
+                kr.Tekstboks,
+                kr.Status AS krise_status,
+                s.Status AS evak_status,
+                s.Lokasjon
             FROM Evakuerte e
             LEFT JOIN KontaktPerson kp ON e.EvakuertID = kp.EvakuertID
             LEFT JOIN Krise kr ON e.KriseID = kr.KriseID
@@ -208,13 +214,26 @@ def adminreg_with_id(evakuert_id):
             return "Evakuert not found", 404
 
         evakuert_data = {
-            
-            "EvakuertID": data[0], "KriseID": data[1], "KontaktPersonID": data[2],
-            "StatusID": data[3], "evak_fnavn": data[4], "evak_mnavn": data[5],
-            "evak_enavn": data[6], "evak_tlf": data[7], "evak_adresse": data[8], 
-            "kon_fnavn": data[9], "kon_mnavn": data[10], "kon_enavn": data[11], 
-            "kon_tlf": data[12], "krise_type": data[13], "krise_navn": data[14], 
-            "lokasjon": data[15], "annen_info": data[16], "status": data[17]
+            "EvakuertID": data[0],
+            "KriseID": data[1],
+            "KontaktPersonID": data[2],
+            "StatusID": data[3],
+            "evak_fnavn": data[4],
+            "evak_mnavn": data[5],
+            "evak_enavn": data[6],
+            "evak_tlf": data[7],
+            "evak_adresse": data[8], 
+            "kon_fnavn": data[9],
+            "kon_mnavn": data[10],
+            "kon_enavn": data[11],
+            "kon_tlf": data[12],
+            "krise_type": data[13],
+            "krise_navn": data[14],
+            "krise_lokasjon": data[15],
+            "annen_info": data[16],
+            "krise_status": data[17],
+            "evak_status": data[18],
+            "evak_lokasjon": data[19]
         }
 
         return render_template("admin-reg.html", evakuert=evakuert_data)
