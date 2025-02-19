@@ -4,7 +4,7 @@ import cv2
 sys.dont_write_bytecode = True
 from flask import Flask, Response, request, render_template, jsonify, redirect, url_for
 sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
-from sql.db_connection import fetch_status_data, update_status, fetch_all_kriser, get_last_inserted_id, run_query
+from sql.db_connection import fetch_status_data, update_status, fetch_all_kriser, get_last_inserted_id, run_query, fetch_all_locations
 from blueprints.admin_reg import admin_reg_bp
 
 try:

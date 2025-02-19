@@ -104,6 +104,26 @@ def run_query(query):
         if 'conn' in locals():
             conn.close()
 
+# Finne alle lokasjoner i databasen for å vise i dropdown
+def fetch_all_locations():
+    try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+        cursor.execute("SELECT DISTINCT Lokasjon FROM Krise")
+        rows = cursor.fetchall()
+
+        return [{'LokasjonID': index + 1, 'LokasjonNavn': row[0]} for index, row in enumerate(rows)]
+
+    except pyodbc.Error as e:
+        print(f"An error occurred: {e}")
+        return []
+
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
 # Function to get the last inserted ID
 def get_last_inserted_id():
     try:
