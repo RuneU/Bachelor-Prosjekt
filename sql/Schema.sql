@@ -41,6 +41,39 @@ CREATE TABLE Status (
     FOREIGN KEY (EvakuertID) REFERENCES Evakuerte(EvakuertID) ON DELETE CASCADE
 );
 
+-- Oppretelse av tabell for Lokasjons logg for evakuerte gjennom Status tabell
+CREATE TABLE Lokasjon_log (
+    log_id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
+    status_id INT NOT NULL,
+    old_lokasjon VARCHAR(256),
+    new_lokasjon VARCHAR(256),
+    change_date DATETIME DEFAULT GETDATE(),
+    CONSTRAINT FK_StatusLog FOREIGN KEY (status_id) REFERENCES Status(StatusID)
+);
+
+-- Trigger event for når lokasjons feltet i status tabellen blir endret og oppdatert i Lokasjona-log
+CREATE TRIGGER trg_after_status_update
+ON Status
+AFTER UPDATE
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    INSERT INTO Lokasjon_log (status_id, old_lokasjon, new_lokasjon, change_date)
+    SELECT d.StatusID, d.Lokasjon, i.Lokasjon, GETDATE()
+    FROM inserted i
+    INNER JOIN deleted d ON i.StatusID = d.StatusID
+    WHERE ISNULL(d.Lokasjon, '') <> ISNULL(i.Lokasjon, '');
+END;
+
+-- Enkapsulert logikk for sletting av data i lokasjon_log tabellen som er eldre enn 14 dager
+CREATE PROCEDURE CleanOldLokasjonLogs
+AS
+BEGIN
+    DELETE FROM Lokasjon_log
+    WHERE change_date < DATEADD(DAY, -14, GETDATE());
+END;
+
 -- Opprettelse av tabellen "RFID"
 CREATE TABLE RFID (
     ID INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
