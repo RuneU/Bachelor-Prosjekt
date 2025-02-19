@@ -2,9 +2,9 @@ import os
 import sys
 import cv2
 sys.dont_write_bytecode = True
-from flask import Flask, Response, request, render_template, jsonify, redirect, url_for
+from flask import Flask, Response, request, render_template, jsonify, redirect, send_from_directory, url_for
 sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
-from sql.db_connection import fetch_status_data, update_status, fetch_all_kriser, get_last_inserted_id, run_query, fetch_all_locations
+from sql.db_connection import fetch_status_data, update_status, search_statuses, fetch_all_kriser, get_last_inserted_id, run_query, fetch_all_locations
 from blueprints.admin_reg import admin_reg_bp
 
 try:
@@ -82,6 +82,16 @@ def update_status_route(evakuert_id):
     lokasjon = request.form['lokasjon']
     update_status(evakuert_id, status, lokasjon)
     return redirect(url_for('admin'))
+
+@app.route("/search", methods=["GET"])
+def search():
+    query = request.args.get("query")
+    if query:
+        statuses = search_statuses(query)
+    else:
+        statuses = fetch_status_data()
+    
+    return render_template("admin.html", statuses=statuses)
 
 app.register_blueprint(admin_reg_bp, url_prefix='/admin-reg')
 

@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="no">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <title>Admin Side</title>
 </head>
+
 <body>
     <header class="bg-gray-800 p-4 flex justify-between items-center">
         <div class="flex items-center space-x-2">
@@ -21,90 +23,145 @@
 
     <main class="container mx-auto py-10 px-6 flex-grow bg-gray-100 text-gray-800 rounded-lg">
         <form method="POST" action="{{ url_for('admin_reg.handle_form') }}">
-
+            <!-- Hidden inputs -->
             <input type="hidden" name="evakuert_id" value="{{ evakuert.EvakuertID if evakuert else '' }}">
             <input type="hidden" name="krise_id" value="{{ evakuert.KriseID if evakuert else '' }}">
             <input type="hidden" name="kontakt_person_id" value="{{ evakuert.KontaktPersonID if evakuert else '' }}">
             <input type="hidden" name="status_id" value="{{ evakuert.StatusID if evakuert else '' }}">
 
-            <!-- Informasjon om krisen -->
+            <!-- Krise Informasjon Section -->
+            <h1 class="text-xl font-bold mb-4">Informasjon om krisen</h1>
             <div class="mb-6">
-                <label for="kris-type" class="mt-2">Krise type</label>
-                <input type="text" id="krise-type" name="krise-type" placeholder="flåm" 
-                    class="input-field bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value="{{ evakuert.krise_type if evakuert else '' }}">
-            </div>
-            <div class="mb-6">
-                <label for="krise-navn" class="mt-2">Krise navn</label>
-                <input type="text" id="krise-navn" name="krise-navn" placeholder="flåm Odda 2019" 
-                    class="input-field bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value="{{ evakuert.krise_navn if evakuert else '' }}">
-            </div>
-            <div class="mb-6">
-                <label for="lokasjon" class="mt-2">Lokasjon</label>
-                <input type="text" id="lokasjon" name="lokasjon" placeholder="Odda sentrum" 
-                    class="input-field bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" value="{{ evakuert.lokasjon if evakuert else '' }}">
-            </div>
-            <div>
-                <label for="annen-info" class="mt-2">Annen informasjon:</label>
-                <textarea id="annen-info" name="annen-info" rows="4" class="input-field block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">{{ evakuert.annen_info if evakuert else '' }}</textarea>
-            </div>
-            <div>
-                <hr class="my-12 h-0.5 border-t-0 bg-black" />
-            </div>
-
-            <!-- Evakuertes info-->
-            <label class="block font-bold mb-2">Personlig Informasjon</label>
-            <h2 class="text-center font-bold text-lg mb-4">Status</h2>
-            <div class="relative flex justify-center mb-6">
-                <div class="relative">
-                    <button id="dropdownButton" type="button" class="h-12 w-48 px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition">
-                        Velg Status
-                    </button>                
-                    <ul id="dropdownMenu" class="hidden absolute mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                        <li class="h-12 px-4 py-2 text-sm bg-green-700 text-white hover:bg-green-600 cursor-pointer" data-color="bg-green-700">OK</li>
-                        <li class="h-12 px-4 py-2 text-sm bg-yellow-600 text-white hover:bg-yellow-500 cursor-pointer" data-color="bg-yellow-600">Mindre skader</li>
-                        <li class="h-12 px-4 py-2 text-sm bg-red-700 text-white hover:bg-red-600 cursor-pointer" data-color="bg-red-700">Kritisk</li>
+                <label for="krise-status" class="text-center block font-bold mb-2">Krise Status</label>
+                <div class="relative flex justify-center">
+                    <button id="krise-status" type="button"
+                        class="h-12 w-48 px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition">
+                        {{ evakuert.krise_status if evakuert and evakuert.krise_status else "Velg Status" }}
+                    </button>
+                    <ul id="kriseDropdownMenu"
+                        class="hidden absolute mt-2 w-full bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
+                        <li class="h-12 px-4 py-2 text-sm hover:bg-gray-200 cursor-pointer" data-value="Ny krise">Ny krise
+                        </li>
+                        <li class="h-12 px-4 py-2 text-sm hover:bg-gray-200 cursor-pointer" data-value="Pågående">Pågående
+                        </li>
+                        <li class="h-12 px-4 py-2 text-sm hover:bg-gray-200 cursor-pointer" data-value="Ferdig">Ferdig</li>
                     </ul>
-                    <input type="hidden" id="selected-status" name="status">
+                    <input type="hidden" id="selected-krise-status" name="krise-status"
+                        value="{{ evakuert.krise_status if evakuert and evakuert.krise_status else '' }}">
                 </div>
             </div>
-
+            </br>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div>
+                    <label for="krise-type" class="block mb-1">Krise type</label>
+                    <input type="text" id="krise-type" name="krise-type" placeholder="flåm"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                        value="{{ evakuert.krise_type if evakuert else '' }}">
+                </div>
+                <div>
+                    <label for="krise-navn" class="block mb-1">Krise navn</label>
+                    <input type="text" id="krise-navn" name="krise-navn" placeholder="flåm Odda 2019"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                        value="{{ evakuert.krise_navn if evakuert else '' }}">
+                </div>
+                <div class="mb-6">
+                    <label for="krise-lokasjon" class="block mb-1">Lokasjon</label>
+                    <input type="text" id="krise-lokasjon" name="krise-lokasjon" placeholder="Odda sentrum"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                        value="{{ evakuert.krise_lokasjon if evakuert else '' }}">
+                </div>
+            </div>
             <div class="mb-6">
-                <div class="flex space-x-2">
-                    <label for="evak-fnavn" class="mt-2">Fornavn:</label>
-                    <input id="evak-fnavn" type="text" name="evak-fnavn" placeholder="Ola" class="input-field border rounded p-2 w-full" value="{{ evakuert.evak_fnavn if evakuert else '' }}">
-                    <label for="evak-mnavn" class="mt-2">Mellomnavn:</label>
-                    <input id="evak-mnavn" type="text" name="evak-mnavn" placeholder="Sylvert" class="input-field border rounded p-2 w-full" value="{{ evakuert.evak_mnavn if evakuert else '' }}">
-                    <label for="evak-enavn" class="mt-2">Etternavn:</label>
-                    <input id="evak-enavn" type="text" name="evak-enavn" placeholder="Nordmann" class="input-field border rounded p-2 w-full" value="{{ evakuert.evak_enavn if evakuert else '' }}">
-                </div>
-                <div class="flex space-x-2 mt-4">
-                    <label for="evak-tlf" class="mt-2">Tlf:</label>
-                    <input id="evak-tlf" type="tel" name="evak-tlf" placeholder="Telefonnummer" class="input-field border rounded p-2 w-full" value="{{ evakuert.evak_tlf if evakuert else '' }}">
-                    <label for="evak-adresse" class="mt-2">Adresse:</label>
-                    <input id="evak-adresse" type="text" name="evak-adresse" placeholder="Adresse" class="input-field border rounded p-2 w-full" value="{{ evakuert.evak_adresse if evakuert else '' }}">
-                </div>
+                <label for="annen-info" class="block mb-1">Annen informasjon:</label>
+                <textarea id="annen-info" name="annen-info" rows="4"
+                    class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500">{{ evakuert.annen_info if evakuert else '' }}</textarea>
             </div>
 
-            <div>
-                <hr class="my-12 h-0.5 border-t-0 bg-black" />
-            </div>
+            <hr class="my-12 border-t border-gray-300">
 
-            <!-- kontaktperson informasjon -->
+            <!-- Evakuertes Info Section -->
+            <h1 class="text-xl font-bold mb-4">Personlig Informasjon</h1>
             <div class="mb-6">
-                <label class="block font-bold mb-2">Pårørende Info</label>
-                <div class="flex space-x-2">
-                    <label for="kon-fnavn" class="mt-2">Fornavn:</label>
-                    <input id="kon-fnavn" type="text" name="kon-fnavn" placeholder="Ola" class="input-field border rounded p-2 w-full" value="{{ evakuert.kon_fnavn if evakuert else '' }}">
-                    <label for="kon-mnavn" class="mt-2">Mellomnavn:</label>
-                    <input id="kon-mnavn" type="text" name="kon-mnavn" placeholder="Mellomnavn" class="input-field border rounded p-2 w-full" value="{{ evakuert.kon_mnavn if evakuert else '' }}">
-                    <label for="kon-enavn" class="mt-2">Etternavn:</label>
-                    <input id="kon-enavn" type="text" name="kon-enavn" placeholder="Etternavn" class="input-field border rounded p-2 w-full" value="{{ evakuert.kon_enavn if evakuert else '' }}">
+                <label class="text-center block font-bold mb-2">Evakuert Status</label>
+                <div class="relative flex justify-center">
+                    <button id="evak_status" type="button"
+                        class="h-12 w-48 px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition">
+                        {{ evakuert.evak_status if evakuert and evakuert.evak_status else "Velg Status" }}
+                    </button>
+                    <ul id="dropdownMenu"
+                    class="hidden absolute mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <li class="h-12 px-4 py-2 text-sm rounded-t bg-green-700 text-white hover:bg-green-600 cursor-pointer"
+                        data-color="bg-green-700" data-value="1">OK</li>
+                    <li class="h-12 px-4 py-2 text-sm bg-yellow-600 text-white hover:bg-yellow-500 cursor-pointer"
+                        data-color="bg-yellow-600" data-value="2">Mindre skader</li>
+                    <li class="h-12 px-4 py-2 text-sm rounded-b bg-red-700 text-white hover:bg-red-600 cursor-pointer"
+                        data-color="bg-red-700" data-value="3">Kritisk</li>
+                    </ul>
+                    <input type="hidden" id="selected-status" name="status"
+                        value="{{ evakuert.evak_status if evakuert and evakuert.evak_status else '' }}">
                 </div>
-                <div class="flex space-x-2 mt-4">
-                    <label for="kon-tlf" class="mt-2">Tlf:</label>
-                    <input id="kon-tlf" type="tel" name="kon-tlf" placeholder="Telefonnummer" class="input-field border rounded p-2 w-full" value="{{ evakuert.kon_tlf if evakuert else '' }}">
-                    <label for="kon-adresse" class="mt-2">Adresse:</label>
-                    <input id="kon-adresse" type="text" name="kon-adresse" placeholder="Adresse" class="input-field border rounded p-2 w-full" value="{{ evakuert.kon_adresse if evakuert else '' }}">
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div>
+                    <label for="evak-fnavn" class="block mb-1">Fornavn:</label>
+                    <input id="evak-fnavn" type="text" name="evak-fnavn" placeholder="Ola"
+                        class="border rounded p-2 w-full" value="{{ evakuert.evak_fnavn if evakuert else '' }}">
+                </div>
+                <div>
+                    <label for="evak-mnavn" class="block mb-1">Mellomnavn:</label>
+                    <input id="evak-mnavn" type="text" name="evak-mnavn" placeholder="Sylvert"
+                        class="border rounded p-2 w-full" value="{{ evakuert.evak_mnavn if evakuert else '' }}">
+                </div>
+                <div>
+                    <label for="evak-enavn" class="block mb-1">Etternavn:</label>
+                    <input id="evak-enavn" type="text" name="evak-enavn" placeholder="Nordmann"
+                        class="border rounded p-2 w-full" value="{{ evakuert.evak_enavn if evakuert else '' }}">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div>
+                    <label for="evak-tlf" class="block mb-1">Tlf:</label>
+                    <input id="evak-tlf" type="tel" name="evak-tlf" placeholder="Telefonnummer"
+                        class="border rounded p-2 w-full" value="{{ evakuert.evak_tlf if evakuert else '' }}">
+                </div>
+                <div>
+                    <label for="evak-adresse" class="block mb-1">Adresse:</label>
+                    <input id="evak-adresse" type="text" name="evak-adresse" placeholder="Adresse"
+                        class="border rounded p-2 w-full" value="{{ evakuert.evak_adresse if evakuert else '' }}">
+                </div>
+                <div>
+                    <label for="evak-lokasjon" class="block mb-1">Lokasjon:</label>
+                    <input id="evak-lokasjon" type="text" name="evak-lokasjon" placeholder="Hvor befinner du deg nå?"
+                        class="border rounded p-2 w-full" value="{{ evakuert.evak_lokasjon if evakuert else '' }}">
+                </div>
+            </div>
+
+            <hr class="my-12 border-t border-gray-300">
+
+            <!-- Kontaktperson Informasjon Section -->
+            <h1 class="text-xl font-bold mb-4">Pårørende Info</h1>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div>
+                    <label for="kon-fnavn" class="block mb-1">Fornavn:</label>
+                    <input id="kon-fnavn" type="text" name="kon-fnavn" placeholder="Ola"
+                        class="border rounded p-2 w-full" value="{{ evakuert.kon_fnavn if evakuert else '' }}">
+                </div>
+                <div>
+                    <label for="kon-mnavn" class="block mb-1">Mellomnavn:</label>
+                    <input id="kon-mnavn" type="text" name="kon-mnavn" placeholder="Mellomnavn"
+                        class="border rounded p-2 w-full" value="{{ evakuert.kon_mnavn if evakuert else '' }}">
+                </div>
+                <div>
+                    <label for="kon-enavn" class="block mb-1">Etternavn:</label>
+                    <input id="kon-enavn" type="text" name="kon-enavn" placeholder="Etternavn"
+                        class="border rounded p-2 w-full" value="{{ evakuert.kon_enavn if evakuert else '' }}">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div>
+                    <label for="kon-tlf" class="block mb-1">Tlf:</label>
+                    <input id="kon-tlf" type="tel" name="kon-tlf" placeholder="Telefonnummer"
+                        class="border rounded p-2 w-full" value="{{ evakuert.kon_tlf if evakuert else '' }}">
                 </div>
             </div>
 
@@ -115,50 +172,64 @@
     </main>
 
     <script>
-        const adminButton = document.getElementById('adminButton');
-        const adminModel = document.getElementById('adminModel');
-        const closeModel = document.getElementById('closeModel');
-        const loginForm = document.getElementById('loginForm');
-        const errorMessage = document.getElementById('errorMessage');
-        const dropdownButton = document.getElementById('dropdownButton');
+        // Existing dropdown for evakuert status
+        const dropdownButton = document.getElementById('evak_status');
         const dropdownMenu = document.getElementById('dropdownMenu');
         const dropdownOptions = dropdownMenu.querySelectorAll('li');
 
-        document.querySelector("form").addEventListener("submit", function() {
+        document.querySelector("form").addEventListener("submit", function () {
             document.getElementById('selected-status').value = dropdownButton.textContent.trim();
+            document.getElementById('selected-krise-status').value = kriseDropdownButton.textContent.trim();
         });
-                
+
         dropdownButton.addEventListener('click', () => {
             dropdownMenu.classList.toggle('hidden');
         });
-    
+
         document.addEventListener('click', (event) => {
             if (!dropdownButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
                 dropdownMenu.classList.add('hidden');
             }
         });
-    
+
         dropdownOptions.forEach(option => {
             option.addEventListener('click', () => {
                 const colorClass = option.getAttribute('data-color');
                 const colorName = option.textContent;
-    
+
                 // Update the button background color and text
-                dropdownButton.className = `w-48 h-12 px-4 py-2 text-white border border-gray-300 rounded-md shadow-sm ${colorClass}`;
+                dropdownButton.className = `w-full h-12 px-4 py-2 text-white border border-gray-300 rounded-md shadow-sm ${colorClass}`;
                 dropdownButton.textContent = colorName;
-    
+
                 dropdownMenu.classList.add('hidden');
             });
         });
 
-        // Add this to your existing JavaScript
-        dropdownOptions.forEach(option => {
+        // New dropdown for Krise status
+        const kriseDropdownButton = document.getElementById('krise-status');
+        const kriseDropdownMenu = document.getElementById('kriseDropdownMenu');
+        const kriseDropdownOptions = kriseDropdownMenu.querySelectorAll('li');
+
+        kriseDropdownButton.addEventListener('click', () => {
+            kriseDropdownMenu.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!kriseDropdownButton.contains(event.target) && !kriseDropdownMenu.contains(event.target)) {
+                kriseDropdownMenu.classList.add('hidden');
+            }
+        });
+
+        kriseDropdownOptions.forEach(option => {
             option.addEventListener('click', () => {
-                const statusValue = option.getAttribute('data-color').replace('bg-', '');
-                document.getElementById('selected-status').value = statusValue;
+                const selectedValue = option.getAttribute('data-value');
+                kriseDropdownButton.textContent = selectedValue;
+                document.getElementById('selected-krise-status').value = selectedValue;
+                kriseDropdownMenu.classList.add('hidden');
             });
         });
     </script>
 
 </body>
+
 </html>
