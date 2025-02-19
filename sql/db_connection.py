@@ -84,6 +84,28 @@ def update_status(evakuert_id, status, lokasjon):
         if 'conn' in locals():
             conn.close()
 
+
+# Function to fetch all kriser
+def fetch_all_kriser():
+    try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+        cursor.execute("SELECT KriseID, KriseNavn FROM Krise")
+        rows = cursor.fetchall()
+        
+        return [{'KriseID': row[0], 'KriseNavn': row[1]} for row in rows]
+    
+    except pyodbc.Error as e:
+        print(f"Error: {e}")
+        return []
+    
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
+
 # Function to run an SQL query (e.g., insert, update, delete)
 def run_query(query):
     try:
@@ -95,6 +117,26 @@ def run_query(query):
     except pyodbc.Error as e:
         print(f"An error occurred: {e}")
     
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
+# Finne alle lokasjoner i databasen for å vise i dropdown
+def fetch_all_locations():
+    try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+        cursor.execute("SELECT DISTINCT Lokasjon FROM Krise")
+        rows = cursor.fetchall()
+
+        return [{'LokasjonID': index + 1, 'LokasjonNavn': row[0]} for index, row in enumerate(rows)]
+
+    except pyodbc.Error as e:
+        print(f"An error occurred: {e}")
+        return []
+
     finally:
         if 'cursor' in locals():
             cursor.close()
