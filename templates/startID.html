@@ -1,54 +1,41 @@
 <!DOCTYPE html>
 <html lang="no">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .hover-effect:hover {
-            transform: translateY(-5px);
-            transition: transform 0.3s ease;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    .hover-effect:hover {
+      transform: translateY(-5px);
+      transition: transform 0.3s ease;
+    }
+  </style>
 </head>
-<body class="bg-gray-100 p-4 gap-20 dark:bg-slate-900 flex items-center justify-center min-h-screen">
-    <div class="w-full max-w-md p-6 bg-white dark:bg-slate-800 rounded-lg shadow-lg">
-        <label for="ID" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Ikke registert fra før av
-        </label>
-        <input
-            type="text"
-            id="ID"
-            name="ID"
-            class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-slate-700 dark:text-white dark:placeholder-gray-400 transition duration-300 hover:border-gray-400"
-        />
-        <button>
-            <ul class="flex flex-col p-4 mt-4 space-x-8 md:flex-row md:mt-0 text-lg">
-                <li><a href="{{ url_for('iot') }}" class="bg-violet-500 hover:bg-violet-600 focus:outline-2 focus:outline-offset-2 focus:outline-violet-500 active:bg-violet-700">Neste side</a></li>
-            </ul>
-        </button>
-        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            Legg til ID som du har fått fra registeringen eller skriv inn ditt fulle navn med fornavn og etternavn
-        </p>
-    </div>
+<body class="bg-white p-4 flex flex-col items-center justify-center min-h-screen">
 
-    <div class="w-full max-w-md p-6 bg-white dark:bg-slate-800 rounded-lg shadow-lg">
-        <label for="ID" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Registert fra før av
-        </label>
-        <div class="flex flex-col space-y-4 md:flex-row md:space-y-0 md:space-x-4">
-            <button class="bg-red-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-rose-600 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:bg-violet-700 transition duration-200">
-                <a href="{{ url_for('iot') }}" class="block w-full h-full">Logg inn med ansikt</a>
-            </button>
-        
-            <button class="bg-red-600 text-white font-semibold py-3 px-6 rounded-lg hover:bg-rose-600 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 active:bg-violet-700 transition duration-200">
-                <a href="{{ url_for('iot') }}" class="block w-full h-full">Logg inn med finger</a>
-            </button>
-        </div>
-        <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-            Legg til ID som du har fått fra registeringen eller skriv inn ditt fulle navn med fornavn og etternavn
-        </p>
+  <!-- Registered User Section -->
+  <div class="w-full max-w-md p-6 mt-6 bg-white rounded-lg shadow-lg border border-red-500">
+    <label for="ID" class="block text-sm font-medium text-red-500 mb-2">
+    </label>
+    <div class="flex flex-col gap-4 md:flex-row">
+      <a
+        href="{{ url_for('iot_login') }}"
+        class="block w-full text-center bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 active:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200"
+      >
+        Logg inn(For deg som har registert deg før på systemet)
+      </a>
+      <a
+        href="{{ url_for('newuser') }}"
+        class="block w-full text-center bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 active:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200"
+      >
+        Ny bruker(For deg som IKKE har registert deg for på systemet)
+      </a>
     </div>
+    <p class="mt-2 text-sm text-uiared">
+      Legg til ID som du har fått fra registeringen eller skriv inn ditt fulle navn med fornavn og etternavn
+    </p>
+  </div>
+
 </body>
 </html>

@@ -3,6 +3,7 @@ CREATE TABLE Krise (
     KriseID INT NOT NULL IDENTITY(1,1),
     KriseSituasjonType VARCHAR(256) NULL,
     KriseNavn VARCHAR(256) NULL,
+    Status VARCHAR(256) NOT NULL,
     Lokasjon VARCHAR(256) NOT NULL,
     Tekstboks TEXT NULL,
     PRIMARY KEY (KriseID)
@@ -14,7 +15,7 @@ CREATE TABLE Evakuerte (
     Fornavn VARCHAR(256) NULL,
     MellomNavn VARCHAR(256) NULL,
     Etternavn VARCHAR(256) NULL,
-    Telefonnummer INT NULL,
+    Telefonnummer VARCHAR(20) NULL,
     Adresse VARCHAR(256) NULL,
     KriseID INT NULL,
     FOREIGN KEY (KriseID) REFERENCES Krise(KriseID)
@@ -24,9 +25,9 @@ CREATE TABLE Evakuerte (
 CREATE TABLE KontaktPerson (
     KontaktPersonID INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
     Fornavn VARCHAR(256) NULL,
-    MellomNavn VARCHAR(256) NULL
+    MellomNavn VARCHAR(256) NULL,
     Etternavn VARCHAR(256) NULL,
-    Telefonnummer INT NULL,
+    Telefonnummer VARCHAR(20) NULL,
     EvakuertID INT NULL,
     FOREIGN KEY (EvakuertID) REFERENCES Evakuerte(EvakuertID) ON DELETE CASCADE
 );

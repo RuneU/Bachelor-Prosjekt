@@ -39,7 +39,7 @@
                     <li><a href="https://norwegiankiwi-glitch.github.io/bachelor-gruppe" target="_blank" class="text-blue-400 hover:text-blue-300 transition duration-300">Om oss</a></li>
                     <li><a href="#tjenester" class="text-blue-400 hover:text-blue-300 transition duration-300">Tjenester</a></li>
                     <li><a href="https://norwegiankiwi-glitch.github.io/bachelor-gruppe/#kontakt-oss" target="_blank" class="text-blue-400 hover:text-blue-300 transition duration-300">Kontakt oss</a></li>
-                    <li><a href="{{ url_for('register') }}" class="text-blue-400 hover:text-blue-300 transition duration-300">Registrering</a></li>
+                    <li><a href="{{ url_for('registrer.register') }}" class="text-blue-400 hover:text-blue-300 transition duration-300">Registrering</a></li>
                     <li><a href="{{ url_for('iot') }}" class="text-blue-400 hover:text-blue-300 transition duration-300">IOT</a></li>
                     <li><a href="{{ url_for('startID') }}" class="text-blue-400 hover:text-blue-300 transition duration-300">startID</a></li>
                     <li><a href="{{ url_for('admin') }}" class="text-blue-400 hover:text-blue-300 transition duration-300">Admin</a></li>
@@ -57,15 +57,8 @@
         </p>
     </main>
 
-    <!-- Footer Section -->
-    <footer class="bg-gray-800 text-gray-400 text-center py-6">
-        <p>&copy; <span id="year"></span> Gruppe 4. Alle rettigheter reservert.</p>
-    </footer>
-
-    <script>
-        // Get the current year and update the footer
-        document.getElementById("year").textContent = new Date().getFullYear();
-    </script>
+    <!-- Include Footer Component -->
+    {% include 'footer.html' %}
     <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
 </body>
 

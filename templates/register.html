@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="no">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,13 +9,14 @@
     <title>Registreringsside</title>
     <link rel="stylesheet" href="{{url_for('static',filename='dist/css/output.css')}}">
 </head>
-<body class="bg-uiared text-gray-200 font-sans flex flex-col min-h-screen">
+
+<body class="bg-blue-500 text-gray-200 font-sans flex flex-col min-h-screen">
 
     <!-- Header Section -->
     <header class="bg-uiared shadow-md">
         <nav class="container mx-auto flex justify-between items-center py-4 px-6">
             <div>
-            <button id="adminButton" class="bg-yellow-300 text-black font-bold py-2 px-4 rounded">Admin</button>
+                <button id="adminButton" class="bg-yellow-300 text-black font-bold py-2 px-4 rounded">Admin</button>
             </div>
             <h1 class="text-lg font-bold">Registrering</h1>
             <span>Innlogget</span>
@@ -22,23 +24,28 @@
     </header>
     <!-- Admin Login Model (Popup) -->
     <div id="adminModel" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center z-50">
-        <div class="absolute top-20 left-1/2 transform -translate-x-1/2 bg-white text-black rounded-lg shadow-lg w-96 p-6">
+        <div
+            class="absolute top-20 left-1/2 transform -translate-x-1/2 bg-white text-black rounded-lg shadow-lg w-96 p-6">
             <h2 class="text-xl font-bold text-center mb-4">Admin Login</h2>
 
             <!-- Login Form -->
             <form id="loginForm">
                 <div class="mb-4">
                     <label class="block font-bold mb-1">Username</label>
-                    <input type="text" id="username" class="w-full p-2 border border-gray-300 rounded" placeholder="Enter your username">
+                    <input type="text" id="username" class="w-full p-2 border border-gray-300 rounded"
+                        placeholder="Enter your username">
                 </div>
                 <div class="mb-4">
                     <label class="block font-bold mb-1">Password</label>
-                    <input type="password" id="password" class="w-full p-2 border border-gray-300 rounded" placeholder="Enter your password">
+                    <input type="password" id="password" class="w-full p-2 border border-gray-300 rounded"
+                        placeholder="Enter your password">
                 </div>
 
                 <div class="flex justify-between items-center">
-                    <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">Login</button>
-                    <button id="closeModel" type="button" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">Close</button>
+                    <button type="submit"
+                        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">Login</button>
+                    <button id="closeModel" type="button"
+                        class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">Close</button>
                 </div>
             </form>
 
@@ -49,50 +56,144 @@
 
     <!-- Main Content -->
     <main class="container mx-auto py-10 px-6 flex-grow bg-gray-100 text-gray-800 rounded-lg">
-        <h2 class="text-center font-bold text-lg mb-4">Status</h2>
-        <div class="relative flex justify-center mb-6">
-            <div class="relative">
-                <button id="dropdownButton" type="button" class="h-12 w-48 px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition">
-                    Velg en farge
-                </button>                
-                <ul id="dropdownMenu" class="hidden absolute mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                    <li class="h-12 px-4 py-2 text-sm bg-green-700 text-white hover:bg-green-600 cursor-pointer" data-color="bg-green-700"></li>
-                    <li class="h-12 px-4 py-2 text-sm bg-yellow-600 text-white hover:bg-yellow-500 cursor-pointer" data-color="bg-yellow-600"></li>
-                    <li class="h-12 px-4 py-2 text-sm bg-red-700 text-white hover:bg-red-600 cursor-pointer" data-color="bg-red-700"></li>
-                </ul>
-            </div>
-        </div>
+        <form method="POST" action="{{ url_for('registrer.register') }}">
+            <input type="hidden" name="evakuert_id" value="{{ evakuert.EvakuertID if evakuert else '' }}">
+            <input type="hidden" name="krise_id" value="{{ evakuert.KriseID if evakuert else '' }}">
+            <input type="hidden" name="kontakt_person_id" value="{{ evakuert.KontaktPersonID if evakuert else '' }}">
+            <input type="hidden" name="status_id" value="{{ evakuert.StatusID if evakuert else '' }}">
 
-        <div class="mb-6">
-            <label class="block font-bold mb-2">Personlig Informasjon</label>
-            <div class="flex space-x-2">
-                <input type="text" placeholder="Fornavn" class="border rounded p-2 w-full">
-                <input type="text" placeholder="Mellomnavn" class="border rounded p-2 w-full">
-                <input type="text" placeholder="Etternavn" class="border rounded p-2 w-full">
-            </div>
-            <div class="flex space-x-2 mt-4">
-                <label class="mt-2">Tlf:</label>
-                <input type="tel" placeholder="Telefonnummer" class="border rounded p-2 w-full">
-                <input type="text" placeholder="Adresse" class="border rounded p-2 w-full">
-            </div>
-        </div>
-        <div class="mb-6">
-            <label class="block font-bold mb-2">Pårørende Info</label>
-            <div class="flex space-x-2">
-                <input type="text" placeholder="Fornavn" class="border rounded p-2 w-full">
-                <input type="text" placeholder="Mellomnavn" class="border rounded p-2 w-full">
-                <input type="text" placeholder="Etternavn" class="border rounded p-2 w-full">
-            </div>
-            <div class="flex space-x-2 mt-4">
-                <label class="mt-2">Tlf:</label>
-                <input type="tel" placeholder="Telefonnummer" class="border rounded p-2 w-full">
-                <input type="text" placeholder="Adresse" class="border rounded p-2 w-full">
-            </div>
-        </div>
 
-        <div class="text-center">
-            <button class="bg-gray-700 text-white px-6 py-2 rounded">Bekreft</button>
-        </div>
+
+            </div>
+            <!-- Informasjon om krisen -->
+            <div class="mb-6">
+                <label for="krise-type" class="block mt-2 text-sm font-medium text-gray-900">Krise type</label>
+                <input type="text" id="krise-type" name="krise-type" placeholder="flåm"
+                    class="input-field w-64 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+                    value="{{ evakuert.krise_type if evakuert else '' }}">
+            </div>
+            <div class="mb-6">
+                <label for="krise-navn" class="block mt-2 text-sm font-medium text-gray-900">Krise navn</label>
+                <select id="krise-navn" name="krise-navn"
+                    class="input-field w-64 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                    {% for krise in kriser %}
+                    <option value="{{ krise.KriseID }}" {% if evakuert and evakuert.krise_id==krise.KriseID %}selected{%
+                        endif %}>{{ krise.KriseNavn }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-6">
+                <label for="lokasjon" class="block mt-2 text-sm font-medium text-gray-900">Lokasjon</label>
+                <select id="lokasjon" name="lokasjon"
+                    class="input-field w-64 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                    {% for location in locations %}
+                    <option value="{{ location.LokasjonID }}" {% if evakuert and evakuert.lokasjon_id==location.LokasjonID %}selected{% endif %}>
+                        {{ location.LokasjonNavn }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <hr class="my-12 h-0.5 border-t-0 bg-black" />
+                <div>
+                </div>
+                <h2 class="text-center font-bold text-lg mb-4">Status</h2>
+                <div class="relative flex justify-center mb-6">
+                    <div class="relative justify-center mb-6">
+                        <button id="dropdownButton" type="button"
+                            class="h-12 w-48 px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition">
+                            Velg en farge
+                        </button>
+                        <ul id="dropdownMenu"
+                            class="hidden absolute mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none left-1/2 transform -translate-x-1/2">
+                            <li class="h-12 px-4 py-2 text-sm border-2 border-green-700 text-black cursor-pointer"
+                                data-color="border-green-700" data-value="1">Ok</li>
+                            <li class="h-12 px-4 py-2 text-sm border-2 border-yellow-600 text-black cursor-pointer"
+                                data-color="border-yellow-600" data-value="2">Mindre skader</li>
+                            <li class="h-12 px-4 py-2 text-sm border-2 border-red-700 text-black cursor-pointer"
+                                data-color="border-red-700" data-value="3">Hard Skadet</li>
+                        </ul>
+                        <input type="hidden" id="status" name="status" value="">
+                    </div>
+                </div>
+                <label class="block font-bold mb-2">Personlig Informasjon</label>
+                <div class="grid gap-6 mb-6 md:grid-cols-3">
+                    <div>
+                        <label for="fornavn" class="block mb-2 text-sm font-medium text-gray-900">Fornavn</label>
+                        <input type="text" id="fornavn" name="fornavn"
+                            class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            placeholder="Ola" />
+                    </div>
+                    <div>
+                        <label for="mellomnavn" class="block mb-2 text-sm font-medium text-gray-900">Mellomnavn</label>
+                        <input type="text" id="mellomnavn" name="mellomnavn"
+                            class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            placeholder="Mellomnavn" />
+                    </div>
+                    <div>
+                        <label for="etternavn" class="block mb-2 text-sm font-medium text-gray-900">Etternavn</label>
+                        <input type="text" id="etternavn" name="etternavn"
+                            class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            placeholder="Normann" />
+                    </div>
+                </div>
+                <div class="grid gap-6 mb-6 md:grid-cols-2">
+                    <div>
+                        <label for="adresse" class="block mb-2 text-sm font-medium text-gray-900">Adresse</label>
+                        <input type="text" id="adresse" name="adresse"
+                            class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            placeholder="Osloveien 1" />
+                    </div>
+                    <div>
+                        <label for="telefonnummer"
+                            class="block mb-2 text-sm font-medium text-gray-900">Telefonnummer</label>
+                        <input type="tel" id="telefonnummer" name="telefonnummer"
+                            class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            placeholder="+47" />
+                    </div>
+
+                </div>
+                <div>
+                    <hr class="my-12 h-0.5 border-t-0 bg-black" />
+                </div>
+                <!-- Pårørende Info Section -->
+                <label class="block font-bold mb-2">Pårørende Informasjon</label>
+                <div class="grid gap-6 mb-6 md:grid-cols-3">
+                    <div>
+                        <label for="parorende_fornavn"
+                            class="block mb-2 text-sm font-medium text-gray-900">Fornavn</label>
+                        <input type="text" id="parorende_fornavn" name="parorende_fornavn"
+                            class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            placeholder="Ola" value="{{ evakuert.parorende_fornavn if evakuert else '' }}" />
+                    </div>
+                    <div>
+                        <label for="parorende_mellomnavn"
+                            class="block mb-2 text-sm font-medium text-gray-900">Mellomnavn</label>
+                        <input type="text" id="parorende_mellomnavn" name="parorende_mellomnavn"
+                            class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            placeholder="Mellomnavn" />
+                    </div>
+                    <div>
+                        <label for="parorende_etternavn"
+                            class="block mb-2 text-sm font-medium text-gray-900">Etternavn</label>
+                        <input type="text" id="parorende_etternavn" name="parorende_etternavn"
+                            class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            placeholder="Normann" />
+                    </div>
+                </div>
+                <div class="grid gap-6 mb-6 md:grid-cols-2">
+                    <div>
+                        <label for="parorende_telefonnummer"
+                            class="block mb-2 text-sm font-medium text-gray-900">Telefonnummer</label>
+                        <input type="tel" id="parorende_telefonnummer" name="parorende_telefonnummer"
+                            class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                            placeholder="+47" />
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="bg-gray-700 text-white px-6 py-2 rounded">Bekreft</button>
+                </div>
+        </form>
     </main>
     <script>
         const adminButton = document.getElementById('adminButton');
@@ -103,34 +204,37 @@
         const dropdownButton = document.getElementById('dropdownButton');
         const dropdownMenu = document.getElementById('dropdownMenu');
         const dropdownOptions = dropdownMenu.querySelectorAll('li');
+        const statusInput = document.getElementById('status');
 
-                
         dropdownButton.addEventListener('click', () => {
             dropdownMenu.classList.toggle('hidden');
         });
-    
+
         document.addEventListener('click', (event) => {
             if (!dropdownButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
                 dropdownMenu.classList.add('hidden');
             }
         });
-    
+
         dropdownOptions.forEach(option => {
             option.addEventListener('click', () => {
                 const colorClass = option.getAttribute('data-color');
+                const colorValue = option.getAttribute('data-value');
                 const colorName = option.textContent;
-    
-                // Update the button background color and text
-                dropdownButton.className = `w-48 h-12 px-4 py-2 text-white border border-gray-300 rounded-md shadow-sm ${colorClass}`;
+
+                // Update the button border color and text
+                dropdownButton.className = `w-48 h-12 px-4 py-2 text-black border-2 rounded-md shadow-sm ${colorClass}`;
                 dropdownButton.textContent = colorName;
-    
+
+                // Set the hidden input value
+                statusInput.value = colorValue;
+
                 dropdownMenu.classList.add('hidden');
             });
         });
 
-
-// Show the model when clicking "Admin"
-adminButton.addEventListener('click', () => {
+        // Show the model when clicking "Admin"
+        adminButton.addEventListener('click', () => {
             adminModel.classList.remove('hidden');
             dropdownButton.classList.add('bg-gray-500', 'text-white');
         });
@@ -138,7 +242,7 @@ adminButton.addEventListener('click', () => {
         // Close the model when clicking "Close" button
         closeModel.addEventListener('click', () => {
             adminModel.classList.add('hidden');
-            droppdownButton.classList.remove('bg-gray-500', 'text-white');
+            dropdownButton.classList.remove('bg-gray-500', 'text-white');
         });
 
         // Close the model when clicking outside the model
@@ -164,9 +268,7 @@ adminButton.addEventListener('click', () => {
                 errorMessage.classList.remove('hidden'); // Show error message
             }
         });
-    
-
-
     </script>
 </body>
+
 </html>
