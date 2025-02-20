@@ -4,8 +4,9 @@ import cv2
 sys.dont_write_bytecode = True
 from flask import Flask, Response, request, render_template, jsonify, redirect, send_from_directory, url_for
 sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
-from sql.db_connection import fetch_status_data, update_status, search_statuses, fetch_all_kriser, get_last_inserted_id, run_query, fetch_all_locations
+from sql.db_connection import fetch_status_data, update_status, search_statuses
 from blueprints.admin_reg import admin_reg_bp
+from blueprints.registrer.routes import registrer_bp
 
 try:
     from camera import generate_frames, save_face
@@ -19,56 +20,7 @@ app = Flask(__name__)
 @app.route("/index")
 def index():
     return render_template("index.html")
-
-@app.route("/register", methods=["GET", "POST"])
-def register():
-    if request.method == "POST":
-        try:
-            fornavn = request.form.get("fornavn")
-            mellomnavn = request.form.get("mellomnavn")
-            etternavn = request.form.get("etternavn")
-            adresse = request.form.get("adresse")
-            telefonnummer = request.form.get("telefonnummer")
-            status = request.form.get("status")
-            lokasjon_id = request.form.get("lokasjon")
-            parorende_fornavn = request.form.get("parorende_fornavn")
-            parorende_mellomnavn = request.form.get("parorende_mellomnavn")
-            parorende_etternavn = request.form.get("parorende_etternavn")
-            parorende_telefonnummer = request.form.get("parorende_telefonnummer")
-
-            # Insert data into the database
-            query = f"""
-                INSERT INTO Evakuerte (Fornavn, MellomNavn, Etternavn, Adresse, Telefonnummer)
-                VALUES ('{fornavn}', '{mellomnavn}', '{etternavn}', '{adresse}', '{telefonnummer}');
-            """
-            run_query(query)
-
-            # Get the last inserted EvakuertID
-            evakuert_id = get_last_inserted_id()
-
-            # Insert data into the KontaktPerson table
-            query = f"""
-                INSERT INTO KontaktPerson (Fornavn, MellomNavn, Etternavn, Telefonnummer, EvakuertID)
-                VALUES ('{parorende_fornavn}', '{parorende_mellomnavn}', '{parorende_etternavn}', '{parorende_telefonnummer}', {evakuert_id});
-            """
-            run_query(query)
-
-            # Insert data into the Status table
-            query = f"""
-                INSERT INTO Status (Status, LokasjonID, EvakuertID)
-                VALUES ('{status}', '{lokasjon_id}', {evakuert_id});
-            """
-            run_query(query)
-
-            return redirect(url_for("index"))
-        except Exception as e:
-            print(f"An error occurred: {e}")
-            return "An error occurred while processing your request."
-
-    kriser = fetch_all_kriser()  # Fetch all kriser from the database
-    locations = fetch_all_locations()  # Fetch all locations from the database
-    return render_template('register.html', kriser=kriser, locations=locations)
-
+  
 # Hent data fra databasen og route til Admin page
 @app.route("/admin")
 def admin():
