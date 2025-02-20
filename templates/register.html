@@ -56,7 +56,7 @@
 
     <!-- Main Content -->
     <main class="container mx-auto py-10 px-6 flex-grow bg-gray-100 text-gray-800 rounded-lg">
-        <form method="POST" action="{{ url_for('registrer.register') }}">
+        <form method="POST" action="{{ url_for('register') }}">
             <input type="hidden" name="evakuert_id" value="{{ evakuert.EvakuertID if evakuert else '' }}">
             <input type="hidden" name="krise_id" value="{{ evakuert.KriseID if evakuert else '' }}">
             <input type="hidden" name="kontakt_person_id" value="{{ evakuert.KontaktPersonID if evakuert else '' }}">
