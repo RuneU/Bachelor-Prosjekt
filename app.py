@@ -20,7 +20,7 @@ app = Flask(__name__)
 @app.route("/index")
 def index():
     return render_template("index.html")
-
+  
 # Hent data fra databasen og route til Admin page
 @app.route("/admin")
 def admin():
@@ -46,7 +46,6 @@ def search():
     return render_template("admin.html", statuses=statuses)
 
 app.register_blueprint(admin_reg_bp, url_prefix='/admin-reg')
-app.register_blueprint(registrer_bp)
 
 def generate_frames():
     camera = cv2.VideoCapture(0)  

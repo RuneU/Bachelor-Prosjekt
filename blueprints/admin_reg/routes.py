@@ -1,5 +1,7 @@
+import sys
 from flask import Blueprint, render_template, request, redirect, url_for
 from sql.db_connection import connection_def
+sys.dont_write_bytecode = True
 
 admin_reg_bp = Blueprint('admin_reg', __name__, template_folder='../templates')
 
