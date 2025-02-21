@@ -72,6 +72,7 @@
                     class="input-field w-64 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
                     value="{{ evakuert.krise_type if evakuert else '' }}">
             </div>
+            <!-- Krise -->
             <div class="mb-6">
                 <label for="krise-navn" class="block mt-2 text-sm font-medium text-gray-900">Krise navn</label>
                 <select id="krise-navn" name="krise-navn"
@@ -82,6 +83,7 @@
                     {% endfor %}
                 </select>
             </div>
+            <!-- Lokasjon -->
             <div class="mb-6">
                 <label for="lokasjon" class="block mt-2 text-sm font-medium text-gray-900">Lokasjon</label>
                 <select id="lokasjon" name="lokasjon"
