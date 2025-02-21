@@ -1,3 +1,4 @@
+{% import "components/log_table_component.html" as log_component %}
 <!DOCTYPE html>
 <html lang="no">
 
@@ -134,6 +135,11 @@
                     <input id="evak-lokasjon" type="text" name="evak-lokasjon" placeholder="Hvor befinner du deg nå?"
                         class="border rounded p-2 w-full" value="{{ evakuert.evak_lokasjon if evakuert else '' }}">
                 </div>
+            </div>
+
+            <h1 class="text-l text-center font-bold mb-4">Lokasjons logg</h1>
+            <div class="">
+                {{ log_component.render_log_table(logs) }}
             </div>
 
             <hr class="my-12 border-t border-gray-300">

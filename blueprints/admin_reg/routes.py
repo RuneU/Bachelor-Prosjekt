@@ -236,7 +236,19 @@ def adminreg_with_id(evakuert_id):
             "evak_lokasjon": data[19]
         }
 
-        return render_template("admin-reg.html", evakuert=evakuert_data)
+        # Fetch log data for this EvakuertID.
+        # For example, assume your logs are stored in a table 'Lokasjon_log'
+        # and you query them like this:
+        cursor.execute("""
+            SELECT old_lokasjon, change_date
+            FROM Lokasjon_log
+            WHERE evakuert_id = ?
+            ORDER BY change_date DESC
+        """, (evakuert_id,))
+        logs = [dict(old_lokasjon=row[0], change_date=row[1]) for row in cursor.fetchall()]
+
+        # Now, return the rendered template and pass both evakuert_data and logs
+        return render_template("admin-reg.html", evakuert=evakuert_data, logs=logs)
     
     except Exception as e:
         return f"Database error: {e}", 500
