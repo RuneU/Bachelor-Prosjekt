@@ -35,7 +35,7 @@ Installer flowbite ```npm install flowbite```
 kjør ```python app.py``` for å sjekke at det fungerer.
 
 ## Database tilkobling
-Opprett en env fil i root directory som heter ```.env```
+Opprett en env fil i root directory av prosjektet som heter ```.env```
 
 I ```.env``` filen legg til koden under. Bytt ut plassholder informasjon med den ekte database informasjonen
 
@@ -78,7 +78,10 @@ python -m unittest discover test
  pip install opencv-python-headless   
 ```
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> cf376ac67c9eece8d8169572403f4b53a947d3c1
 Link flask nettside: https://flask.palletsprojects.com/en/stable/installation/
 
 Link til Flowbite for tailwind og flowbite: https://flowbite.com/docs/getting-started/flask/
