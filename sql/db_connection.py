@@ -148,9 +148,10 @@ def get_last_inserted_id():
     try:
         conn = pyodbc.connect(connection_string)
         cursor = conn.cursor()
-        cursor.execute("SELECT @@IDENTITY AS ID")
+        cursor.execute("SELECT SCOPE_IDENTITY() AS ID")
         row = cursor.fetchone()
         return row.ID if row else None
+
     
     except pyodbc.Error as e:
         print(f"An error occurred: {e}")
