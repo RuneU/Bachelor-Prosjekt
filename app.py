@@ -9,9 +9,10 @@ import face_recognition as face
 from face_utils import save_face
 import mysql.connector
 sys.dont_write_bytecode = True
-from flask import Flask, Response, request, render_template, jsonify, redirect, url_for, session
+from datetime import datetime
+from flask import Flask, Response, request, render_template, jsonify, redirect, url_for, session, send_from_directory
 sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
-from sql.db_connection import fetch_status_data, update_status
+from sql.db_connection import fetch_status_data, update_status, search_statuses
 from blueprints.admin_reg import admin_reg_bp
 from dotenv import load_dotenv
 import logging
@@ -23,6 +24,9 @@ logger = logging.getLogger(__name__)
 latest_frame = None
 
 load_dotenv()
+
+from blueprints.registrer.routes import registrer_bp
+
 
 try:
     from face_utils import generate_frames
@@ -58,6 +62,7 @@ def get_db_connection():
 @app.route("/index")
 def index():
     return render_template("index.html")
+
 
 
 
@@ -120,13 +125,14 @@ def register():
 
     
 
+
 # Hent data fra databasen og route til Admin page
 @app.route("/admin")
 def admin():
         statuses = fetch_status_data()  
         return render_template("admin.html", statuses=statuses)
 
-#Status for evakuerte på admin page
+# Status for evakuerte på admin page
 @app.route('/update_status/<int:evakuert_id>', methods=['POST'])
 def update_status_route(evakuert_id):
     status = request.form['status']
@@ -134,6 +140,18 @@ def update_status_route(evakuert_id):
     update_status(evakuert_id, status, lokasjon)
     return redirect(url_for('admin'))
 
+@app.route("/search", methods=["GET"])
+def search():
+    query = request.args.get("query")
+    if query:
+        statuses = search_statuses(query)
+    else:
+        statuses = fetch_status_data()
+    
+    return render_template("admin.html", statuses=statuses)
+
+app.register_blueprint(admin_reg_bp, url_prefix='/admin-reg')
+app.register_blueprint(registrer_bp)
 
 
 @app.route('/capture')
@@ -192,7 +210,6 @@ def startID():
 def newuser():
     return render_template("newuser.html")
 
-
 @app.route("/iot_login")
 def iot_login():
     return render_template("iot_login.html")
@@ -205,13 +222,16 @@ def iot_login():
 
 
 
+"""
+    Koden under her skal jeg få inn i egen fil, men akkurat nå vil jeg få det til å funke(azure blob container vil ikke åpne bilde)
+    """
 
 
 
 
 
 
-from datetime import datetime
+
 
 
 
@@ -242,10 +262,6 @@ def capture_face():
         return jsonify({"success": False, "message": "No faces recognized."})
 
 def recognize_faces_from_image(image_path):
-    """
-    Load the captured image, compute its face encodings,
-    and compare with known faces fetched from the database.
-    """
     # Gather known faces from the Evakuerte table
     known_face_encodings, known_face_ids, known_face_names = fetch_known_faces_from_db()
     
@@ -271,10 +287,7 @@ def recognize_faces_from_image(image_path):
     return recognized_faces
 
 def fetch_known_faces_from_db():
-    """
-    Connect to the database, query the Evakuerte table to fetch ImageURL, EvakuertID, and Fornavn,
-    then download and process each image to extract face encodings.
-    """
+    
     known_face_encodings = []
     known_face_ids = []
     known_face_names = []
@@ -315,10 +328,7 @@ def fetch_known_faces_from_db():
     return known_face_encodings, known_face_ids, known_face_names
 
 def find_best_match(face_encoding, known_face_encodings, known_face_ids, known_face_names):
-    """
-    Compare a captured face encoding against a list of known face encodings.
-    Returns the best match's EvakuertID, name, and the distance metric if the match is under threshold.
-    """
+   
     if not known_face_encodings:
         logger.debug("No known faces available for matching.")
         return None, None, None
@@ -337,10 +347,7 @@ def find_best_match(face_encoding, known_face_encodings, known_face_ids, known_f
     return None, None, None
 
 def generate_frames_with_progress():
-    """
-    Capture frames from the camera and update the global latest_frame.
-    Yields JPEG-encoded frames for streaming.
-    """
+    
     global latest_frame
     camera = cv2.VideoCapture(0)
     if not camera.isOpened():
@@ -389,6 +396,7 @@ def progress():
 @app.route('/recognition')
 def recognition():
     return render_template('recognition.html')
+
 
 
 if __name__ == '__main__':
