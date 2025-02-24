@@ -5,7 +5,7 @@ from io import BytesIO
 import cv2
 import pyodbc
 import numpy as np
-import face_recognition as face
+#import face_recognition as face
 from face_utils import save_face
 import mysql.connector
 sys.dont_write_bytecode = True
@@ -236,167 +236,167 @@ def iot_login():
 
 
 
-@app.route('/capture_face', methods=['POST'])
-def capture_face():
-    global latest_frame
-    if latest_frame is None:
-        logger.error("No frame available. Is the camera running?")
-        return jsonify({"success": False, "message": "No frame available."})
+# @app.route('/capture_face', methods=['POST'])
+# def capture_face():
+#     global latest_frame
+#     if latest_frame is None:
+#         logger.error("No frame available. Is the camera running?")
+#         return jsonify({"success": False, "message": "No frame available."})
     
-    # Create a unique filename for the captured face image
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    image_path = f"static/captured_face_{timestamp}.jpg"
+#     # Create a unique filename for the captured face image
+#     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+#     image_path = f"static/captured_face_{timestamp}.jpg"
     
-    try:
-        cv2.imwrite(image_path, latest_frame)
-        logger.debug(f"Face captured and saved as '{image_path}'")
-    except Exception as e:
-        logger.error(f"Failed to save image: {e}")
-        return jsonify({"success": False, "message": "Failed to save image."})
+#     try:
+#         cv2.imwrite(image_path, latest_frame)
+#         logger.debug(f"Face captured and saved as '{image_path}'")
+#     except Exception as e:
+#         logger.error(f"Failed to save image: {e}")
+#         return jsonify({"success": False, "message": "Failed to save image."})
     
-    # Match the captured face against known faces from the database
-    recognized_faces = recognize_faces_from_image(image_path)
+#     # Match the captured face against known faces from the database
+#     recognized_faces = recognize_faces_from_image(image_path)
     
-    if recognized_faces:
-        return jsonify({"success": True, "recognized_faces": recognized_faces})
-    else:
-        return jsonify({"success": False, "message": "No faces recognized."})
+#     if recognized_faces:
+#         return jsonify({"success": True, "recognized_faces": recognized_faces})
+#     else:
+#         return jsonify({"success": False, "message": "No faces recognized."})
 
-def recognize_faces_from_image(image_path):
-    # Gather known faces from the Evakuerte table
-    known_face_encodings, known_face_ids, known_face_names = fetch_known_faces_from_db()
+# def recognize_faces_from_image(image_path):
+#     # Gather known faces from the Evakuerte table
+#     known_face_encodings, known_face_ids, known_face_names = fetch_known_faces_from_db()
     
-    # Load and encode the captured face image
-    image = face.load_image_file(image_path)
-    captured_encodings = face.face_encodings(image)
+#     # Load and encode the captured face image
+#     image = face.load_image_file(image_path)
+#     captured_encodings = face.face_encodings(image)
     
-    recognized_faces = []
-    for captured_encoding in captured_encodings:
-        best_match_id, best_match_name, distance = find_best_match(
-            captured_encoding,
-            known_face_encodings,
-            known_face_ids,
-            known_face_names
-        )
-        if best_match_id is not None:
-            recognized_faces.append({
-                "id": best_match_id,
-                "name": best_match_name,
-                "distance": float(distance)
-            })
+#     recognized_faces = []
+#     for captured_encoding in captured_encodings:
+#         best_match_id, best_match_name, distance = find_best_match(
+#             captured_encoding,
+#             known_face_encodings,
+#             known_face_ids,
+#             known_face_names
+#         )
+#         if best_match_id is not None:
+#             recognized_faces.append({
+#                 "id": best_match_id,
+#                 "name": best_match_name,
+#                 "distance": float(distance)
+#             })
     
-    return recognized_faces
+#     return recognized_faces
 
-def fetch_known_faces_from_db():
+# def fetch_known_faces_from_db():
     
-    known_face_encodings = []
-    known_face_ids = []
-    known_face_names = []
+#     known_face_encodings = []
+#     known_face_ids = []
+#     known_face_names = []
     
-    connection_string = f"DRIVER={DB_DRIVER};SERVER={DB_SERVER};DATABASE={DB_DATABASE};UID={DB_UID};PWD={DB_PWD}"
+#     connection_string = f"DRIVER={DB_DRIVER};SERVER={DB_SERVER};DATABASE={DB_DATABASE};UID={DB_UID};PWD={DB_PWD}"
     
-    try:
-        connection = pyodbc.connect(connection_string)
-        cursor = connection.cursor()
-        query = "SELECT EvakuertID, ImageURL, Fornavn FROM Evakuerte WHERE ImageURL IS NOT NULL"
-        cursor.execute(query)
-        rows = cursor.fetchall()
+#     try:
+#         connection = pyodbc.connect(connection_string)
+#         cursor = connection.cursor()
+#         query = "SELECT EvakuertID, ImageURL, Fornavn FROM Evakuerte WHERE ImageURL IS NOT NULL"
+#         cursor.execute(query)
+#         rows = cursor.fetchall()
         
-        for row in rows:
-            evakuert_id, image_url, fornavn = row
-            try:
-                logger.debug(f"Fetching image for EvakuertID: {evakuert_id}, ImageURL: {image_url}")
-                response = requests.get(image_url)
-                if response.status_code == 200:
-                    image_data = face.load_image_file(BytesIO(response.content))
-                    encodings = face.face_encodings(image_data)
-                    if len(encodings) > 0:
-                        known_face_encodings.append(encodings[0])
-                        known_face_ids.append(evakuert_id)
-                        known_face_names.append(fornavn)
-                    else:
-                        logger.warning(f"No face found in image for EvakuertID: {evakuert_id}")
-                else:
-                    logger.error(f"Failed to download image for EvakuertID {evakuert_id}: HTTP {response.status_code}")
-            except Exception as e:
-                logger.error(f"Error processing image for EvakuertID {evakuert_id}: {e}")
+#         for row in rows:
+#             evakuert_id, image_url, fornavn = row
+#             try:
+#                 logger.debug(f"Fetching image for EvakuertID: {evakuert_id}, ImageURL: {image_url}")
+#                 response = requests.get(image_url)
+#                 if response.status_code == 200:
+#                     image_data = face.load_image_file(BytesIO(response.content))
+#                     encodings = face.face_encodings(image_data)
+#                     if len(encodings) > 0:
+#                         known_face_encodings.append(encodings[0])
+#                         known_face_ids.append(evakuert_id)
+#                         known_face_names.append(fornavn)
+#                     else:
+#                         logger.warning(f"No face found in image for EvakuertID: {evakuert_id}")
+#                 else:
+#                     logger.error(f"Failed to download image for EvakuertID {evakuert_id}: HTTP {response.status_code}")
+#             except Exception as e:
+#                 logger.error(f"Error processing image for EvakuertID {evakuert_id}: {e}")
         
-        cursor.close()
-        connection.close()
-    except Exception as e:
-        logger.error(f"Database error: {e}")
+#         cursor.close()
+#         connection.close()
+#     except Exception as e:
+#         logger.error(f"Database error: {e}")
     
-    return known_face_encodings, known_face_ids, known_face_names
+#     return known_face_encodings, known_face_ids, known_face_names
 
-def find_best_match(face_encoding, known_face_encodings, known_face_ids, known_face_names):
+# def find_best_match(face_encoding, known_face_encodings, known_face_ids, known_face_names):
    
-    if not known_face_encodings:
-        logger.debug("No known faces available for matching.")
-        return None, None, None
+#     if not known_face_encodings:
+#         logger.debug("No known faces available for matching.")
+#         return None, None, None
     
-    face_distances = face.face_distance(known_face_encodings, face_encoding)
-    best_match_index = np.argmin(face_distances)
-    best_distance = face_distances[best_match_index]
+#     face_distances = face.face_distance(known_face_encodings, face_encoding)
+#     best_match_index = np.argmin(face_distances)
+#     best_distance = face_distances[best_match_index]
     
-    # Set your matching threshold – adjust if necessary
-    threshold = 0.6
-    logger.debug(f"Best match distance: {best_distance} (threshold: {threshold})")
+#     # Set your matching threshold – adjust if necessary
+#     threshold = 0.6
+#     logger.debug(f"Best match distance: {best_distance} (threshold: {threshold})")
     
-    if best_distance < threshold:
-        logger.debug(f"Match found: EvakuertID={known_face_ids[best_match_index]}, Name={known_face_names[best_match_index]}")
-        return known_face_ids[best_match_index], known_face_names[best_match_index], best_distance
-    return None, None, None
+#     if best_distance < threshold:
+#         logger.debug(f"Match found: EvakuertID={known_face_ids[best_match_index]}, Name={known_face_names[best_match_index]}")
+#         return known_face_ids[best_match_index], known_face_names[best_match_index], best_distance
+#     return None, None, None
 
-def generate_frames_with_progress():
+# def generate_frames_with_progress():
     
-    global latest_frame
-    camera = cv2.VideoCapture(0)
-    if not camera.isOpened():
-        logger.error("Failed to open camera.")
-        return
+#     global latest_frame
+#     camera = cv2.VideoCapture(0)
+#     if not camera.isOpened():
+#         logger.error("Failed to open camera.")
+#         return
     
-    try:
-        while True:
-            success, frame = camera.read()
-            if not success:
-                logger.error("Failed to read frame from camera.")
-                break
+#     try:
+#         while True:
+#             success, frame = camera.read()
+#             if not success:
+#                 logger.error("Failed to read frame from camera.")
+#                 break
             
-            # Update the global latest_frame for capture_face to use
-            latest_frame = frame.copy()
-            ret, buffer = cv2.imencode('.jpg', frame)
-            frame_bytes = buffer.tobytes()
+#             # Update the global latest_frame for capture_face to use
+#             latest_frame = frame.copy()
+#             ret, buffer = cv2.imencode('.jpg', frame)
+#             frame_bytes = buffer.tobytes()
             
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
-    finally:
-        camera.release()
+#             yield (b'--frame\r\n'
+#                    b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+#     finally:
+#         camera.release()
 
 
-# Route for video feed with progress updates
-@app.route('/video_feed')
-def video_feed():
-    evakuert_id = request.args.get("evakuert_id")  # Get from URL param
-    recognition_mode = request.args.get('recognition', default=False, type=bool)
-    # Remove the fetching of known faces if they're not used in generate_frames_with_progress
-    if recognition_mode:
-        return Response(generate_frames_with_progress(),
-                        mimetype='multipart/x-mixed-replace; boundary=frame')
-    else:
-        return Response(generate_frames(evakuert_id), 
-                        mimetype='multipart/x-mixed-replace; boundary=frame')
+# # Route for video feed with progress updates
+# @app.route('/video_feed')
+# def video_feed():
+#     evakuert_id = request.args.get("evakuert_id")  # Get from URL param
+#     recognition_mode = request.args.get('recognition', default=False, type=bool)
+#     # Remove the fetching of known faces if they're not used in generate_frames_with_progress
+#     if recognition_mode:
+#         return Response(generate_frames_with_progress(),
+#                         mimetype='multipart/x-mixed-replace; boundary=frame')
+#     else:
+#         return Response(generate_frames(evakuert_id), 
+#                         mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 
-@app.route('/progress')
-def progress():
-    return Response(generate_frames_with_progress(),
-                    mimetype='text/event-stream')
+# @app.route('/progress')
+# def progress():
+#     return Response(generate_frames_with_progress(),
+#                     mimetype='text/event-stream')
 
-# Route for the recognition page
-@app.route('/recognition')
-def recognition():
-    return render_template('recognition.html')
+# # Route for the recognition page
+# @app.route('/recognition')
+# def recognition():
+#     return render_template('recognition.html')
 
 
 
