@@ -38,8 +38,9 @@ def update_status_route(evakuert_id):
 @app.route("/search", methods=["GET"])
 def search():
     query = request.args.get("query")
-    if query:
-        statuses = search_statuses(query)
+    krise_id = request.args.get("KriseID")
+    if query or krise_id:
+        statuses = search_statuses(query, krise_id)
     else:
         statuses = fetch_status_data()
     
