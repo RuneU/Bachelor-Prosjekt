@@ -213,7 +213,7 @@ def search_statuses(query):
 try:
     conn = pyodbc.connect(connection_string)
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM Status")  # SQL query
+    cursor.execute("SELECT * FROM Evakuerte")  # SQL query
     rows = cursor.fetchall()
     
     for row in rows:

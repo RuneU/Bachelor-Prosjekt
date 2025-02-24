@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capture Photo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        #camera {
+            border: 2px solid #ccc;
+            margin-bottom: 20px;
+        }
+        #controls {
+            margin-top: 20px;
+        }
+        #status {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Capture a Photo</h1>
+    
+    <!-- Dynamically set the video feed source -->
+    <img id="camera" width="640" height="480" alt="Camera Feed">
+    <canvas id="canvas" style="display:none;"></canvas>
+    
+    <div id="controls">
+        <button id="capture-btn">Capture</button>
+    </div>
+    
+    <div id="status"></div>
+
+    <script>
+        let evakuertId = null;
+        const camera = document.getElementById("camera");
+        const canvas = document.getElementById("canvas");
+        const captureBtn = document.getElementById("capture-btn");
+        const statusDiv = document.getElementById("status");
+
+        // Prompt for Evakuert ID and start camera
+        document.addEventListener("DOMContentLoaded", () => {
+            evakuertId = prompt("Please enter your Evakuert ID:");
+
+            if (!evakuertId || isNaN(evakuertId)) {
+                alert("Invalid Evakuert ID. Please refresh and enter a valid number.");
+                return;
+            }
+
+            // Set camera feed source with Evakuert ID
+            camera.src = `/video_feed?evakuert_id=${encodeURIComponent(evakuertId)}`;
+        });
+
+        // Capture the image from the video feed
+        function captureImage() {
+            if (!evakuertId) {
+                alert("Evakuert ID is missing. Please refresh and enter it again.");
+                return;
+            }
+
+            const context = canvas.getContext("2d");
+            canvas.width = camera.width;
+            canvas.height = camera.height;
+            context.drawImage(camera, 0, 0, canvas.width, canvas.height);
+
+            const imageData = canvas.toDataURL("image/jpeg");
+
+            // Send the image to the backend
+            sendImageToBackend(imageData);
+        }
+
+        // Send image data to Flask backend
+        async function sendImageToBackend(imageData) {
+            const payload = {
+                evakuert_id: parseInt(evakuertId, 10), // Ensure it's an integer
+                image: imageData,
+            };
+
+            try {
+                const response = await fetch("/save_photo", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    statusDiv.textContent = result.message;
+                } else {
+                    statusDiv.textContent = "Error: " + result.error;
+                }
+            } catch (error) {
+                console.error("Error sending image to backend:", error);
+                statusDiv.textContent = "Failed to send image to backend.";
+            }
+        }
+
+        // Set up capture button
+        captureBtn.addEventListener("click", captureImage);
+    </script>
+</body>
+</html>
