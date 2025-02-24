@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for
-from sql.db_connection import fetch_all_kriser, fetch_all_locations, run_query, get_last_inserted_id, fetch_status_data, update_status, search_statuses
+import pyodbc
+from sql.db_connection import connection_string, run_query, fetch_all_kriser, fetch_all_locations
 
 registrer_bp = Blueprint('registrer', __name__)
 
@@ -19,36 +20,60 @@ def register():
             parorende_etternavn = request.form.get("parorende_etternavn")
             parorende_telefonnummer = request.form.get("parorende_telefonnummer")
 
-            # Insert data into the database
-            query = f"""
-                INSERT INTO Evakuerte (Fornavn, MellomNavn, Etternavn, Adresse, Telefonnummer)
-                VALUES ('{fornavn}', '{mellomnavn}', '{etternavn}', '{adresse}', '{telefonnummer}');
+            # Insert into Evakuerte and retrieve the new ID in one statement
+            # Establish a connection and create a cursor
+            conn = pyodbc.connect(connection_string)
+            cursor = conn.cursor()
+
+            # Insert into Evakuerte and retrieve the new ID in one statement
+            evakuert_query = """
+            SET NOCOUNT ON;
+            INSERT INTO Evakuerte (Fornavn, MellomNavn, Etternavn, Adresse, Telefonnummer)
+            VALUES (?, ?, ?, ?, ?);
+            SELECT SCOPE_IDENTITY() AS ID;
             """
-            run_query(query)
+            cursor.execute(evakuert_query, (fornavn, mellomnavn, etternavn, adresse, telefonnummer))
+            row = cursor.fetchone()
+            if row and row[0]:
+                evakuert_id = int(row[0])
+            else:
+                raise Exception("Failed to retrieve a valid EvakuertID.")
+            conn.commit()
 
-            # Get the last inserted EvakuertID
-            evakuert_id = get_last_inserted_id()
+            cursor.close()
+            conn.close()
 
-            # Insert data into the KontaktPerson table
-            query = f"""
+
+
+
+            # Insert into KontaktPerson using the newly obtained evakuert_id
+            query_kontakt = f"""
                 INSERT INTO KontaktPerson (Fornavn, MellomNavn, Etternavn, Telefonnummer, EvakuertID)
                 VALUES ('{parorende_fornavn}', '{parorende_mellomnavn}', '{parorende_etternavn}', '{parorende_telefonnummer}', {evakuert_id});
             """
-            run_query(query)
+            run_query(query_kontakt)
 
-            # Insert data into the Status table
-            query = f"""
-                INSERT INTO Status (Status, Lokasjon, EvakuertID)
-                VALUES ('{status}', '{lokasjon_id}', {evakuert_id});
-            """
-            run_query(query)
+            print("Request form data:", request.form)
+            print("status:", request.form.get("status"))
+            print("lokasjon:", request.form.get("lokasjon"))
+            print("evakuert_id:", evakuert_id)
+
+            # Insert into Status table using a parameterized query with dynamic values
+            conn = pyodbc.connect(connection_string)
+            cursor = conn.cursor()
+            query_status = "INSERT INTO Status ([Status], Lokasjon, EvakuertID) VALUES (?, ?, ?)"
+            cursor.execute(query_status, (status, lokasjon_id, evakuert_id))
+            conn.commit()
+            cursor.close()
+            conn.close()
+
+
 
             return redirect(url_for("index"))
         except Exception as e:
             print(f"An error occurred: {e}")
             return "An error occurred while processing your request."
 
-    kriser = fetch_all_kriser()  # Fetch all kriser from the database
-    locations = fetch_all_locations()  # Fetch all locations from the database
+    kriser = fetch_all_kriser()
+    locations = fetch_all_locations()
     return render_template('register.html', kriser=kriser, locations=locations)
-
