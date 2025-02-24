@@ -200,6 +200,48 @@ def search_statuses(query):
         if 'conn' in locals():
             conn.close()
 
+def search_statuses(query, krise_id):
+    try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+        search_query = """
+            SELECT s.Status, s.Lokasjon, s.EvakuertID, e.Fornavn, e.Etternavn, e.KriseID
+            FROM Status s
+            JOIN Evakuerte e ON s.EvakuertID = e.EvakuertID
+            WHERE (s.Status LIKE ? OR s.Lokasjon LIKE ? OR e.Fornavn LIKE ? OR e.Etternavn LIKE ?)
+        """
+        params = [f'%{query}%', f'%{query}%', f'%{query}%', f'%{query}%']
+        
+        if krise_id:
+            search_query += " AND e.KriseID = ?"
+            params.append(krise_id)
+        
+        cursor.execute(search_query, params)
+        rows = cursor.fetchall()
+        data = [
+            {
+                'Status': row[0],
+                'Lokasjon': row[1],
+                'EvakuertID': row[2],
+                'Fornavn': row[3],
+                'Etternavn': row[4],
+                'KriseID': row[5]
+            }
+            for row in rows
+        ]
+        
+        print(data)  # Debug print statement to verify the data
+        
+        return data
+    except pyodbc.Error as e:
+        print(f"Error: {e}")
+        return []
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
 # Example usage of run_query function
 # run_query("INSERT INTO Evakuerte (Fornavn) VALUES ('Seb')")  # Add data
 
