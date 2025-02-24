@@ -32,7 +32,7 @@ def fetch_status_data():
         conn = pyodbc.connect(connection_string)
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT s.Status, s.Lokasjon, s.EvakuertID, e.Fornavn, e.Etternavn
+            SELECT s.Status, s.Lokasjon, s.EvakuertID, e.Fornavn, e.Etternavn, e.KriseID
             FROM Status s
             JOIN Evakuerte e ON s.EvakuertID = e.EvakuertID
         """)
@@ -44,7 +44,8 @@ def fetch_status_data():
                 'Lokasjon': row[1],
                 'EvakuertID': row[2],
                 'Fornavn': row[3],
-                'Etternavn': row[4]
+                'Etternavn': row[4],
+                'KriseID': row[5]
             }
             for row in rows
         ]
@@ -168,7 +169,7 @@ def search_statuses(query):
         conn = pyodbc.connect(connection_string)
         cursor = conn.cursor()
         search_query = f"""
-            SELECT s.Status, s.Lokasjon, s.EvakuertID, e.Fornavn, e.Etternavn
+            SELECT s.Status, s.Lokasjon, s.EvakuertID, e.Fornavn, e.Etternavn, e.KriseID
             FROM Status s
             JOIN Evakuerte e ON s.EvakuertID = e.EvakuertID
             WHERE s.Status LIKE ? OR s.Lokasjon LIKE ? OR e.Fornavn LIKE ? OR e.Etternavn LIKE ?
@@ -181,7 +182,8 @@ def search_statuses(query):
                 'Lokasjon': row[1],
                 'EvakuertID': row[2],
                 'Fornavn': row[3],
-                'Etternavn': row[4]
+                'Etternavn': row[4],
+                'KriseID': row[5]
             }
             for row in rows
         ]
