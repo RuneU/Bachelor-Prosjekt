@@ -117,7 +117,7 @@ def get_last_inserted_id():
 try:
     conn = pyodbc.connect(connection_string)
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM Status")  # SQL query
+    cursor.execute("SELECT * FROM Evakuerte")  # SQL query
     rows = cursor.fetchall()
     
     for row in rows:

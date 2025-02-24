@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RFID Reader & Writer</title>
+</head>
+<body>
+    <h1>RFID Reader & Writer</h1>
+
+    <h2>Scan RFID</h2>
+    <form method="POST" action="/">
+        <button type="submit" name="scan">Scan RFID</button>
+    </form>
+
+    {% if scanned_data %}
+        <div id="scan-result">
+            <p><strong>Card UID:</strong> {{ scanned_data.uid }}</p>
+            <p><strong>Stored User ID:</strong> {{ scanned_data.user_id if scanned_data.user_id else 'No ID Found' }}</p>
+            <p><strong>Scan Count:</strong> {{ scanned_data.scan_count }}</p>
+        </div>
+    {% endif %}
+
+    <h2>Write to RFID</h2>
+    <form method="POST" action="/">
+        <input type="text" name="user_id" placeholder="Enter User ID" required>
+        <button type="submit" name="write">Write to RFID</button>
+    </form>
+
+    {% if write_message %}
+        <p style="color: green;"><strong>{{ write_message }}</strong></p>
+    {% endif %}
+
+    {% if error_message %}
+        <p style="color: red;"><strong>{{ error_message }}</strong></p>
+    {% endif %}
+
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Face Recognition</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f7f7f7;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+    }
+    #video-container {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    #videoFeed {
+      border: 2px solid #333;
+    }
+    #captureButton {
+      display: block;
+      margin: 0 auto;
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #captureButton:hover {
+      background-color: #218838;
+    }
+    #result {
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Face Recognition</h1>
+  <div id="video-container">
+    <img id="videoFeed" src="{{ url_for('video_feed', recognition=True) }}" alt="Video Feed" width="640" height="480">
+  </div>
+  <button id="captureButton">Capture Face</button>
+  <div id="result"></div>
+  
+  <script>
+    document.getElementById("captureButton").addEventListener("click", function() {
+      fetch("/capture_face", { method: "POST" })
+      .then(response => response.json())
+      .then(data => {
+        const resultDiv = document.getElementById("result");
+        if (data.success) {
+          resultDiv.innerHTML = "<p>Face captured successfully!</p><pre>" + JSON.stringify(data.recognized_faces, null, 2) + "</pre>";
+        } else {
+          resultDiv.innerHTML = "<p>Error: " + data.message + "</p>";
+        }
+      })
+      .catch(error => {
+        document.getElementById("result").innerText = "Error capturing face.";
+        console.error("Error:", error);
+      });
+    });
+  </script>
+</body>
+</html>
