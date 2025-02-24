@@ -46,7 +46,12 @@ def search():
     return render_template("admin.html", statuses=statuses)
 
 app.register_blueprint(admin_reg_bp, url_prefix='/admin-reg')
+
 app.register_blueprint(registrer_bp)
+
+@app.route('/incident_creation')
+def incident_creation():
+    return render_template('incident_creation.html')
 
 def generate_frames():
     camera = cv2.VideoCapture(0)  
