@@ -48,12 +48,11 @@
             </br>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div>
-                    <div>
-                        <label for="krise-type" class="block mb-1">Krise situasjonstype</label>
-                        <input type="text" id="krise-type" name="krise-type" placeholder="flåm"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                            value="{{ evakuert.krise_type if evakuert else '' }}">
-                    </div>
+                    <label for="krise-type" class="block mb-1">Krise type</label>
+                    <input type="text" id="krise-type" name="krise-type" placeholder="flåm"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                        value="{{ evakuert.krise_type if evakuert else '' }}">
+                </div>
                 <div>
                     <label for="krise-navn" class="block mb-1">Krise navn</label>
                     <input type="text" id="krise-navn" name="krise-navn" placeholder="flåm Odda 2019"
