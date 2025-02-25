@@ -48,6 +48,7 @@ app.register_blueprint(admin_reg_bp, url_prefix='/admin-reg')
 
 app.register_blueprint(registrer_bp)
 
+# POST krise oppretelse til db
 @app.route('/handle_incident', methods=['POST'])
 def handle_incident():
     try:
