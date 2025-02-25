@@ -45,6 +45,7 @@ DB_SERVER=<server.database.windows.net>
 DB_DATABASE=<databaseNavn>
 DB_UID=<brukerID>
 DB_PWD=<Passord>
+
 ```
 
 Installer dotenv 
@@ -59,6 +60,15 @@ Husk å installere driveren
 ```
 pip install pyodbc
 ```
+## Face ID
+For å kjøre face registering og lagering, må man først laste ned cmake (https://cmake.org/)
+Etter det må man laste ned microsoft visual stuido build tool 2022 C++ (https://visualstudio.microsoft.com/downloads/?q=build+tools)
+Deretter må du restarte Pcen
+Deretter kan du bruke kommandoen:
+```
+pip install face.recognition
+```
+
 
 Ferdig
 
