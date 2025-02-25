@@ -107,6 +107,7 @@ def fetch_all_kriser():
             conn.close()
 
 
+
 # Function to run an SQL query (e.g., insert, update, delete)
 def run_query(query):
     try:
@@ -138,6 +139,23 @@ def fetch_all_locations():
         print(f"An error occurred: {e}")
         return []
 
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
+# Function to fetch all krisesituasjon types
+def fetch_all_krise_situasjon_types():
+    try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+        cursor.execute("SELECT DISTINCT, KriseSituasjonTypeNavn FROM Krise")
+        rows = cursor.fetchall()
+        return [{'KriseSituasjonTypeID': index + 1, 'KriseSituasjonTypeNavn': row[0]} for index, row in enumerate(rows)]
+    except pyodbc.Error as e:
+        print(f"Error: {e}")
+        return []
     finally:
         if 'cursor' in locals():
             cursor.close()

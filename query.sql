@@ -1,1 +1,1 @@
-SELECT * FROM Status;
+SELECT * FROM Krise;

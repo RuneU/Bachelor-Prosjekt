@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 import pyodbc
-from sql.db_connection import connection_string, run_query, fetch_all_kriser, fetch_all_locations
+from sql.db_connection import connection_string, run_query, fetch_all_kriser, fetch_all_locations, fetch_all_krise_situasjon_types
 
 registrer_bp = Blueprint('registrer', __name__)
 
@@ -46,6 +46,7 @@ def register():
 
 
 
+
             # Insert into KontaktPerson using the newly obtained evakuert_id
             query_kontakt = f"""
                 INSERT INTO KontaktPerson (Fornavn, MellomNavn, Etternavn, Telefonnummer, EvakuertID)
@@ -76,4 +77,5 @@ def register():
 
     kriser = fetch_all_kriser()
     locations = fetch_all_locations()
-    return render_template('register.html', kriser=kriser, locations=locations)
+    krise_situasjon_types = fetch_all_krise_situasjon_types()
+    return render_template('register.html', kriser=kriser, locations=locations, krise_situasjon_types=krise_situasjon_types)
