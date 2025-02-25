@@ -4,7 +4,7 @@ import cv2
 sys.dont_write_bytecode = True
 from flask import Flask, Response, request, render_template, jsonify, redirect, send_from_directory, url_for
 sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
-from sql.db_connection import fetch_status_data, update_status, search_statuses
+from sql.db_connection import fetch_status_data, update_status, search_statuses, create_krise
 from blueprints.admin_reg import admin_reg_bp
 from blueprints.registrer.routes import registrer_bp
 
@@ -15,7 +15,6 @@ except ImportError as e:
 
 app = Flask(__name__)
 
-
 @app.route("/")
 @app.route("/index")
 def index():
@@ -24,7 +23,7 @@ def index():
 # Hent data fra databasen og route til Admin page
 @app.route("/admin")
 def admin():
-        statuses = fetch_status_data()  
+        statuses = fetch_status_data()
         return render_template("admin.html", statuses=statuses)
 
 # Status for evakuerte på admin page
@@ -49,8 +48,36 @@ app.register_blueprint(admin_reg_bp, url_prefix='/admin-reg')
 
 app.register_blueprint(registrer_bp)
 
-@app.route('/incident_creation')
+@app.route('/handle_incident', methods=['POST'])
+def handle_incident():
+    try:
+        status = request.form.get('krise-status')
+        krise_situasjon_type = request.form.get('krise-type') 
+        krise_navn = request.form.get('krise-navn')
+        lokasjon = request.form.get('krise-lokasjon')
+        tekstboks = request.form.get('annen-info')
+
+        if not all([status, krise_situasjon_type, krise_navn, lokasjon]):
+            print('Vennligst fyll ut alle obligatoriske felt', 'error')
+            return redirect(url_for('incident_creation'))
+
+        if create_krise(status, krise_situasjon_type, krise_navn, lokasjon, tekstboks):
+            print('Krise opprettet vellykket!', 'success')
+        else:
+            print('Feil ved opprettelse av krise', 'error')
+            
+        return redirect(url_for('index'))
+
+    except Exception as e:
+        print(f"Error: {str(e)}")
+        print('En uventet feil oppsto', 'error')
+        return redirect(url_for('incident_creation'))
+
+@app.route('/incident_creation', methods=['GET', 'POST'])
 def incident_creation():
+    if request.method == 'POST':
+        # Handle post if needed
+        pass
     return render_template('incident_creation.html')
 
 def generate_frames():

@@ -84,6 +84,25 @@ def update_status(evakuert_id, status, lokasjon):
         if 'conn' in locals():
             conn.close()
 
+# Function to post new krise to db
+def create_krise(status, krise_situasjon_type, krise_navn, lokasjon, tekstboks):
+    try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO Krise (Status, KriseSituasjonType, KriseNavn, Lokasjon, Tekstboks)
+            VALUES (?, ?, ?, ?, ?)
+        """, (status, krise_situasjon_type, krise_navn, lokasjon, tekstboks))
+        conn.commit()
+        return True
+    except pyodbc.Error as e:
+        print(f"Error creating krise: {e}")
+        return False
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
 
 # Function to fetch all kriser
 def fetch_all_kriser():
