@@ -70,12 +70,11 @@
                 <select id="krise-type" name="krise-type"
                     class="input-field w-64 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
                     {% for type in krise_situasjon_types %}
-                    <option value="{{ type.KriseSituasjonTypeID }}" {% if evakuert and evakuert.krise_type == type.KriseSituasjonTypeID %}selected{% endif %}>
-                        {{ type.KriseSituasjonTypeNavn }}
-                    </option>
+                    <option value="{{ type.KriseSituasjonType }}">{{ type.KriseSituasjonType }}</option>
                     {% endfor %}
                 </select>
             </div>
+            
             
             <div class="mb-6">
                 <label for="krise-navn" class="block mt-2 text-sm font-medium text-gray-900">Hendelse navn</label>
