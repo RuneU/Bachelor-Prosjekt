@@ -20,7 +20,7 @@
     <!-- Responsive grid for option buttons -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
       <!-- Option Button 1: Fjes og Finger -->
-      <button onclick="handleButtonClick('Fjes og Finger')"
+      <button onclick="handleButtonClick('capture_page')"
               class="hover-effect w-full text-left bg-white p-6 shadow-lg border border-red-500 rounded-xl transition transform hover:shadow-xl">
         <div class="flex items-center space-x-4">
           <img class="w-12 h-12" src="{{ url_for('static', filename='img/id.png') }}" alt="ID Logo">
@@ -32,7 +32,7 @@
       </button>
 
       <!-- Option Button 2: Bare fjes -->
-      <button onclick="handleButtonClick('Bare fjes')"
+      <button onclick="handleButtonClick('capture_page')"
               class="hover-effect w-full text-left bg-white p-6 shadow-lg border border-red-500 rounded-xl transition transform hover:shadow-xl">
         <div class="flex items-center space-x-4">
           <img class="w-12 h-12" src="{{ url_for('static', filename='img/smile.png') }}" alt="Smile Logo">
@@ -41,16 +41,10 @@
             <p class="text-red-500">Registrer kun med ansikt</p>
           </div>
         </div>
-        <!-- Optional action link styled in blue -->
-        <div class="mt-4">
-          <a href="{{ url_for('faceID') }}" class="text-blue-500 hover:text-blue-600 transition duration-300">
-            Gå til faceID
-          </a>
-        </div>
       </button>
 
       <!-- Option Button 3: Bare finger -->
-      <button onclick="handleButtonClick('Bare finger')"
+      <button onclick="handleButtonClick('fingerRegister')"
               class="hover-effect w-full text-left bg-white p-6 shadow-lg border border-red-500 rounded-xl transition transform hover:shadow-xl">
         <div class="flex items-center space-x-4">
           <img class="w-12 h-12" src="{{ url_for('static', filename='img/fingerprint.png') }}" alt="Finger Logo">
@@ -62,7 +56,7 @@
       </button>
 
       <!-- Option Button 4: Ingenting -->
-      <button onclick="handleButtonClick('Ingenting')"
+      <button onclick="handleButtonClick('noID')"
               class="hover-effect w-full text-left bg-white p-6 shadow-lg border border-red-500 rounded-xl transition transform hover:shadow-xl">
         <div class="flex items-center space-x-4">
           <img class="w-12 h-12" src="{{ url_for('static', filename='img/sad.png') }}" alt="Nothing Logo">
@@ -76,10 +70,25 @@
   </div>
 
   <script>
-    // JavaScript function to handle button clicks
     function handleButtonClick(option) {
-      alert(`Du valgte: ${option}`);
-      // Additional logic (e.g., redirection) can be added here.
+      let url = "";
+      
+      switch (option) {
+        case "capture_page":
+          url = "{{ url_for('capture_page') }}";
+          break;
+        case "fingerRegister":
+          url = "{{ url_for('fingerRegister') }}";
+          break;
+        case "noID":
+          url = "{{ url_for('noID') }}";
+          break;
+        default:
+          alert("Ugyldig valg");
+          return;
+      }
+      
+      window.location.href = url;
     }
   </script>
 </body>

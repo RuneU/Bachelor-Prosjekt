@@ -1,18 +1,23 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="{{ lang }}">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flowbite Flask</title>
-    <link rel="stylesheet" href="{{url_for('static',filename='dist/css/output.css')}}">
+    <title>{{ t['title'] }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/output.css') }}">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-
 <body class="bg-gray-900 text-gray-200 font-sans flex flex-col min-h-screen">
+    <!-- Language switcher -->
+    
     <!-- Navigation Bar -->
     <nav class="bg-gray-800 shadow-md">
+        <div class="flex justify-center py-4">
+            <a href="{{ url_for('index', lang='en') }}" class="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition">English</a>
+            <span class="px-2 text-gray-400">|</span>
+            <a href="{{ url_for('index', lang='no') }}" class="px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition">Norsk</a>
+        </div>
         <div class="container flex flex-wrap items-center justify-between mx-auto py-4 px-6">
             <a href="" class="flex items-center">
                 <img src="https://flowbite.com/docs/images/logo.svg" class="h-6 mr-3 sm:h-9" alt="Flowbite Logo">
@@ -20,8 +25,9 @@
             </a>
             <div class="flex md:order-2">
                 <button type="button"
-                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0">Get
-                    started</button>
+                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0">
+                    {{ t['button_get_started'] }}
+                </button>
                 <button data-collapse-toggle="navbar-cta" type="button"
                     class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
                     aria-controls="navbar-cta" aria-expanded="false">
@@ -36,14 +42,34 @@
             </div>
             <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-cta">
                 <ul class="flex flex-col p-4 mt-4 space-x-8 md:flex-row md:mt-0 text-lg">
-                    <li><a href="https://norwegiankiwi-glitch.github.io/bachelor-gruppe" target="_blank" class="text-blue-400 hover:text-blue-300 transition duration-300">Om oss</a></li>
-                    <li><a href="#tjenester" class="text-blue-400 hover:text-blue-300 transition duration-300">Tjenester</a></li>
-                    <li><a href="https://norwegiankiwi-glitch.github.io/bachelor-gruppe/#kontakt-oss" target="_blank" class="text-blue-400 hover:text-blue-300 transition duration-300">Kontakt oss</a></li>
-                    <li><a href="{{ url_for('registrer.register') }}" class="text-blue-400 hover:text-blue-300 transition duration-300">Registrering</a></li>
-                    <li><a href="{{ url_for('iot') }}" class="text-blue-400 hover:text-blue-300 transition duration-300">IOT</a></li>
-                    <li><a href="{{ url_for('startID') }}" class="text-blue-400 hover:text-blue-300 transition duration-300">startID</a></li>
-                    <li><a href="{{ url_for('admin') }}" class="text-blue-400 hover:text-blue-300 transition duration-300">Admin</a></li>
-                </ul>
+                    <li>
+                        <a href="https://norwegiankiwi-glitch.github.io/bachelor-gruppe" target="_blank"
+                           class="text-blue-400 hover:text-blue-300 transition duration-300">
+                            {{ t['nav_about'] }}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#tjenester" class="text-blue-400 hover:text-blue-300 transition duration-300">
+                            {{ t['nav_services'] }}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://norwegiankiwi-glitch.github.io/bachelor-gruppe/#kontakt-oss" target="_blank"
+                           class="text-blue-400 hover:text-blue-300 transition duration-300">
+                            {{ t['nav_contact'] }}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('registrer.register') }}"
+                           class="text-blue-400 hover:text-blue-300 transition duration-300">
+                            {{ t['nav_register'] }}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ url_for('admin') }}" class="text-blue-400 hover:text-blue-300 transition duration-300">
+                            {{ t['nav_admin'] }}
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -51,9 +77,9 @@
 
     <!-- Main Content -->
     <main class="container mx-auto text-center py-20 px-6 flex-grow">
-        <h1 class="text-4xl font-bold text-blue-400 mb-6">Velkommen til Gruppe 4 sitt prosjekt</h1>
+        <h1 class="text-4xl font-bold text-blue-400 mb-6">{{ t['welcome_heading'] }}</h1>
         <p class="text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
-            Velkommen til gruppe 4 sitt bachelorprosjekt for 2025. Dette prosjektet er utviklet over vårsemesteret 2025 med CIEM som oppdragsgiver.
+            {{ t['welcome_paragraph'] }}
         </p>
     </main>
 
@@ -61,6 +87,5 @@
     {% include 'footer.html' %}
     <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
 </body>
-
 </html>
 

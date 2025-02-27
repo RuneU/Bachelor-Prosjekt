@@ -24,15 +24,15 @@
         name="ID"
         class="w-full px-4 py-2 border border-red-500 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-300 hover:border-red-400"
       />
-      <button class="mt-4 w-full bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 active:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">
-        <a href="{{ url_for('iot') }}">Neste side</a>
+      <button id="nextBtn" class="mt-4 w-full bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 active:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg">
+        Neste side
       </button>
       <p class="mt-2 text-sm text-red-500">
         Legg til ID som du har fått fra registeringen eller skriv inn ditt fulle navn med fornavn og etternavn
       </p>
     </div>
 
-    <!-- Numeric Keypad (outside the unregistered box) -->
+    <!-- Numeric Keypad -->
     <div class="max-w-xs p-6 bg-white rounded-lg shadow-lg border border-red-500">
       <p class="text-red-500 font-medium mb-2 text-center">Tastatur</p>
       <div class="grid grid-cols-3 gap-2">
@@ -53,9 +53,27 @@
       </div>
     </div>
   </div>
+    </div>
+  </div>
 
-  <!-- JavaScript for keypad functionality -->
   <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      document.querySelectorAll(".keypad-btn").forEach(button => {
+        button.addEventListener("click", function() {
+          document.getElementById("numberInput").value += this.textContent;
+        });
+      });
+    });
+
+    function clearInput() {
+      document.getElementById("numberInput").value = "";
+    }
+
+    function backspaceInput() {
+      const input = document.getElementById("numberInput");
+      input.value = input.value.slice(0, -1);
+    }
+
     function appendNumber(num) {
       const input = document.getElementById("numberInput");
       if (input) {
@@ -63,19 +81,31 @@
       }
     }
 
-    function clearInput() {
-      const input = document.getElementById("numberInput");
-      if (input) {
-        input.value = "";
+    document.getElementById("nextBtn").addEventListener("click", function() {
+      const evakuertID = document.getElementById("numberInput").value;
+      
+      if (!evakuertID || isNaN(evakuertID)) {
+        alert("Vennligst skriv inn en gyldig Evakuert ID.");
+        return;
       }
-    }
 
-    function backspaceInput() {
-      const input = document.getElementById("numberInput");
-      if (input) {
-        input.value = input.value.slice(0, -1);
-      }
-    }
+      fetch("/set_user_id", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ evakuert_id: evakuertID }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.message) {
+          window.location.href = "/iot";  // Redirect after storing ID
+        } else {
+          alert("Feil: " + data.error);
+        }
+      })
+      .catch(error => {
+        console.error("Error:", error);
+      });
+    });
   </script>
 </body>
 </html>
