@@ -25,6 +25,7 @@ def index():
     return render_template('index.html', t=translations.get(lang, translations['no']), lang=lang)
 
 
+
 @app.route('/set_user_id', methods=['POST'])
 def set_user_id():
     data = request.json
@@ -34,54 +35,6 @@ def set_user_id():
     session["evakuert_id"] = int(data["evakuert_id"])
     return jsonify({"message": "User ID stored successfully"}), 200
 
-
-@app.route("/register", methods=["GET", "POST"])
-def register():
-    if request.method == "POST":
-        try:
-            fornavn = request.form.get("fornavn")
-            mellomnavn = request.form.get("mellomnavn")
-            etternavn = request.form.get("etternavn")
-            adresse = request.form.get("adresse")
-            telefonnummer = request.form.get("telefonnummer")
-            status = request.form.get("status")
-            parorende_fornavn = request.form.get("parorende_fornavn")
-            parorende_mellomnavn = request.form.get("parorende_mellomnavn")
-            parorende_etternavn = request.form.get("parorende_etternavn")
-            parorende_telefonnummer = request.form.get("parorende_telefonnummer")
-
-            # Insert data into the database
-            query = f"""
-                INSERT INTO Evakuerte (Fornavn, MellomNavn, Etternavn, Adresse, Telefonnummer)
-                VALUES ('{fornavn}', '{mellomnavn}', '{etternavn}', '{adresse}', '{telefonnummer}');
-            """
-            run_query(query)
-
-            # Get the last inserted EvakuertID
-            evakuert_id = get_last_inserted_id()
-
-            # Insert data into the KontaktPerson table
-            query = f"""
-                INSERT INTO KontaktPerson (Fornavn, MellomNavn, Etternavn, Telefonnummer, EvakuertID)
-                VALUES ('{parorende_fornavn}', '{parorende_mellomnavn}', '{parorende_etternavn}', '{parorende_telefonnummer}', {evakuert_id});
-            """
-            run_query(query)
-
-            # Insert data into the Status table
-            query = f"""
-                INSERT INTO Status (Status, Lokasjon, EvakuertID)
-                VALUES ('{status}', '{adresse}', {evakuert_id});
-            """
-            run_query(query)
-
-            return redirect(url_for("index"))
-        except Exception as e:
-            print(f"An error occurred: {e}")
-            return "An error occurred while processing your request."
-
-    return render_template("register.html")
-
-    
 
 
 # Hent data fra databasen og route til Admin page

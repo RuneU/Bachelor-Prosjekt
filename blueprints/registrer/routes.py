@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 import pyodbc
-from sql.db_connection import connection_string, run_query, fetch_all_kriser, fetch_all_locations
+from sql.db_connection import connection_string, run_query, fetch_all_kriser, fetch_all_locations, fetch_all_krise_situasjon_types
 
 registrer_bp = Blueprint('registrer', __name__)
 
@@ -19,7 +19,6 @@ def register():
             parorende_mellomnavn = request.form.get("parorende_mellomnavn")
             parorende_etternavn = request.form.get("parorende_etternavn")
             parorende_telefonnummer = request.form.get("parorende_telefonnummer")
-
             # Insert into Evakuerte and retrieve the new ID in one statement
             # Establish a connection and create a cursor
             conn = pyodbc.connect(connection_string)
@@ -38,6 +37,43 @@ def register():
                 evakuert_id = int(row[0])
             else:
                 raise Exception("Failed to retrieve a valid EvakuertID.")
+            conn.commit()
+
+            cursor.close()
+            conn.close()
+
+            # Retrieve the crisis details from the form
+            krise_navn = request.form.get("krise-navn")
+            krise_type = request.form.get("krise-type")
+
+            # Open a connection to check/insert into Krise table and update Evakuerte with KriseID
+            conn = pyodbc.connect(connection_string)
+            cursor = conn.cursor()
+
+            # Try to find an existing crisis with the given KriseNavn
+            cursor.execute("SELECT KriseID FROM Krise WHERE KriseNavn = ?", (krise_navn,))
+            row = cursor.fetchone()
+
+            if row:
+                crisis_id = row[0]
+            else:
+                # If not found, insert a new crisis record.
+                # You can adjust the default values for Status, Lokasjon, Tekstboks as needed.
+                insert_crisis_query = """
+                    INSERT INTO Krise (KriseSituasjonType, KriseNavn, Status, Lokasjon, Tekstboks)
+                    VALUES (?, ?, '', '', '')
+                """
+                cursor.execute(insert_crisis_query, (krise_type, krise_navn))
+                conn.commit()
+                cursor.execute("SELECT SCOPE_IDENTITY() AS ID")
+                row = cursor.fetchone()
+                if row and row[0]:
+                    crisis_id = int(row[0])
+                else:
+                    raise Exception("Failed to retrieve new KriseID.")
+
+            # Now update the Evakuerte record to set its KriseID field
+            cursor.execute("UPDATE Evakuerte SET KriseID = ? WHERE EvakuertID = ?", (crisis_id, evakuert_id))
             conn.commit()
 
             cursor.close()
@@ -76,4 +112,5 @@ def register():
 
     kriser = fetch_all_kriser()
     locations = fetch_all_locations()
-    return render_template('register.html', kriser=kriser, locations=locations)
+    krise_situasjon_types = fetch_all_krise_situasjon_types()  # New function to fetch KriseSituasjonType data
+    return render_template('register.html', kriser=kriser, locations=locations, krise_situasjon_types=krise_situasjon_types)
