@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 import pyodbc
-from sql.db_connection import connection_string, run_query, fetch_all_kriser, fetch_all_locations
+from sql.db_connection import connection_string, run_query, fetch_all_kriser, fetch_all_locations, fetch_all_krise_situasjon_types
 
 registrer_bp = Blueprint('registrer', __name__)
 
@@ -19,7 +19,6 @@ def register():
             parorende_mellomnavn = request.form.get("parorende_mellomnavn")
             parorende_etternavn = request.form.get("parorende_etternavn")
             parorende_telefonnummer = request.form.get("parorende_telefonnummer")
-
             # Insert into Evakuerte and retrieve the new ID in one statement
             # Establish a connection and create a cursor
             conn = pyodbc.connect(connection_string)
@@ -42,6 +41,7 @@ def register():
 
             cursor.close()
             conn.close()
+
 
 
 
@@ -76,4 +76,5 @@ def register():
 
     kriser = fetch_all_kriser()
     locations = fetch_all_locations()
-    return render_template('register.html', kriser=kriser, locations=locations)
+    krise_situasjon_types = fetch_all_krise_situasjon_types()  # New function to fetch KriseSituasjonType data
+    return render_template('register.html', kriser=kriser, locations=locations, krise_situasjon_types=krise_situasjon_types)

@@ -107,6 +107,7 @@ def fetch_all_kriser():
             conn.close()
 
 
+
 # Function to run an SQL query (e.g., insert, update, delete)
 def run_query(query):
     try:
@@ -143,6 +144,27 @@ def fetch_all_locations():
             cursor.close()
         if 'conn' in locals():
             conn.close()
+
+# Function to fetch all krisesituasjon types
+def fetch_all_krise_situasjon_types():
+    try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+        # Select distinct, non-null types from the Krise table
+        cursor.execute("SELECT DISTINCT KriseSituasjonType FROM Krise WHERE KriseSituasjonType IS NOT NULL")
+        rows = cursor.fetchall()
+        # Return a list of dictionaries. We can use the value itself for both key and value.
+        return [{'KriseSituasjonType': row[0]} for row in rows]
+    except pyodbc.Error as e:
+        print(f"Error in fetch_all_krise_situasjon_types: {e}")
+        return []
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
+
 
 # Function to get the last inserted ID
 def get_last_inserted_id():
