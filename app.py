@@ -7,6 +7,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
 from sql.db_connection import fetch_status_data, update_status, search_statuses, create_krise
 from blueprints.admin_reg import admin_reg_bp
 from blueprints.registrer.routes import registrer_bp
+from blueprints.admin_inc.routes import admin_inc_bp
 
 try:
     from camera import generate_frames, save_face
@@ -14,6 +15,7 @@ except ImportError as e:
     print("Feil ved import av camera.py:", e)
 
 app = Flask(__name__)
+app.secret_key = 'your-unique-secret-key'
 
 @app.route("/")
 @app.route("/index")
@@ -80,6 +82,8 @@ def incident_creation():
         # Handle post if needed
         pass
     return render_template('incident_creation.html')
+
+app.register_blueprint(admin_inc_bp)
 
 def generate_frames():
     camera = cv2.VideoCapture(0)  
