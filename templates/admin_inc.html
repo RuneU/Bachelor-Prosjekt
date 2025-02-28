@@ -86,24 +86,25 @@
         </p>
 
         <!-- Status Counters Section -->
+         <p class="text-center mb-4 text-lg">
+            Status blant evakuerte
+         </p>
         <div class="flex justify-around my-4">
-            <p class="mb-4 text-lg">Status for evakuerte for denne krisen</p>
-        </div>
-        <div class="flex justify-around my-4">
-            <!-- Kritisk -->
             <div class="bg-red-500 text-white p-4 rounded shadow">
                 <h3 class="text-xl font-bold">Kritisk</h3>
                 <p class="text-3xl">{{ status_counts.get('Kritisk', 0) }}</p>
             </div>
-            <!-- Mindre Skadet -->
             <div class="bg-yellow-500 text-white p-4 rounded shadow">
-                <h3 class="text-xl font-bold">Mindre Skadet</h3>
-                <p class="text-3xl">{{ status_counts.get('Mindre Skadet', 0) }}</p>
+                <h3 class="text-xl font-bold">Mindre skader</h3>
+                <p class="text-3xl">{{ status_counts.get('Mindre skader', 0) }}</p>
             </div>
-            <!-- OK -->
             <div class="bg-green-500 text-white p-4 rounded shadow">
                 <h3 class="text-xl font-bold">OK</h3>
                 <p class="text-3xl">{{ status_counts.get('OK', 0) }}</p>
+            </div>
+            <div class="bg-blue-500 text-white p-4 rounded shadow">
+                <h3 class="text-xl font-bold">Other</h3>
+                <p class="text-3xl">{{ status_counts.get('Other', 0) }}</p>
             </div>
         </div>
 
