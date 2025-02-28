@@ -3,20 +3,16 @@ import sys
 sys.dont_write_bytecode = True
 from flask import Flask, request, render_template, jsonify, redirect, url_for, session
 sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
-from sql.db_connection import connection_string, fetch_status_data, update_status, search_statuses, create_krise
+from sql.db_connection import fetch_status_data, update_status, search_statuses, create_krise
 from blueprints.admin_reg import admin_reg_bp
+from blueprints.registrer.routes import registrer_bp
+from blueprints.admin_inc.routes import admin_inc_bp
 from dotenv import load_dotenv
 from translations import translations
 
-
 load_dotenv()
 
-from blueprints.registrer.routes import registrer_bp
-from blueprints.admin_inc.routes import admin_inc_bp
-
-
 app = Flask(__name__)
-app.secret_key = 'your-unique-secret-key'
 app.secret_key = 'your-secret-key'
 
 @app.route("/")
@@ -24,8 +20,6 @@ def index():
     lang = request.args.get('lang', session.get('lang', 'no'))
     session['lang'] = lang
     return render_template('index.html', t=translations.get(lang, translations['no']), lang=lang)
-
-
 
 @app.route('/set_user_id', methods=['POST'])
 def set_user_id():
@@ -35,8 +29,6 @@ def set_user_id():
     
     session["evakuert_id"] = int(data["evakuert_id"])
     return jsonify({"message": "User ID stored successfully"}), 200
-
-
 
 # Hent data fra databasen og route til Admin page
 @app.route("/admin")
