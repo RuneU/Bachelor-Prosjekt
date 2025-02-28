@@ -59,11 +59,10 @@ def update_status_route(evakuert_id):
 def search():
     query = request.args.get("query")
     krise_id = request.args.get("KriseID")
-    print(f"Search query: {query}, KriseID: {krise_id}")  # Debugging line
     statuses = search_statuses(query, krise_id)
     krise_options = fetch_all_kriser()
-    print(f"Statuses: {statuses}")  # Debugging line
     return render_template("admin.html", statuses=statuses, krise_options=krise_options)
+
 app.register_blueprint(admin_reg_bp, url_prefix='/admin-reg')
 
 app.register_blueprint(registrer_bp)
