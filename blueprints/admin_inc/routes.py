@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from sql.db_connection import fetch_krise_by_id, update_krise, count_evakuerte_by_krise, fetch_status_counts
+from sql.db_connection import fetch_krise_by_id, update_krise, count_evakuerte_by_krise, fetch_status_counts_for_krise
 
 admin_inc_bp = Blueprint('admin_inc', __name__, template_folder='../templates')
 
@@ -9,7 +9,7 @@ def admin_inc_detail(krise_id):
     krise = fetch_krise_by_id(krise_id)
     if krise:
         evakuert_count = count_evakuerte_by_krise(krise_id)
-        status_counts = fetch_status_counts()
+        status_counts = fetch_status_counts_for_krise(krise_id)
         return render_template('admin_inc.html', krise=krise, evakuert_count=evakuert_count, status_counts=status_counts)
     else:
         flash(f"Krise with ID {krise_id} not found", "error")
