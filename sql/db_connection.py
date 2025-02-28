@@ -32,7 +32,7 @@ def fetch_status_data():
         conn = pyodbc.connect(connection_string)
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT s.Status, s.Lokasjon, s.EvakuertID, e.Fornavn, e.Etternavn
+            SELECT s.Status, s.Lokasjon, s.EvakuertID, e.Fornavn, e.Etternavn, e.KriseID
             FROM Status s
             JOIN Evakuerte e ON s.EvakuertID = e.EvakuertID
         """)
@@ -44,7 +44,8 @@ def fetch_status_data():
                 'Lokasjon': row[1],
                 'EvakuertID': row[2],
                 'Fornavn': row[3],
-                'Etternavn': row[4]
+                'Etternavn': row[4],
+                'KriseID': row[5]
             }
             for row in rows
         ]
@@ -259,6 +260,7 @@ def fetch_status_counts():
             conn.close()
 
 
+
 # Function to run an SQL query (e.g., insert, update, delete)
 def run_query(query):
     try:
@@ -296,14 +298,36 @@ def fetch_all_locations():
         if 'conn' in locals():
             conn.close()
 
+# Function to fetch all krisesituasjon types
+def fetch_all_krise_situasjon_types():
+    try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+        # Select distinct, non-null types from the Krise table
+        cursor.execute("SELECT DISTINCT KriseSituasjonType FROM Krise WHERE KriseSituasjonType IS NOT NULL")
+        rows = cursor.fetchall()
+        # Return a list of dictionaries. We can use the value itself for both key and value.
+        return [{'KriseSituasjonType': row[0]} for row in rows]
+    except pyodbc.Error as e:
+        print(f"Error in fetch_all_krise_situasjon_types: {e}")
+        return []
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
+
+
 # Function to get the last inserted ID
 def get_last_inserted_id():
     try:
         conn = pyodbc.connect(connection_string)
         cursor = conn.cursor()
-        cursor.execute("SELECT @@IDENTITY AS ID")
+        cursor.execute("SELECT SCOPE_IDENTITY() AS ID")
         row = cursor.fetchone()
         return row.ID if row else None
+
     
     except pyodbc.Error as e:
         print(f"An error occurred: {e}")
@@ -321,7 +345,7 @@ def search_statuses(query):
         conn = pyodbc.connect(connection_string)
         cursor = conn.cursor()
         search_query = f"""
-            SELECT s.Status, s.Lokasjon, s.EvakuertID, e.Fornavn, e.Etternavn
+            SELECT s.Status, s.Lokasjon, s.EvakuertID, e.Fornavn, e.Etternavn, e.KriseID
             FROM Status s
             JOIN Evakuerte e ON s.EvakuertID = e.EvakuertID
             WHERE s.Status LIKE ? OR s.Lokasjon LIKE ? OR e.Fornavn LIKE ? OR e.Etternavn LIKE ?
@@ -334,7 +358,50 @@ def search_statuses(query):
                 'Lokasjon': row[1],
                 'EvakuertID': row[2],
                 'Fornavn': row[3],
-                'Etternavn': row[4]
+                'Etternavn': row[4],
+                'KriseID': row[5]
+            }
+            for row in rows
+        ]
+        
+        print(data)  # Debug print statement to verify the data
+        
+        return data
+    except pyodbc.Error as e:
+        print(f"Error: {e}")
+        return []
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
+def search_statuses(query, krise_id):
+    try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+        search_query = """
+            SELECT s.Status, s.Lokasjon, s.EvakuertID, e.Fornavn, e.Etternavn, e.KriseID
+            FROM Status s
+            JOIN Evakuerte e ON s.EvakuertID = e.EvakuertID
+            WHERE (s.Status LIKE ? OR s.Lokasjon LIKE ? OR e.Fornavn LIKE ? OR e.Etternavn LIKE ?)
+        """
+        params = [f'%{query}%', f'%{query}%', f'%{query}%', f'%{query}%']
+        
+        if krise_id:
+            search_query += " AND e.KriseID = ?"
+            params.append(krise_id)
+        
+        cursor.execute(search_query, params)
+        rows = cursor.fetchall()
+        data = [
+            {
+                'Status': row[0],
+                'Lokasjon': row[1],
+                'EvakuertID': row[2],
+                'Fornavn': row[3],
+                'Etternavn': row[4],
+                'KriseID': row[5]
             }
             for row in rows
         ]
@@ -364,7 +431,7 @@ def search_statuses(query):
 try:
     conn = pyodbc.connect(connection_string)
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM Status")  # SQL query
+    cursor.execute("SELECT * FROM Evakuerte")  # SQL query
     rows = cursor.fetchall()
     
     for row in rows:

@@ -63,21 +63,25 @@
             <input type="hidden" name="status_id" value="{{ evakuert.StatusID if evakuert else '' }}">
 
 
-
             </div>
             <!-- Informasjon om krisen -->
             <div class="mb-6">
-                <label for="krise-type" class="block mt-2 text-sm font-medium text-gray-900">Krise type</label>
-                <input type="text" id="krise-type" name="krise-type" placeholder="flåm"
-                    class="input-field w-64 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
-                    value="{{ evakuert.krise_type if evakuert else '' }}">
+                <label for="krise-type" class="block mt-2 text-sm font-medium text-gray-900">Hendelse type</label>
+                <select id="krise-type" name="krise-type"
+                    class="input-field w-64 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                    {% for type in krise_situasjon_types %}
+                    <option value="{{ type.KriseSituasjonType }}">{{ type.KriseSituasjonType }}</option>
+                    {% endfor %}
+                </select>
             </div>
+            
+            
             <div class="mb-6">
-                <label for="krise-navn" class="block mt-2 text-sm font-medium text-gray-900">Krise navn</label>
+                <label for="krise-navn" class="block mt-2 text-sm font-medium text-gray-900">Hendelse navn</label>
                 <select id="krise-navn" name="krise-navn"
                     class="input-field w-64 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
                     {% for krise in kriser %}
-                    <option value="{{ krise.KriseID }}" {% if evakuert and evakuert.krise_id==krise.KriseID %}selected{%
+                    <option value="{{ krise.KriseNavn }}" {% if evakuert and evakuert.krise_id==krise.KriseID %}selected{%
                         endif %}>{{ krise.KriseNavn }}</option>
                     {% endfor %}
                 </select>
@@ -87,7 +91,7 @@
                 <select id="lokasjon" name="lokasjon"
                     class="input-field w-64 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
                     {% for location in locations %}
-                    <option value="{{ location.LokasjonID }}" {% if evakuert and evakuert.lokasjon_id==location.LokasjonID %}selected{% endif %}>
+                    <option value="{{ location.LokasjonNavn }}" {% if evakuert and evakuert.lokasjon_id==location.LokasjonID %}selected{% endif %}>
                         {{ location.LokasjonNavn }}</option>
                     {% endfor %}
                 </select>
@@ -106,11 +110,11 @@
                         <ul id="dropdownMenu"
                             class="hidden absolute mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none left-1/2 transform -translate-x-1/2">
                             <li class="h-12 px-4 py-2 text-sm border-2 border-green-700 text-black cursor-pointer"
-                                data-color="border-green-700" data-value="1">Ok</li>
+                                data-color="border-green-700" data-value="Ok">Ok</li>
                             <li class="h-12 px-4 py-2 text-sm border-2 border-yellow-600 text-black cursor-pointer"
-                                data-color="border-yellow-600" data-value="2">Mindre skader</li>
+                                data-color="border-yellow-600" data-value="Mindre skader">Mindre skader</li>
                             <li class="h-12 px-4 py-2 text-sm border-2 border-red-700 text-black cursor-pointer"
-                                data-color="border-red-700" data-value="3">Hard Skadet</li>
+                                data-color="border-red-700" data-value="Hard Skadet">Hard Skadet</li>
                         </ul>
                         <input type="hidden" id="status" name="status" value="">
                     </div>
@@ -232,6 +236,24 @@
                 dropdownMenu.classList.add('hidden');
             });
         });
+        dropdownOptions.forEach(option => {
+        option.addEventListener('click', () => {
+        const colorClass = option.getAttribute('data-color');
+        const colorValue = option.getAttribute('data-value');
+        const colorName = option.textContent;
+
+        // Update the button border color and text
+        dropdownButton.className = `w-48 h-12 px-4 py-2 text-black border-2 rounded-md shadow-sm ${colorClass}`;
+        dropdownButton.textContent = colorName;
+
+        // Set the hidden input value and add a debug log
+        statusInput.value = colorValue;
+        console.log("Updated status input to:", colorValue);
+
+        dropdownMenu.classList.add('hidden');
+    });
+});
+
 
         // Show the model when clicking "Admin"
         adminButton.addEventListener('click', () => {

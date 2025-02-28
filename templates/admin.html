@@ -11,7 +11,7 @@
     <!-- Navigation Bar -->
     <nav class="bg-gray-800 shadow-md">
         <div class="container flex flex-wrap items-center justify-between mx-auto py-4 px-6">
-            <a href="https://flowbite.com/" class="flex items-center">
+            <a href="" class="flex items-center">
                 <img src="https://flowbite.com/docs/images/logo.svg" class="h-6 mr-3 sm:h-9" alt="Flowbite Logo">
                 <span class="self-center text-xl font-semibold whitespace-nowrap text-white">Admin Panel</span>
             </a>
@@ -27,6 +27,12 @@
         <div class="relative flex justify-center mb-6">
             <form action="/search" method="GET" class="w-full max-w-md">
                 <input type="text" name="query" placeholder="Søk:" class="w-full p-2 border rounded bg-gray-700 text-gray-300">
+                <select name="KriseID" class="w-full p-2 border rounded bg-gray-700 text-gray-300 mt-2">
+                    <option value="">Velg KriseType</option>
+                    <option value="1">Brann</option>
+                    <option value="2">Flom</option>
+                    <option value="3">Skjelv</option>
+                </select>
                 <button type="submit" class="absolute right-0 top-0 h-full bg-blue-700 text-white px-4 rounded-r">Søk</button>
             </form>
         </div>
@@ -45,6 +51,7 @@
                         <p><strong>Status:</strong> <input type="text" name="status" value="{{ status['Status'] }}" class="bg-gray-800 text-gray-300 p-2 rounded"></p>
                         <p><strong>Lokasjon:</strong> <input type="text" name="lokasjon" value="{{ status['Lokasjon'] }}" class="bg-gray-800 text-gray-300 p-2 rounded"></p>
                         <p><strong>EvakuertID:</strong> <span class="font-bold text-blue-500">{{ status['EvakuertID'] if status['EvakuertID'] else 'No data' }}</span></p>
+                        <p><strong>KriseID:</strong> <span class="font-bold text-blue-500">{{ status['KriseID'] if status['KriseID'] else 'No data' }}</span></p>
                         <button type="submit" class="mt-2 bg-blue-700 text-white px-4 py-2 rounded">Oppdater</button>
                     </form>
                 </div>
