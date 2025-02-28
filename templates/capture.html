@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Capture Photo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -28,86 +29,91 @@
     </style>
 </head>
 <body>
-    <h1>Capture a Photo</h1>
+    <h1 class="text-2xl font-bold text-center mb-6">Capture a Photo</h1>
     
-    <!-- Dynamically set the video feed source -->
-    <img id="camera" width="640" height="480" alt="Camera Feed">
+    <img id="camera" width="640" height="480" alt="Camera Feed" class="rounded-lg shadow-md">
     <canvas id="canvas" style="display:none;"></canvas>
     
-    <div id="controls">
-        <button id="capture-btn">Capture</button>
+    <div id="controls" class="mt-4">
+        <button id="capture-btn" class="px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition">Capture</button>
     </div>
     
-    <div id="status"></div>
+    <div id="status" class="mt-4 text-lg font-semibold"></div>
+    
+    <div class="mt-6 flex space-x-4">
+        <a href="{{ url_for('RFID') }}" class="px-6 py-3 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition">RFID</a>
+        <a href="{{ url_for('fingerRegister') }}" class="px-6 py-3 bg-red-500 text-white rounded-lg shadow-md hover:bg-red-600 transition">Finger Register</a>
+    </div>
 
     <script>
-        let evakuertId = null;
+        let evakuertId = null;  // ✅ Ensure it's a global variable
         const camera = document.getElementById("camera");
         const canvas = document.getElementById("canvas");
         const captureBtn = document.getElementById("capture-btn");
         const statusDiv = document.getElementById("status");
 
-        // Prompt for Evakuert ID and start camera
-        document.addEventListener("DOMContentLoaded", () => {
-            evakuertId = prompt("Please enter your Evakuert ID:");
+        document.addEventListener("DOMContentLoaded", async () => {
+            try {
+                // Fetch session data from Flask
+                const response = await fetch("/check_session");
+                const data = await response.json();
 
-            if (!evakuertId || isNaN(evakuertId)) {
-                alert("Invalid Evakuert ID. Please refresh and enter a valid number.");
-                return;
+                if (data.evakuert_id && data.evakuert_id !== "No ID in session") {
+                    evakuertId = data.evakuert_id;  // ✅ Assign to the global variable
+                    console.log("Using session Evakuert ID:", evakuertId);
+
+                    // Set the video feed source using the stored session ID
+                    camera.src = `/video_feed?evakuert_id=${encodeURIComponent(evakuertId)}`;
+                } else {
+                    alert("Session expired or no Evakuert ID found. Redirecting...");
+                    window.location.href = "/startID"; // Redirect if session is empty
+                }
+            } catch (error) {
+                console.error("Error fetching session data:", error);
+                alert("Failed to retrieve session data.");
             }
-
-            // Set camera feed source with Evakuert ID
-            camera.src = `/video_feed?evakuert_id=${encodeURIComponent(evakuertId)}`;
         });
 
-        // Capture the image from the video feed
         function captureImage() {
             if (!evakuertId) {
-                alert("Evakuert ID is missing. Please refresh and enter it again.");
+                alert("Evakuert ID is missing. Please refresh the page.");
                 return;
             }
-
             const context = canvas.getContext("2d");
             canvas.width = camera.width;
             canvas.height = camera.height;
             context.drawImage(camera, 0, 0, canvas.width, canvas.height);
-
             const imageData = canvas.toDataURL("image/jpeg");
 
-            // Send the image to the backend
             sendImageToBackend(imageData);
         }
 
-        // Send image data to Flask backend
         async function sendImageToBackend(imageData) {
+            if (!evakuertId) {
+                console.error("Cannot send image: Evakuert ID is missing.");
+                return;
+            }
+
             const payload = {
-                evakuert_id: parseInt(evakuertId, 10), // Ensure it's an integer
+                evakuert_id: parseInt(evakuertId, 10),  // ✅ Ensure it's an integer
                 image: imageData,
             };
 
             try {
                 const response = await fetch("/save_photo", {
                     method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
+                    headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(payload),
                 });
 
                 const result = await response.json();
-
-                if (response.ok) {
-                    statusDiv.textContent = result.message;
-                } else {
-                    statusDiv.textContent = "Error: " + result.error;
-                }
+                statusDiv.textContent = response.ok ? result.message : "Error: " + result.error;
             } catch (error) {
                 console.error("Error sending image to backend:", error);
                 statusDiv.textContent = "Failed to send image to backend.";
             }
         }
 
-        // Set up capture button
         captureBtn.addEventListener("click", captureImage);
     </script>
 </body>

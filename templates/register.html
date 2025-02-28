@@ -63,17 +63,21 @@
             <input type="hidden" name="status_id" value="{{ evakuert.StatusID if evakuert else '' }}">
 
 
-
             </div>
             <!-- Informasjon om krisen -->
             <div class="mb-6">
-                <label for="krise-type" class="block mt-2 text-sm font-medium text-gray-900">Krise type</label>
-                <input type="text" id="krise-type" name="krise-type" placeholder="flåm"
-                    class="input-field w-64 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
-                    value="{{ evakuert.krise_type if evakuert else '' }}">
+                <label for="krise-type" class="block mt-2 text-sm font-medium text-gray-900">Hendelse type</label>
+                <select id="krise-type" name="krise-type"
+                    class="input-field w-64 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+                    {% for type in krise_situasjon_types %}
+                    <option value="{{ type.KriseSituasjonType }}">{{ type.KriseSituasjonType }}</option>
+                    {% endfor %}
+                </select>
             </div>
+            
+            
             <div class="mb-6">
-                <label for="krise-navn" class="block mt-2 text-sm font-medium text-gray-900">Krise navn</label>
+                <label for="krise-navn" class="block mt-2 text-sm font-medium text-gray-900">Hendelse navn</label>
                 <select id="krise-navn" name="krise-navn"
                     class="input-field w-64 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
                     {% for krise in kriser %}
