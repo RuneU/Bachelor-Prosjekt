@@ -3,7 +3,7 @@ import sys
 sys.dont_write_bytecode = True
 from flask import Flask, request, render_template, jsonify, redirect, url_for, session
 sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
-from sql.db_connection import connection_string, fetch_status_data, update_status, search_statuses, create_krise
+from sql.db_connection import connection_string, fetch_all_kriser, fetch_status_data, update_status, search_statuses, create_krise
 from blueprints.admin_reg import admin_reg_bp
 from dotenv import load_dotenv
 from translations import translations
@@ -41,8 +41,10 @@ def set_user_id():
 # Hent data fra databasen og route til Admin page
 @app.route("/admin")
 def admin():
-        statuses = fetch_status_data()
-        return render_template("admin.html", statuses=statuses)
+    statuses = fetch_status_data()
+    krise_options = fetch_all_kriser()
+    print(krise_options)  # Debugging line to check the fetched data
+    return render_template("admin.html", statuses=statuses, krise_options=krise_options)
 
 # Status for evakuerte på admin page
 @app.route('/update_status/<int:evakuert_id>', methods=['POST'])
@@ -52,17 +54,16 @@ def update_status_route(evakuert_id):
     update_status(evakuert_id, status, lokasjon)
     return redirect(url_for('admin'))
 
+# Query for søk på admin page
 @app.route("/search", methods=["GET"])
 def search():
     query = request.args.get("query")
     krise_id = request.args.get("KriseID")
-    if query or krise_id:
-        statuses = search_statuses(query, krise_id)
-    else:
-        statuses = fetch_status_data()
-    
-    return render_template("admin.html", statuses=statuses)
-
+    print(f"Search query: {query}, KriseID: {krise_id}")  # Debugging line
+    statuses = search_statuses(query, krise_id)
+    krise_options = fetch_all_kriser()
+    print(f"Statuses: {statuses}")  # Debugging line
+    return render_template("admin.html", statuses=statuses, krise_options=krise_options)
 app.register_blueprint(admin_reg_bp, url_prefix='/admin-reg')
 
 app.register_blueprint(registrer_bp)
