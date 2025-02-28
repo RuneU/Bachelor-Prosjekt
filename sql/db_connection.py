@@ -171,11 +171,12 @@ def fetch_all_kriser():
         cursor = conn.cursor()
         cursor.execute("SELECT KriseID, KriseNavn FROM Krise")
         rows = cursor.fetchall()
-        return [{'KriseID': row[0], 'KriseNavn': row[1]} for row in rows]
+        krise_options = [{'KriseID': row[0], 'KriseNavn': row[1]} for row in rows]
+        print(krise_options)  # Debugging line to check the fetched data
+        return krise_options
     except pyodbc.Error as e:
         print(f"Error: {e}")
         return []
-    
     finally:
         if 'cursor' in locals():
             cursor.close()
