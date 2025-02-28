@@ -127,6 +127,26 @@ def fetch_all_locations():
         if 'conn' in locals():
             conn.close()
 
+# Function to get the last inserted ID
+def get_last_inserted_id():
+    try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+        cursor.execute("SELECT SCOPE_IDENTITY() AS ID")
+        row = cursor.fetchone()
+        return row.ID if row else None
+
+
+    except pyodbc.Error as e:
+        print(f"An error occurred: {e}")
+        return None
+
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
 # Function to fetch all KriseSituasjonType
 def fetch_all_krise_situasjon_types():
     try:
