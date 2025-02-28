@@ -246,26 +246,36 @@ def count_evakuerte_by_krise(krise_id):
         if conn:
             conn.close()
 
-def fetch_status_counts():
+def fetch_status_counts_for_krise(krise_id):
     try:
         conn = pyodbc.connect(connection_string)
         cursor = conn.cursor()
-        query = "SELECT Status, COUNT(*) FROM Status GROUP BY Status"
-        cursor.execute(query)
+        query = """
+            SELECT s.Status, COUNT(*) 
+            FROM Status s
+            JOIN Evakuerte e ON s.EvakuertID = e.EvakuertID
+            WHERE e.KriseID = ?
+            GROUP BY s.Status
+        """
+        cursor.execute(query, (krise_id,))
         rows = cursor.fetchall()
         counts = {}
         for row in rows:
             counts[row[0]] = row[1]
+
+        # Calculate the count for statuses that are not "Kritisk", "Mindre Skadet", or "OK"
+        other_count = sum(value for key, value in counts.items() if key not in ("Kritisk", "Mindre Skadet", "OK"))
+        counts["Other"] = other_count
+
         return counts
     except Exception as e:
-        print(f"Error fetching status counts: {e}")
+        print(f"Error fetching status counts for Krise: {e}")
         return {}
     finally:
-        if 'cursor' in locals():
+        if cursor:
             cursor.close()
-        if 'conn' in locals():
+        if conn:
             conn.close()
-
 
 
 # Function to run an SQL query (e.g., insert, update, delete)
