@@ -75,13 +75,38 @@
             </div>
 
             <!-- Submit Button -->
-            <button type="submit" class="px-4 py-2 bg-green-500 text-white rounded-md">Oppdater Krise</button>
+             <div class="text-center">
+                <button type="submit" class="bg-gray-700 text-white px-6 py-2 rounded">Oppdater Krise</button>
+            </div>
         </form>
 
         <h1 class="text-xl font-bold mb-4">Informasjon om krisen</h1>
         <p class="mb-4 text-lg">
             Antall Evakuerte: <span class="font-bold">{{ evakuert_count }}</span>
         </p>
+
+        <!-- Status Counters Section -->
+        <div class="flex justify-around my-4">
+            <p class="mb-4 text-lg">Status for evakuerte for denne krisen</p>
+        </div>
+        <div class="flex justify-around my-4">
+            <!-- Kritisk -->
+            <div class="bg-red-500 text-white p-4 rounded shadow">
+                <h3 class="text-xl font-bold">Kritisk</h3>
+                <p class="text-3xl">{{ status_counts.get('Kritisk', 0) }}</p>
+            </div>
+            <!-- Mindre Skadet -->
+            <div class="bg-yellow-500 text-white p-4 rounded shadow">
+                <h3 class="text-xl font-bold">Mindre Skadet</h3>
+                <p class="text-3xl">{{ status_counts.get('Mindre Skadet', 0) }}</p>
+            </div>
+            <!-- OK -->
+            <div class="bg-green-500 text-white p-4 rounded shadow">
+                <h3 class="text-xl font-bold">OK</h3>
+                <p class="text-3xl">{{ status_counts.get('OK', 0) }}</p>
+            </div>
+        </div>
+
 
         <div id="confirmationModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full">
             <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">

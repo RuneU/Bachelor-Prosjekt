@@ -238,6 +238,27 @@ def count_evakuerte_by_krise(krise_id):
         if conn:
             conn.close()
 
+def fetch_status_counts():
+    try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+        query = "SELECT Status, COUNT(*) FROM Status GROUP BY Status"
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        counts = {}
+        for row in rows:
+            counts[row[0]] = row[1]
+        return counts
+    except Exception as e:
+        print(f"Error fetching status counts: {e}")
+        return {}
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
+
 # Function to run an SQL query (e.g., insert, update, delete)
 def run_query(query):
     try:
