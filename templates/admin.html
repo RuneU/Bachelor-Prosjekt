@@ -29,9 +29,9 @@
                 <input type="text" name="query" placeholder="Søk:" class="w-full p-2 border rounded bg-gray-700 text-gray-300">
                 <select name="KriseID" class="w-full p-2 border rounded bg-gray-700 text-gray-300 mt-2">
                     <option value="">Velg KriseType</option>
-                    <option value="1">Brann</option>
-                    <option value="2">Flom</option>
-                    <option value="3">Skjelv</option>
+                    {% for krise in krise_options %}
+                        <option value="{{ krise['KriseID'] }}">{{ krise['KriseNavn'] }}</option>
+                    {% endfor %}
                 </select>
                 <button type="submit" class="absolute right-0 top-0 h-full bg-blue-700 text-white px-4 rounded-r">Søk</button>
             </form>
