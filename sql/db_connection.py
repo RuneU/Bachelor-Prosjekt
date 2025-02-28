@@ -93,6 +93,77 @@ def update_status(evakuert_id, status, lokasjon):
         if 'conn' in locals():
             conn.close()
 
+# Function to post new krise to db
+def create_krise(status, krise_situasjon_type, krise_navn, lokasjon, tekstboks):
+    try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+        cursor.execute("""
+            INSERT INTO Krise (Status, KriseSituasjonType, KriseNavn, Lokasjon, Tekstboks)
+            VALUES (?, ?, ?, ?, ?)
+        """, (status, krise_situasjon_type, krise_navn, lokasjon, tekstboks))
+        conn.commit()
+        return True
+    except pyodbc.Error as e:
+        print(f"Error creating krise: {e}")
+        return False
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
+# Updates Krise table
+def update_krise(krise_id, status, krise_type, krise_navn, lokasjon, tekstboks):
+    """
+    Updates a row in the Krise table.
+    :param krise_id: The ID of the Krise to update.
+    :param status: The new status.
+    :param krise_type: The new KriseSituasjonType.
+    :param krise_navn: The new KriseNavn.
+    :param lokasjon: The new Lokasjon.
+    :param tekstboks: The new Tekstboks.
+    :return: True if the update was successful, False otherwise.
+    """
+    conn = None
+    cursor = None
+    try:
+        conn = connection_def()  # Establish database connection
+        cursor = conn.cursor()
+
+        # Query to update the Krise table
+        cursor.execute("""
+            UPDATE Krise
+            SET 
+                KriseSituasjonType = ?, 
+                KriseNavn = ?, 
+                Status = ?, 
+                Lokasjon = ?, 
+                Tekstboks = ?
+            WHERE KriseID = ?
+        """, (
+            krise_type,
+            krise_navn,
+            status,
+            lokasjon,
+            tekstboks,
+            krise_id
+        ))
+
+        conn.commit()  # Commit the transaction
+        return True  # Return True if the update was successful
+
+    except Exception as e:
+        print(f"Error updating Krise: {e}")
+        conn.rollback()  # Rollback the transaction in case of an error
+        return False
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
 # Function to fetch all kriser
 def fetch_all_kriser():
     try:
@@ -104,6 +175,109 @@ def fetch_all_kriser():
     except pyodbc.Error as e:
         print(f"Error: {e}")
         return []
+    
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
+def fetch_krise_by_id(krise_id):
+    """
+    Fetches a single Krise entry by KriseID.
+    Returns a dictionary representing the row, or None if not found.
+    """
+    conn = None
+    cursor = None
+    try:
+        conn = connection_def()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT 
+                KriseID, 
+                KriseSituasjonType, 
+                KriseNavn, 
+                Status, 
+                Lokasjon, 
+                Tekstboks 
+            FROM Krise 
+            WHERE KriseID = ?
+        """, (krise_id,))
+
+        row = cursor.fetchone()
+        if row:
+            return {
+                "KriseID": row[0],
+                "KriseSituasjonType": row[1],
+                "KriseNavn": row[2],
+                "Status": row[3],
+                "Lokasjon": row[4],
+                "Tekstboks": row[5]
+            }
+        else:
+            return None
+
+    except Exception as e:
+        print(f"Error fetching Krise by ID: {e}")
+        return None
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+def count_evakuerte_by_krise(krise_id):
+    try:
+        conn = connection_def()
+        cursor = conn.cursor()
+        query = "SELECT COUNT(*) FROM Evakuerte WHERE KriseID = ?"
+        cursor.execute(query, (krise_id,))
+        row = cursor.fetchone()
+        return row[0] if row else 0
+    except Exception as e:
+        print(f"Error counting Evakuerte: {e}")
+        return 0
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+def fetch_status_counts():
+    try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+        query = "SELECT Status, COUNT(*) FROM Status GROUP BY Status"
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        counts = {}
+        for row in rows:
+            counts[row[0]] = row[1]
+        return counts
+    except Exception as e:
+        print(f"Error fetching status counts: {e}")
+        return {}
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
+
+
+# Function to run an SQL query (e.g., insert, update, delete)
+def run_query(query):
+    try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+        cursor.execute(query)
+        conn.commit()
+    
+    except pyodbc.Error as e:
+        print(f"An error occurred: {e}")
+    
     finally:
         if 'cursor' in locals():
             cursor.close()
