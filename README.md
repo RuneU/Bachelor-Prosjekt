@@ -88,10 +88,21 @@ python -m unittest discover test
  pip install opencv-python-headless   
 ```
 
-<<<<<<< HEAD
-=======
+## Docker
+For å lettere kunne åpne prosjektet gjennom nye pcer, så har vi valgt å bruke docker. Når du har sørget for å laste ned docker. Så kjører du denne kommandoen for å bygge opp prosjektet. 
+```
+docker build --no-cache -t flask-app .
+```
+Det kan ta litt tid på grunn av face registering modulen. Så hvis du kun trenger å åpne nettsiden, og ikke IOT siden, så kan du ingorere face.recognition i requirement.txt. For å starte denne kontaineren, kjør denne kommandoen. 
+```
+docker run -p 5000:5000 flask-app
+```
+For å kunne kjøre IOT nettsiden, kjør denne kommandoen
+```
+docker run -p 5000:5000 flask-app python IOT.py
+```
 
->>>>>>> cf376ac67c9eece8d8169572403f4b53a947d3c1
+
 Link flask nettside: https://flask.palletsprojects.com/en/stable/installation/
 
 Link til Flowbite for tailwind og flowbite: https://flowbite.com/docs/getting-started/flask/
