@@ -79,9 +79,6 @@ def register():
             cursor.close()
             conn.close()
 
-
-
-
             # Insert into KontaktPerson using the newly obtained evakuert_id
             query_kontakt = f"""
                 INSERT INTO KontaktPerson (Fornavn, MellomNavn, Etternavn, Telefonnummer, EvakuertID)

@@ -18,6 +18,7 @@ CREATE TABLE Evakuerte (
     Telefonnummer VARCHAR(20) NULL,
     Adresse VARCHAR(256) NULL,
     KriseID INT NULL,
+    ImageURL NVARCHAR(500) NULL,
     FOREIGN KEY (KriseID) REFERENCES Krise(KriseID)
 );
 
