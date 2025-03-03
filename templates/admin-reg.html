@@ -60,10 +60,23 @@
                         value="{{ evakuert.krise_type if evakuert else '' }}">
                 </div>
                 <div>
-                    <label for="krise-navn" class="block mb-1">Krise navn</label>
-                    <input type="text" id="krise-navn" name="krise-navn" placeholder="flåm Odda 2019"
-                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        value="{{ evakuert.krise_navn if evakuert else '' }}">
+                    <label for="kriseDropdownButton" class="block mb-1">Krise navn</label>
+                    <div class="relative">
+                        <!-- This button shows the current KriseNavn or a default prompt -->
+                        <button type="button" id="kriseDropdownButton" class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg p-2.5 text-left">
+                            {{ evakuert.krise_navn if evakuert else 'Velg Krise' }}
+                        </button>
+                        <!-- The dropdown list; initially hidden -->
+                        <ul id="kriseDropdownList" class="absolute z-10 left-0 right-0 mt-1 bg-white border border-gray-300 rounded-md shadow-lg hidden">
+                            {% for krise in kriser %}
+                            <li data-kriseid="{{ krise[0] }}" data-krisenavn="{{ krise[1] }}" class="p-2 hover:bg-gray-200 cursor-pointer">
+                                {{ krise[1] }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        <!-- Hidden input that holds the selected KriseID (will be updated via JS) -->
+                        <input type="hidden" name="krise_id" id="krise_id" value="{{ evakuert.KriseID if evakuert else '' }}">
+                    </div>
                 </div>
                 <div class="mb-6">
                     <label for="krise-lokasjon" class="block mb-1">Lokasjon</label>
@@ -211,29 +224,35 @@
             });
         });
 
-        // New dropdown for Krise status
-        const kriseDropdownButton = document.getElementById('krise-status');
-        const kriseDropdownMenu = document.getElementById('kriseDropdownMenu');
-        const kriseDropdownOptions = kriseDropdownMenu.querySelectorAll('li');
+    // Dropdown for Krise navn
+    const kriseDropdownButton = document.getElementById('kriseDropdownButton');
+    const kriseDropdownList = document.getElementById('kriseDropdownList');
 
-        kriseDropdownButton.addEventListener('click', () => {
-            kriseDropdownMenu.classList.toggle('hidden');
-        });
+    // Toggle the dropdown when button is clicked
+    kriseDropdownButton.addEventListener('click', () => {
+        kriseDropdownList.classList.toggle('hidden');
+    });
 
-        document.addEventListener('click', (event) => {
-            if (!kriseDropdownButton.contains(event.target) && !kriseDropdownMenu.contains(event.target)) {
-                kriseDropdownMenu.classList.add('hidden');
-            }
-        });
+    // Close the dropdown if click occurs outside of it
+    document.addEventListener('click', (event) => {
+        if (!kriseDropdownButton.contains(event.target) && !kriseDropdownList.contains(event.target)) {
+            kriseDropdownList.classList.add('hidden');
+        }
+    });
 
-        kriseDropdownOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                const selectedValue = option.getAttribute('data-value');
-                kriseDropdownButton.textContent = selectedValue;
-                document.getElementById('selected-krise-status').value = selectedValue;
-                kriseDropdownMenu.classList.add('hidden');
-            });
+    // When an option is clicked, update the button text and hidden input
+    kriseDropdownList.querySelectorAll('li').forEach(item => {
+        item.addEventListener('click', () => {
+            const selectedKriseNavn = item.getAttribute('data-krisenavn');
+            const selectedKriseID = item.getAttribute('data-kriseid');
+            kriseDropdownButton.textContent = selectedKriseNavn;
+            document.getElementById('krise_id').value = selectedKriseID;
+            kriseDropdownList.classList.add('hidden');
         });
+    });
+
+    // (Keep your existing JS for other dropdowns here)
+
     </script>
 
 </body>

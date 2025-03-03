@@ -209,7 +209,6 @@ def adminreg_with_id(evakuert_id):
         """, (evakuert_id,))
         
         data = cursor.fetchone()
-        
         if not data:
             return "Evakuert not found", 404
 
@@ -237,8 +236,6 @@ def adminreg_with_id(evakuert_id):
         }
 
         # Fetch log data for this EvakuertID.
-        # For example, assume your logs are stored in a table 'Lokasjon_log'
-        # and you query them like this:
         cursor.execute("""
             SELECT old_lokasjon, change_date
             FROM Lokasjon_log
@@ -247,8 +244,11 @@ def adminreg_with_id(evakuert_id):
         """, (evakuert_id,))
         logs = [dict(old_lokasjon=row[0], change_date=row[1]) for row in cursor.fetchall()]
 
-        # Now, return the rendered template and pass both evakuert_data and logs
-        return render_template("admin-reg.html", evakuert=evakuert_data, logs=logs)
+        # Fetch all crisis records for the dropdown
+        cursor.execute("SELECT KriseID, KriseNavn FROM Krise")
+        kriser = cursor.fetchall()
+
+        return render_template("admin-reg.html", evakuert=evakuert_data, logs=logs, kriser=kriser)
     
     except Exception as e:
         return f"Database error: {e}", 500
@@ -256,3 +256,4 @@ def adminreg_with_id(evakuert_id):
     finally:
         cursor.close()
         conn.close()
+
