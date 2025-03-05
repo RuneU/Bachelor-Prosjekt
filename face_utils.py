@@ -8,7 +8,6 @@ from dotenv import load_dotenv
 from azure.storage.blob import BlobServiceClient
 from flask import Flask, Response, request, render_template, jsonify, redirect, url_for, session
 import logging
-
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
