@@ -171,11 +171,12 @@ def fetch_all_kriser():
         cursor = conn.cursor()
         cursor.execute("SELECT KriseID, KriseNavn FROM Krise")
         rows = cursor.fetchall()
-        return [{'KriseID': row[0], 'KriseNavn': row[1]} for row in rows]
+        krise_options = [{'KriseID': row[0], 'KriseNavn': row[1]} for row in rows]
+        print(krise_options)  # Debugging line to check the fetched data
+        return krise_options
     except pyodbc.Error as e:
         print(f"Error: {e}")
         return []
-    
     finally:
         if 'cursor' in locals():
             cursor.close()
@@ -305,6 +306,26 @@ def fetch_all_locations():
     except pyodbc.Error as e:
         print(f"An error occurred: {e}")
         return []
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
+# Function to get the last inserted ID
+def get_last_inserted_id():
+    try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+        cursor.execute("SELECT SCOPE_IDENTITY() AS ID")
+        row = cursor.fetchone()
+        return row.ID if row else None
+
+
+    except pyodbc.Error as e:
+        print(f"An error occurred: {e}")
+        return None
+
     finally:
         if 'cursor' in locals():
             cursor.close()

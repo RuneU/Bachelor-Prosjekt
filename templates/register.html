@@ -58,44 +58,40 @@
     <main class="container mx-auto py-10 px-6 flex-grow bg-gray-100 text-gray-800 rounded-lg">
         <form method="POST" action="{{ url_for('registrer.register') }}">
             <input type="hidden" name="evakuert_id" value="{{ evakuert.EvakuertID if evakuert else '' }}">
-            <input type="hidden" name="krise_id" value="{{ evakuert.KriseID if evakuert else '' }}">
             <input type="hidden" name="kontakt_person_id" value="{{ evakuert.KontaktPersonID if evakuert else '' }}">
             <input type="hidden" name="status_id" value="{{ evakuert.StatusID if evakuert else '' }}">
 
 
             </div>
             <!-- Informasjon om krisen -->
-            <div class="mb-6">
-                <label for="krise-type" class="block mt-2 text-sm font-medium text-gray-900">Hendelse type</label>
-                <select id="krise-type" name="krise-type"
-                    class="input-field w-64 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
-                    {% for type in krise_situasjon_types %}
-                    <option value="{{ type.KriseSituasjonType }}">{{ type.KriseSituasjonType }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            
-            
-            <div class="mb-6">
-                <label for="krise-navn" class="block mt-2 text-sm font-medium text-gray-900">Hendelse navn</label>
-                <select id="krise-navn" name="krise-navn"
-                    class="input-field w-64 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
-                    {% for krise in kriser %}
-                    <option value="{{ krise.KriseNavn }}" {% if evakuert and evakuert.krise_id==krise.KriseID %}selected{%
-                        endif %}>{{ krise.KriseNavn }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="mb-6">
-                <label for="lokasjon" class="block mt-2 text-sm font-medium text-gray-900">Lokasjon</label>
-                <select id="lokasjon" name="lokasjon"
-                    class="input-field w-64 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
-                    {% for location in locations %}
-                    <option value="{{ location.LokasjonNavn }}" {% if evakuert and evakuert.lokasjon_id==location.LokasjonID %}selected{% endif %}>
-                        {{ location.LokasjonNavn }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+           <!-- Krise Dropdown -->
+<div class="mb-6">
+    <label for="krise-navn" class="block mt-2 text-sm font-medium text-gray-900">Hendelse navn</label>
+    <select id="krise-navn" name="krise_id"
+        class="input-field w-64 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
+        <option value="">Velg en hendelse</option>
+        {% for krise in kriser %}
+        <option value="{{ krise.KriseID }}" data-krise-type="{{ krise.KriseSituasjonType }}" data-lokasjon="{{ krise.Lokasjon }}">
+            {{ krise.KriseNavn }}
+        </option>
+        {% endfor %}
+    </select>
+</div>
+
+<!-- Read-only field for KriseSituasjonType -->
+<div class="mb-6">
+    <label for="krise-type" class="block mt-2 text-sm font-medium text-gray-900">Hendelse type</label>
+    <input type="text" id="krise-type" class="input-field w-64 bg-gray-50 border border-gray-300 text-gray-500 text-sm rounded-lg block p-2.5" disabled>
+    <input type="hidden" name="krise-type" id="hidden-krise-type">
+</div>
+
+<!-- Read-only field for Lokasjon -->
+<div class="mb-6">
+    <label for="lokasjon" class="block mt-2 text-sm font-medium text-gray-900">Lokasjon</label>
+    <input type="text" id="lokasjon" class="input-field w-64 bg-gray-50 border border-gray-300 text-gray-500 text-sm rounded-lg block p-2.5" disabled>
+    <input type="hidden" name="lokasjon" id="hidden-lokasjon">
+</div>
+
             <div>
                 <hr class="my-12 h-0.5 border-t-0 bg-black" />
                 <div>
@@ -290,6 +286,26 @@
                 errorMessage.classList.remove('hidden'); // Show error message
             }
         });
+
+        document.getElementById("krise-navn").addEventListener("change", function () {
+        let selectedOption = this.options[this.selectedIndex];
+        let kriseType = selectedOption.getAttribute("data-krise-type");
+        let lokasjon = selectedOption.getAttribute("data-lokasjon");
+
+        // Set visible fields (but they remain disabled)
+        document.getElementById("krise-type").value = kriseType || "";
+        document.getElementById("lokasjon").value = lokasjon || "";
+
+        // Copy values to hidden fields to ensure they are sent in the form submission
+        document.getElementById("hidden-krise-type").value = kriseType || "";
+        document.getElementById("hidden-lokasjon").value = lokasjon || "";
+    });
+
+
+    // Debugging: Log KriseID before submitting
+    document.querySelector("form").addEventListener("submit", function () {
+        console.log("Submitting KriseID:", document.getElementById("krise-navn").value);
+    });
     </script>
 </body>
 

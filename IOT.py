@@ -17,6 +17,7 @@ from blueprints.admin_reg import admin_reg_bp
 from dotenv import load_dotenv
 import logging
 from translations import translations
+from rfid_module import register_user_with_rfid, scan_rfid
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -129,6 +130,7 @@ def prepare_image(image):
 @app.route("/noID")
 def noID():
     return render_template("noID.html")
+
 
 @app.route("/fingerLogin")
 def fingerLogin():
@@ -302,8 +304,6 @@ def video_feed():
          return Response(generate_frames(evakuert_id), 
                          mimetype='multipart/x-mixed-replace; boundary=frame')
 
-
-
 @app.route('/progress')
 def progress():
      return Response(generate_frames_with_progress(),
@@ -315,8 +315,53 @@ def recognition():
      return render_template('recognition.html')
 
 
+@app.route('/RFIDregister')
+def RFIDregister():
+    if "evakuert_id" not in session:
+        return redirect(url_for("startID"))
+    return render_template('RFIDregister.html', evakuert_id=session["evakuert_id"])
+
+
+@app.route('/scan', methods=['GET'])
+def scan():
+    result = scan_rfid()
+    return render_template('scan.html', scan_result=result)
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    if "evakuert_id" not in session:
+        return redirect(url_for("startID"))
+
+    if request.method == 'POST':
+        evakuert_id = session["evakuert_id"]
+        result = register_user_with_rfid(evakuert_id)
+        return jsonify(result)
+
+    return render_template('RFIDregister.html', evakuert_id=session["evakuert_id"])
+
+@app.route('/api/scan', methods=['GET'])
+def api_scan():
+    """Scans an RFID card and links it to the EvakuertID in session."""
+    if "evakuert_id" not in session:
+        return jsonify({'error': 'No EvakuertID found in session'})
+
+    scan_result = scan_rfid()
+    if "uid" in scan_result:
+        uid = scan_result["uid"]
+        evakuert_id = session["evakuert_id"]
+        
+        conn = pyodbc.connect(connection_string)
+        if conn:
+            cursor = conn.cursor()
+            cursor.execute("UPDATE Evakuerte SET UID = ? WHERE EvakuertID = ?", (uid, evakuert_id))
+            conn.commit()
+            conn.close()
+        return jsonify({'message': f'RFID {uid} linked to EvakuertID {evakuert_id}'})
+    
+    return jsonify(scan_result)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
 
 

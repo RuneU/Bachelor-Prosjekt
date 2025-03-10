@@ -1,113 +1,99 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 import pyodbc
-from sql.db_connection import connection_string, run_query, fetch_all_kriser, fetch_all_locations, fetch_all_krise_situasjon_types
+from sql.db_connection import connection_string, fetch_all_kriser, fetch_all_locations, fetch_all_krise_situasjon_types
 
 registrer_bp = Blueprint('registrer', __name__)
 
 @registrer_bp.route("/register", methods=["GET", "POST"])
 def register():
-    if request.method == "POST":
-        try:
+    try:
+        if request.method == "POST":
+            # Get form data
             fornavn = request.form.get("fornavn")
             mellomnavn = request.form.get("mellomnavn")
             etternavn = request.form.get("etternavn")
             adresse = request.form.get("adresse")
             telefonnummer = request.form.get("telefonnummer")
             status = request.form.get("status")
-            lokasjon_id = request.form.get("lokasjon")
+            lokasjon = request.form.get("lokasjon")
+            krise_id = request.form.get("krise_id")
             parorende_fornavn = request.form.get("parorende_fornavn")
             parorende_mellomnavn = request.form.get("parorende_mellomnavn")
             parorende_etternavn = request.form.get("parorende_etternavn")
             parorende_telefonnummer = request.form.get("parorende_telefonnummer")
-            # Insert into Evakuerte and retrieve the new ID in one statement
-            # Establish a connection and create a cursor
+
+            print(f"Received KriseID: {krise_id}")  # Debugging
+
+            if not krise_id or not krise_id.isdigit():
+                return "Error: Invalid KriseID received", 400  
+
+            krise_id = int(krise_id)
+
+            # Verify KriseID exists in the Krise table
             conn = pyodbc.connect(connection_string)
             cursor = conn.cursor()
-
-            # Insert into Evakuerte and retrieve the new ID in one statement
-            evakuert_query = """
-            SET NOCOUNT ON;
-            INSERT INTO Evakuerte (Fornavn, MellomNavn, Etternavn, Adresse, Telefonnummer)
-            VALUES (?, ?, ?, ?, ?);
-            SELECT SCOPE_IDENTITY() AS ID;
-            """
-            cursor.execute(evakuert_query, (fornavn, mellomnavn, etternavn, adresse, telefonnummer))
+            cursor.execute("SELECT COUNT(*) FROM Krise WHERE KriseID = ?", (krise_id,))
             row = cursor.fetchone()
+            if row[0] == 0:
+                return "Error: KriseID does not exist in the database", 400
+
+            print("Inserting into Evakuerte...")  # Debugging
+
+           
+            # Insert into Evakuerte and fetch the inserted ID using OUTPUT INSERTED
+            evakuert_query = """
+            INSERT INTO Evakuerte (Fornavn, MellomNavn, Etternavn, Adresse, Telefonnummer, KriseID)
+            OUTPUT INSERTED.EvakuertID
+            VALUES (?, ?, ?, ?, ?, ?);
+            """
+            cursor.execute(evakuert_query, (fornavn, mellomnavn, etternavn, adresse, telefonnummer, krise_id))
+            row = cursor.fetchone()
+
+            print(f"Retrieved EvakuertID: {row}")  # Debugging
             if row and row[0]:
                 evakuert_id = int(row[0])
             else:
-                raise Exception("Failed to retrieve a valid EvakuertID.")
-            conn.commit()
+                return "Error: Failed to retrieve a valid EvakuertID", 500
 
-            cursor.close()
-            conn.close()
+            print(f"EvakuertID to be used in KontaktPerson: {evakuert_id}")
 
-            # Retrieve the crisis details from the form
-            krise_navn = request.form.get("krise-navn")
-            krise_type = request.form.get("krise-type")
-
-            # Open a connection to check/insert into Krise table and update Evakuerte with KriseID
-            conn = pyodbc.connect(connection_string)
-            cursor = conn.cursor()
-
-            # Try to find an existing crisis with the given KriseNavn
-            cursor.execute("SELECT KriseID FROM Krise WHERE KriseNavn = ?", (krise_navn,))
-            row = cursor.fetchone()
-
-            if row:
-                crisis_id = row[0]
-            else:
-                # If not found, insert a new crisis record.
-                # You can adjust the default values for Status, Lokasjon, Tekstboks as needed.
-                insert_crisis_query = """
-                    INSERT INTO Krise (KriseSituasjonType, KriseNavn, Status, Lokasjon, Tekstboks)
-                    VALUES (?, ?, '', '', '')
-                """
-                cursor.execute(insert_crisis_query, (krise_type, krise_navn))
-                conn.commit()
-                cursor.execute("SELECT SCOPE_IDENTITY() AS ID")
-                row = cursor.fetchone()
-                if row and row[0]:
-                    crisis_id = int(row[0])
-                else:
-                    raise Exception("Failed to retrieve new KriseID.")
-
-            # Now update the Evakuerte record to set its KriseID field
-            cursor.execute("UPDATE Evakuerte SET KriseID = ? WHERE EvakuertID = ?", (crisis_id, evakuert_id))
-            conn.commit()
-
-            cursor.close()
-            conn.close()
-
-            # Insert into KontaktPerson using the newly obtained evakuert_id
-            query_kontakt = f"""
+            # Insert into KontaktPerson
+            query_kontakt = """
                 INSERT INTO KontaktPerson (Fornavn, MellomNavn, Etternavn, Telefonnummer, EvakuertID)
-                VALUES ('{parorende_fornavn}', '{parorende_mellomnavn}', '{parorende_etternavn}', '{parorende_telefonnummer}', {evakuert_id});
+                VALUES (?, ?, ?, ?, ?);
             """
-            run_query(query_kontakt)
-
-            print("Request form data:", request.form)
-            print("status:", request.form.get("status"))
-            print("lokasjon:", request.form.get("lokasjon"))
-            print("evakuert_id:", evakuert_id)
-
-            # Insert into Status table using a parameterized query with dynamic values
-            conn = pyodbc.connect(connection_string)
-            cursor = conn.cursor()
-            query_status = "INSERT INTO Status ([Status], Lokasjon, EvakuertID) VALUES (?, ?, ?)"
-            cursor.execute(query_status, (status, lokasjon_id, evakuert_id))
+            cursor.execute(query_kontakt, (parorende_fornavn, parorende_mellomnavn, parorende_etternavn, parorende_telefonnummer, evakuert_id))
             conn.commit()
+            print("Pårørende successfully inserted!")
+
+            # Insert into Status table
+            query_status = "INSERT INTO Status ([Status], Lokasjon, EvakuertID) VALUES (?, ?, ?)"
+            cursor.execute(query_status, (status, lokasjon, evakuert_id))
+            conn.commit()
+
             cursor.close()
             conn.close()
-
-
 
             return redirect(url_for("index"))
-        except Exception as e:
-            print(f"An error occurred: {e}")
-            return "An error occurred while processing your request."
 
-    kriser = fetch_all_kriser()
-    locations = fetch_all_locations()
-    krise_situasjon_types = fetch_all_krise_situasjon_types()  # New function to fetch KriseSituasjonType data
-    return render_template('register.html', kriser=kriser, locations=locations, krise_situasjon_types=krise_situasjon_types)
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return f"<h2>An error occurred:</h2> <p>{e}</p>", 500 
+
+    # Fetch all crisis details (Auto-populate support)
+    conn = pyodbc.connect(connection_string)
+    cursor = conn.cursor()
+    cursor.execute("SELECT KriseID, KriseNavn, KriseSituasjonType, Lokasjon FROM Krise")
+    kriser = [
+        {
+            "KriseID": row[0],
+            "KriseNavn": row[1],
+            "KriseSituasjonType": row[2],
+            "Lokasjon": row[3]
+        }
+        for row in cursor.fetchall()
+    ]
+    cursor.close()
+    conn.close()
+
+    return render_template('register.html', kriser=kriser, locations=fetch_all_locations(), krise_situasjon_types=fetch_all_krise_situasjon_types())
