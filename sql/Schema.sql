@@ -18,6 +18,7 @@ CREATE TABLE Evakuerte (
     Telefonnummer VARCHAR(20) NULL,
     Adresse VARCHAR(256) NULL,
     KriseID INT NULL,
+    ImageURL NVARCHAR(500) NULL,
     FOREIGN KEY (KriseID) REFERENCES Krise(KriseID)
 );
 
@@ -85,3 +86,10 @@ CREATE TABLE RFID (
     EvakuertID INT UNIQUE,
     FOREIGN KEY (EvakuertID) REFERENCES Evakuerte(EvakuertID) ON DELETE CASCADE
 );
+
+CREATE TABLE Faces (
+    FaceID INT IDENTITY(1,1) PRIMARY KEY, 
+    EvakuertID INT NOT NULL, 
+    ImageURL NVARCHAR(500) NOT NULL, 
+    Timestamp DATETIME DEFAULT GETDATE(), 
+    FOREIGN KEY (EvakuertID) REFERENCES Evakuerte(EvakuertID) ON DELETE CASCADE);

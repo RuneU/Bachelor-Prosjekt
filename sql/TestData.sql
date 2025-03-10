@@ -1,9 +1,9 @@
 -- Sett inn data i "Krise"-tabellen
-INSERT INTO Krise (KriseSituasjonType, KriseNavn, Lokasjon)
+INSERT INTO Krise (KriseSituasjonType, KriseNavn, Lokasjon, status)
 VALUES
-('Brann', 'Bybrann i Oslo', 'Oslo'),
-('Flom', 'Vannflom i Bergen', 'Bergen'),
-('Jordskjelv', 'Jordskjelv i Tromsø', 'Tromsø');
+('Brann', 'Bybrann i Oslo', 'Oslo', 'Ny'),
+('Flom', 'Vannflom i Bergen', 'Bergen', 'Pågående'),
+('Jordskjelv', 'Jordskjelv i Tromsø', 'Tromsø', 'Pågående');
 
 -- Sett inn data i "Evakuerte"-tabellen
 INSERT INTO Evakuerte (Fornavn, Etternavn, Telefonnummer, Adresse, KriseID)
