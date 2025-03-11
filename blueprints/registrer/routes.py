@@ -55,8 +55,6 @@ def register():
             else:
                 return "Error: Failed to retrieve a valid EvakuertID", 500
 
-
-
             print(f"EvakuertID to be used in KontaktPerson: {evakuert_id}")
 
             # Insert into KontaktPerson
