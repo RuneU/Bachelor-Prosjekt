@@ -7,7 +7,7 @@ from sql.db_connection import connection_string, fetch_all_kriser, fetch_status_
 from blueprints.admin_reg import admin_reg_bp
 from blueprints.registrer.routes import registrer_bp
 from blueprints.admin_inc.routes import admin_inc_bp
-from blueprints.auth.routes import auth_bp
+from blueprints.auth.auth import auth_bp  
 from dotenv import load_dotenv
 from translations import translations
 
@@ -38,6 +38,7 @@ app.register_blueprint(admin_status_bp)
 app.register_blueprint(admin_reg_bp, url_prefix='/admin-reg')
 app.register_blueprint(registrer_bp)
 app.register_blueprint(admin_inc_bp)
+app.register_blueprint(auth_bp) 
 
 # POST krise oppretelse til db
 @app.route('/handle_incident', methods=['POST'])

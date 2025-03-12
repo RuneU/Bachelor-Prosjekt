@@ -10,7 +10,6 @@ auth_bp = Blueprint('auth', __name__)
 def register_user():
     if request.method == 'POST':
         username = request.form.get('username')
-        email = request.form.get('email')
         password = request.form.get('password')
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
@@ -22,10 +21,10 @@ def register_user():
             conn = pyodbc.connect(connection_string)
             cursor = conn.cursor()
             insert_query = """
-                INSERT INTO Users (username, email, password, first_name, last_name)
+                INSERT INTO Users (username, password, first_name, last_name)
                 VALUES (?, ?, ?, ?, ?)
             """
-            cursor.execute(insert_query, (username, email, password_hash, first_name, last_name))
+            cursor.execute(insert_query, (username, password_hash, first_name, last_name))
             conn.commit()
             flash("Registration successful! You can now log in.", "success")
             return redirect(url_for('auth.login'))
@@ -33,9 +32,9 @@ def register_user():
             print(f"Error inserting user: {e}")
             flash("An error occurred during registration.", "error")
         finally:
-            if 'cursor' in locals():
+            if cursor:
                 cursor.close()
-            if 'conn' in locals():
+            if conn:
                 conn.close()
     
     return render_template('register_user.html')
@@ -52,12 +51,12 @@ def login():
             # Look for a user with the given username or email
             query = """
                 SELECT id, username, email, password, active FROM Users
-                WHERE username = ? OR email = ?
+                WHERE username = ?
             """
             cursor.execute(query, (identifier, identifier))
             row = cursor.fetchone()
             if row:
-                user_id, username, email, stored_password, active = row
+                user_id, username, stored_password, active = row
                 if active and check_password_hash(stored_password, password):
                     # Successful login, store the user id in the session
                     session['user_id'] = user_id
@@ -71,11 +70,11 @@ def login():
             print(f"Login error: {e}")
             flash("An error occurred during login.", "error")
         finally:
-            if 'cursor' in locals():
+            if cursor:
                 cursor.close()
-            if 'conn' in locals():
+            if conn:
                 conn.close()
-    return render_template('login.html')
+    return render_template('admin_status.html')
 
 # Logout endpoint
 @auth_bp.route('/logout')
