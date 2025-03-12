@@ -25,7 +25,7 @@
     <!-- Main Content -->
     <main class="container mx-auto py-10 px-6 flex-grow bg-gray-900 text-gray-200 rounded-lg shadow-lg">
         <div class="relative flex justify-center mb-6">
-            <form action="/search" method="GET" class="w-full max-w-md">
+            <form action="{{ url_for('admin_status.search') }}" method="GET" class="w-full max-w-md">
                 <input type="text" name="query" placeholder="Søk:" class="w-full p-2 border rounded bg-gray-700 text-gray-300">
                 <select name="KriseID" class="w-full p-2 border rounded bg-gray-700 text-gray-300 mt-2">
                     <option value="">Velg KriseType</option>
