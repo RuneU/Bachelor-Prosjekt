@@ -1,6 +1,6 @@
 import sys
 from flask import jsonify
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 from sql.db_connection import connection_def
 sys.dont_write_bytecode = True
 
@@ -119,8 +119,8 @@ def handle_form():
                 VALUES (?, ?, ?, ?, ?, ?)
             """, (
                 form_data['evak_fnavn'],
-                form_data['evak-mnavn'],
-                form_data['evak-enavn'],
+                form_data['evak_mnavn'],
+                form_data['evak_enavn'],
                 safe_int(form_data['evak_tlf']),
                 form_data['evak_adresse'],
                 krise_id
@@ -145,7 +145,7 @@ def handle_form():
                 evakuert_id
             ))
         conn.commit()
-        return redirect(url_for('admin'))
+        return redirect(url_for('admin_status.admin'))
     except ValueError as ve:
         conn.rollback()
         return f"Invalid input format: {str(ve)}", 400

@@ -30,34 +30,13 @@ def set_user_id():
     session["evakuert_id"] = int(data["evakuert_id"])
     return jsonify({"message": "User ID stored successfully"}), 200
 
-# Hent data fra databasen og route til Admin page
-@app.route("/admin")
-def admin():
-    statuses = fetch_status_data()
-    krise_options = fetch_all_kriser()
-    print(krise_options)  # Debugging line to check the fetched data
-    return render_template("admin.html", statuses=statuses, krise_options=krise_options)
+from blueprints.admin_status.routes import admin_status_bp
 
-# Status for evakuerte på admin page
-@app.route('/update_status/<int:evakuert_id>', methods=['POST'])
-def update_status_route(evakuert_id):
-    status = request.form['status']
-    lokasjon = request.form['lokasjon']
-    update_status(evakuert_id, status, lokasjon)
-    return redirect(url_for('admin'))
-
-# Query for søk på admin page
-@app.route("/search", methods=["GET"])
-def search():
-    query = request.args.get("query")
-    krise_id = request.args.get("KriseID")
-    statuses = search_statuses(query, krise_id)
-    krise_options = fetch_all_kriser()
-    return render_template("admin.html", statuses=statuses, krise_options=krise_options)
-
+# Register the blueprints
+app.register_blueprint(admin_status_bp)
 app.register_blueprint(admin_reg_bp, url_prefix='/admin-reg')
-
 app.register_blueprint(registrer_bp)
+app.register_blueprint(admin_inc_bp)
 
 # POST krise oppretelse til db
 @app.route('/handle_incident', methods=['POST'])
@@ -91,8 +70,6 @@ def incident_creation():
         # Handle post if needed
         pass
     return render_template('incident_creation.html')
-
-app.register_blueprint(admin_inc_bp)
 
 def generate_frames():
     camera = cv2.VideoCapture(0)  
