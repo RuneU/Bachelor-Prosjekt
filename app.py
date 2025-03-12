@@ -7,6 +7,7 @@ from sql.db_connection import connection_string, fetch_all_kriser, fetch_status_
 from blueprints.admin_reg import admin_reg_bp
 from blueprints.registrer.routes import registrer_bp
 from blueprints.admin_inc.routes import admin_inc_bp
+from blueprints.auth.routes import auth_bp
 from dotenv import load_dotenv
 from translations import translations
 
