@@ -3,160 +3,108 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Registreringsside</title>
-    <link rel="stylesheet" href="{{url_for('static',filename='dist/css/output.css')}}">
+    <title>Registrering</title>
+    <style>
+        .dropdown-option[data-value="Mild skade"] { background-color: #a7f3d0; } /* Green */
+        .dropdown-option[data-value="Middels skade"] { background-color: #fde68a; } /* Yellow */
+        .dropdown-option[data-value="Alvorlig skade"] { background-color: #fca5a5; } /* Red */
+    </style>
 </head>
 
-<body class="bg-blue-500 text-gray-200 font-sans flex flex-col min-h-screen">
+<!-- Admin Login Model (Popup) -->
+<div id="adminModel" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center z-50">
+    <div
+        class="absolute top-20 left-1/2 transform -translate-x-1/2 bg-white text-black rounded-lg shadow-lg w-96 p-6">
+        <h2 class="text-xl font-bold text-center mb-4">Admin Login</h2>
 
-    <!-- Header Section -->
-    <header class="bg-uiared shadow-md">
-        <nav class="container mx-auto flex justify-between items-center py-4 px-6">
-            <div>
-                <button id="adminButton" class="bg-yellow-300 text-black font-bold py-2 px-4 rounded">Admin</button>
+        <!-- Login Form -->
+        <form id="loginForm">
+            <div class="mb-4">
+                <label class="block font-bold mb-1">Username</label>
+                <input type="text" id="username" class="w-full p-2 border border-gray-300 rounded"
+                    placeholder="Enter your username">
             </div>
-            <h1 class="text-lg font-bold">Registrering</h1>
-            <span>Innlogget</span>
-        </nav>
-    </header>
-    <!-- Admin Login Model (Popup) -->
-    <div id="adminModel" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center z-50">
-        <div
-            class="absolute top-20 left-1/2 transform -translate-x-1/2 bg-white text-black rounded-lg shadow-lg w-96 p-6">
-            <h2 class="text-xl font-bold text-center mb-4">Admin Login</h2>
-
-            <!-- Login Form -->
-            <form id="loginForm">
-                <div class="mb-4">
-                    <label class="block font-bold mb-1">Username</label>
-                    <input type="text" id="username" class="w-full p-2 border border-gray-300 rounded"
-                        placeholder="Enter your username">
-                </div>
-                <div class="mb-4">
-                    <label class="block font-bold mb-1">Password</label>
-                    <input type="password" id="password" class="w-full p-2 border border-gray-300 rounded"
-                        placeholder="Enter your password">
-                </div>
-
-                <div class="flex justify-between items-center">
-                    <button type="submit"
-                        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">Login</button>
-                    <button id="closeModel" type="button"
-                        class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">Close</button>
-                </div>
-            </form>
-
-            <!-- Error Message -->
-            <p id="errorMessage" class="text-red-500 text-center mt-4 hidden">Invalid login credentials</p>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <main class="container mx-auto py-10 px-6 flex-grow bg-gray-100 text-gray-800 rounded-lg">
-        <form method="POST" action="{{ url_for('register') }}">
-            <h2 class="text-center font-bold text-lg mb-4">Status</h2>
-            <div class="relative flex justify-center mb-6">
-                <div class="relative">
-                    <button id="dropdownButton" type="button"
-                        class="h-12 w-48 px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition">
-                        Velg en farge
-                    </button>
-                    <ul id="dropdownMenu"
-                        class="hidden absolute mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                        <li class="h-12 px-4 py-2 text-sm rounded-lg bg-green-700 text-white hover:bg-green-600 cursor-pointer"
-                            data-color="bg-green-700" data-value="1"></li>
-                        <li class="h-12 px-4 py-2 text-sm rounded-lg bg-yellow-600 text-white hover:bg-yellow-500 cursor-pointer"
-                            data-color="bg-yellow-600" data-value="2"></li>
-                        <li class="h-12 px-4 py-2 text-sm rounded-lg bg-red-700 text-white hover:bg-red-600 cursor-pointer"
-                            data-color="bg-red-700" data-value="3"></li>
-                    </ul>
-                    <input type="hidden" id="status" name="status" value="">
-                </div>
-            </div>
-            
-            <label class="block font-bold mb-2">Personlig Informasjon</label>
-            <div class="grid gap-6 mb-6 md:grid-cols-3">
-                <div>
-                    <label for="fornavn" class="block mb-2 text-sm font-medium text-gray-900">Fornavn</label>
-                    <input type="text" id="fornavn" name="fornavn"
-                        class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        placeholder="Ola" />
-                </div>
-                <div>
-                    <label for="mellomnavn" class="block mb-2 text-sm font-medium text-gray-900">Mellomnavn</label>
-                    <input type="text" id="mellomnavn" name="mellomnavn"
-                        class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        placeholder="Mellomnavn" />
-                </div>
-                <div>
-                    <label for="etternavn" class="block mb-2 text-sm font-medium text-gray-900">Etternavn</label>
-                    <input type="text" id="etternavn" name="etternavn"
-                        class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        placeholder="Normann" />
-                </div>
-            </div>
-            <div class="grid gap-6 mb-6 md:grid-cols-2">
-                <div>
-                    <label for="adresse" class="block mb-2 text-sm font-medium text-gray-900">Adresse</label>
-                    <input type="text" id="adresse" name="adresse"
-                        class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        placeholder="Osloveien 1" />
-                </div>
-                <div>
-                    <label for="telefonnummer" class="block mb-2 text-sm font-medium text-gray-900">Telefonnummer</label>
-                    <input type="tel" id="telefonnummer" name="telefonnummer"
-                        class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        placeholder="+47" />
-                </div>
-            </div>
-            <!-- Pårørende Info Section -->
-            <label class="block font-bold mb-2">Pårørende Informasjon</label>
-            <div class="grid gap-6 mb-6 md:grid-cols-3">
-                <div>
-                    <label for="parorende_fornavn" class="block mb-2 text-sm font-medium text-gray-900">Fornavn</label>
-                    <input type="text" id="parorende_fornavn" name="parorende_fornavn"
-                        class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        placeholder="Ola" />
-                </div>
-                <div>
-                    <label for="parorende_mellomnavn" class="block mb-2 text-sm font-medium text-gray-900">Mellomnavn</label>
-                    <input type="text" id="parorende_mellomnavn" name="parorende_mellomnavn"
-                        class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        placeholder="Mellomnavn" />
-                </div>
-                <div>
-                    <label for="parorende_etternavn" class="block mb-2 text-sm font-medium text-gray-900">Etternavn</label>
-                    <input type="text" id="parorende_etternavn" name="parorende_etternavn"
-                        class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        placeholder="Normann" />
-                </div>
-            </div>
-            <div class="grid gap-6 mb-6 md:grid-cols-2">
-                <div>
-                    <label for="parorende_telefonnummer" class="block mb-2 text-sm font-medium text-gray-900">Telefonnummer</label>
-                    <input type="tel" id="parorende_telefonnummer" name="parorende_telefonnummer"
-                        class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        placeholder="+47" />
-                </div>
+            <div class="mb-4">
+                <label class="block font-bold mb-1">Password</label>
+                <input type="password" id="password" class="w-full p-2 border border-gray-300 rounded"
+                    placeholder="Enter your password">
             </div>
 
-            <div class="text-center">
-                <button type="submit" class="bg-gray-700 text-white px-6 py-2 rounded">Bekreft</button>
+            <div class="flex justify-between items-center">
+                <button type="submit"
+                    class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">Login</button>
+                <button id="closeModel" type="button"
+                    class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">Close</button>
             </div>
         </form>
-    </main>
+
+        <!-- Error Message -->
+        <p id="errorMessage" class="text-red-500 text-center mt-4 hidden">Invalid login credentials</p>
+    </div>
+</div>
+
+<!--Body/header-->
+<body class="bg-gray-150 flex flex-col items-center min-h-screen p-6">
+    <header class="w-full bg-white shadow-md py-4 px-6 flex justify-between items-center">
+        <h1 class="text-xl font-bold">Registrering 👤</h1>
+        <div class="flex items-center space-x-4">
+            <button id="adminButton" class="bg-yellow-300 text-black font-bold py-2 px-4 rounded">Admin</button>
+            <span class="text-black">Innlogget</span>
+        </div>
+    </header>
+
+    <div class="w-full max-w-2xl bg-white p-6 rounded-lg shadow-md mt-6">
+        <h2 class="text-center text-2xl font-bold mb-4">Registrering 👤</h2>
+
+        <!-- Dropdown for condition -->
+        <label class="block text-lg font-semibold mb-2">Hva er tilstanden din?</label>
+        <div class="relative mb-4">
+            <button id="dropdownButton" type="button"
+             class="w-full p-2 border rounded-lg text-gray-800 bg-gray-200">Velg tilstand
+            </button>
+            <ul id="dropdownMenu"
+             class="absolute w-full bg-white border rounded-lg shadow-lg hidden z-10">
+                <li class="dropdown-option p-2 cursor-pointer bg-green-700 hover:bg-green-600 rounded-t-lg" data-value="Mild skade" data-color="bg-green-300">Mild skade</li>
+                <li class="dropdown-option p-2 cursor-pointer bg-yellow-600 text-white hover:bg-yellow-500" data-value="Middels skade" data-color="bg-yellow-300">Middels skade</li>
+                <li class="dropdown-option p-2 cursor-pointer  bg-red-700 text-white hover:bg-red-600 rounded-b-lg" data-value="Alvorlig skade" data-color="bg-red-300">Alvorlig skade</li>
+            </ul>
+        </div>
+        <input type="hidden" id="status" value="">
+
+        <!-- Personal Information -->
+        <div class="grid grid-cols-3 gap-2 mb-4">
+            <input type="text" id="firstName" placeholder="Fornavn" class="p-2 border rounded-lg">
+            <input type="text" id="middleName" placeholder="Mellomnavn" class="p-2 border rounded-lg">
+            <input type="text" id="lastName" placeholder="Etternavn" class="p-2 border rounded-lg">
+        </div>
+        <div class="grid grid-cols-2 gap-2 mb-4">
+            <input type="text" id="phoneNumber" placeholder="📞 Telefon nummer" class="p-2 border rounded-lg">
+            <input type="text" id="address" placeholder="🏠 Adresse" class="p-2 border rounded-lg">
+        </div>
+        <input type="text" id="currentPosition" placeholder="👤 Hva er posisjonen din akkurat nå?" class="w-full p-2 border rounded-lg mb-6">
+
+        <!-- Emergency Contact -->
+        <h2 class="text-lg font-bold mb-2">Hvem er din nærmeste pårørende?</h2>
+        <div class="grid grid-cols-3 gap-2 mb-4">
+            <input type="text" id="emergencyFirstName" placeholder="Fornavn" class="p-2 border rounded-lg">
+            <input type="text" id="emergencyMiddleName" placeholder="Mellomnavn" class="p-2 border rounded-lg">
+            <input type="text" id="emergencyLastName" placeholder="Etternavn" class="p-2 border rounded-lg">
+        </div>
+        <div class="grid grid-cols-2 gap-2 mb-6">
+            <input type="text" id="emergencyPhoneNumber" placeholder="📞 Telefon nummer" class="p-2 border rounded-lg">
+            <input type="text" id="emergencyAddress" placeholder="🏠 Adresse" class="p-2 border rounded-lg">
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="w-full bg-gray-700 text-white py-2 rounded-lg hover:bg-gray-600">Registrer deg</button>
+    </div>
+
     <script>
-        const adminButton = document.getElementById('adminButton');
-        const adminModel = document.getElementById('adminModel');
-        const closeModel = document.getElementById('closeModel');
-        const loginForm = document.getElementById('loginForm');
-        const errorMessage = document.getElementById('errorMessage');
         const dropdownButton = document.getElementById('dropdownButton');
         const dropdownMenu = document.getElementById('dropdownMenu');
-        const dropdownOptions = dropdownMenu.querySelectorAll('li');
+        const dropdownOptions = dropdownMenu.querySelectorAll('.dropdown-option');
         const statusInput = document.getElementById('status');
 
         dropdownButton.addEventListener('click', () => {
@@ -175,51 +123,11 @@
                 const colorValue = option.getAttribute('data-value');
                 const colorName = option.textContent;
 
-                // Update the button background color and text
-                dropdownButton.className = `w-48 h-12 px-4 py-2 text-white border border-gray-300 rounded-md shadow-sm ${colorClass}`;
+                dropdownButton.className = `w-full p-2 border rounded-lg text-gray-800 ${colorClass}`;
                 dropdownButton.textContent = colorName;
-
-                // Set the hidden input value
                 statusInput.value = colorValue;
-
                 dropdownMenu.classList.add('hidden');
             });
-        });
-
-        // Show the model when clicking "Admin"
-        adminButton.addEventListener('click', () => {
-            adminModel.classList.remove('hidden');
-            dropdownButton.classList.add('bg-gray-500', 'text-white');
-        });
-
-        // Close the model when clicking "Close" button
-        closeModel.addEventListener('click', () => {
-            adminModel.classList.add('hidden');
-            dropdownButton.classList.remove('bg-gray-500', 'text-white');
-        });
-
-        // Close the model when clicking outside the model
-        adminModel.addEventListener('click', (event) => {
-            if (event.target === adminModel) {
-                adminModel.classList.add('hidden');
-                dropdownButton.classList.remove('bg-gray-500', 'text-white');
-            }
-        });
-
-        // Handle login form submission
-        loginForm.addEventListener('submit', (event) => {
-            event.preventDefault(); // Prevent page reload
-
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            // Simple hardcoded authentication check (replace with backend logic)
-            if (username === "admin" && password === "password123") {
-                alert("Login successful!");
-                adminModal.classList.add('hidden'); // Close model after successful login
-            } else {
-                errorMessage.classList.remove('hidden'); // Show error message
-            }
         });
     </script>
 </body>
