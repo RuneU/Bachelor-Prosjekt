@@ -28,7 +28,7 @@
     
         <!-- Main Content -->
         <main class="container mx-auto py-10 px-6 flex-grow bg-gray-900 text-gray-200 rounded-lg shadow-lg">
-            <h1 class="text-5xl text-center font-extrabold dark:text-white">Total liste over hendelser</h1>
+            <h1 class="text-5xl text-center font-extrabold dark:text-white">Hendelser</h1>
             </br>
             <!-- Search Form and Filter -->
             <div class="relative flex justify-center mb-6">
@@ -60,7 +60,15 @@
                         <a href="/admin-inc/{{ krise.KriseID }}" class="block">
                             <div class="bg-gray-800 p-4 rounded shadow hover:bg-gray-700 transition duration-200">
                                 <h3 class="text-xl font-bold">{{ krise.KriseNavn }}</h3>
-                                <p class="mt-2">Status: <span class="font-semibold">{{ krise.Status }}</span></p>
+                                <p class="mt-2">Status: 
+                                    {% if krise.Status == "Ferdig" %}
+                                        <span class="font-semibold text-green-400">{{ krise.Status }}</span>
+                                    {% elif krise.Status == "Pågående" %}
+                                        <span class="font-semibold text-yellow-400">{{ krise.Status }}</span>
+                                    {% else %}
+                                        <span class="font-semibold text-red-400">{{ krise.Status }}</span>
+                                    {% endif %}
+                                </p>
                             </div>
                         </a>
                     {% else %}
