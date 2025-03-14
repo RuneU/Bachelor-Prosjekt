@@ -38,6 +38,11 @@ app.register_blueprint(admin_reg_bp, url_prefix='/admin-reg')
 app.register_blueprint(registrer_bp)
 app.register_blueprint(admin_inc_bp)
 
+@app.route('/admin_status_inc')
+def admin_status_inc():
+    krise_list = fetch_all_kriser()
+    return render_template('admin_status_inc.html', krise_list=krise_list)
+
 # POST krise oppretelse til db
 @app.route('/handle_incident', methods=['POST'])
 def handle_incident():
@@ -66,10 +71,8 @@ def handle_incident():
 
 @app.route('/incident_creation', methods=['GET', 'POST'])
 def incident_creation():
-    if request.method == 'POST':
-        # Handle post if needed
-        pass
-    return render_template('incident_creation.html')
+    krise_list = fetch_all_kriser()
+    return render_template('admin_status_inc.html', krise_list=krise_list)
 
 def generate_frames():
     camera = cv2.VideoCapture(0)  

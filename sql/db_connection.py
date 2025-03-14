@@ -169,10 +169,13 @@ def fetch_all_kriser():
     try:
         conn = pyodbc.connect(connection_string)
         cursor = conn.cursor()
-        cursor.execute("SELECT KriseID, KriseNavn FROM Krise")
+        # Updated query to select KriseID, KriseNavn, and Status
+        cursor.execute("SELECT KriseID, KriseNavn, Status FROM Krise")
         rows = cursor.fetchall()
-        krise_options = [{'KriseID': row[0], 'KriseNavn': row[1]} for row in rows]
-        print(krise_options)  # Debugging line to check the fetched data
+        # Each row now includes Status
+        krise_options = [
+            {'KriseID': row[0], 'KriseNavn': row[1], 'Status': row[2]} for row in rows
+        ]
         return krise_options
     except pyodbc.Error as e:
         print(f"Error: {e}")
@@ -182,6 +185,7 @@ def fetch_all_kriser():
             cursor.close()
         if 'conn' in locals():
             conn.close()
+
 
 def fetch_krise_by_id(krise_id):
     """
