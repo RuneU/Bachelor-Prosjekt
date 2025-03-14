@@ -1,8 +1,10 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 from sql.db_connection import fetch_status_data, fetch_all_kriser, update_status, search_statuses
+from auth import login_required
 
 admin_status_bp = Blueprint('admin_status', __name__)
-
+@admin_status_bp.route("/admin")
+@login_required
 @admin_status_bp.route("/admin")
 def admin():
     statuses = fetch_status_data()

@@ -2,27 +2,50 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 import pyodbc
 from werkzeug.security import generate_password_hash, check_password_hash
 from sql.db_connection import connection_string
+from flask_dance.contrib.google import make_google_blueprint, google
+from functools import wraps
+from flask import session, redirect, url_for, flash
+import uuid
 
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "user_id" not in session:
+            flash("Please log in to access this page.", "error")
+            return redirect(url_for("auth.login"))
+        return f(*args, **kwargs)
+    return decorated_function
+# Create the main auth blueprint
 auth_bp = Blueprint('auth', __name__)
 
-# Registration endpoint
+# Create the Flask-Dance Google blueprint (note: module name must be valid, so use an underscore)
+google_bp = make_google_blueprint(
+    client_id="YOUR_GOOGLE_CLIENT_ID",
+    client_secret="YOUR_GOOGLE_CLIENT_SECRET",
+    scope=["profile", "email"],
+    redirect_url="/auth/login/google/authorized"  # URL to redirect after Google auth
+)
+
+# -------------------------------
+# Normal Registration Endpoint
+# -------------------------------
 @auth_bp.route('/register_user', methods=['GET', 'POST'])
 def register_user():
     if request.method == 'POST':
-        username = request.form.get('username')
-        password = request.form.get('password')
+        username   = request.form.get('username')
+        password   = request.form.get('password')
         first_name = request.form.get('first_name')
-        last_name = request.form.get('last_name')
+        last_name  = request.form.get('last_name')
         
         # Hash the password
         password_hash = generate_password_hash(password)
-
         try:
             conn = pyodbc.connect(connection_string)
             cursor = conn.cursor()
             insert_query = """
                 INSERT INTO Users (username, password, first_name, last_name)
-                VALUES (?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?)
             """
             cursor.execute(insert_query, (username, password_hash, first_name, last_name))
             conn.commit()
@@ -32,14 +55,15 @@ def register_user():
             print(f"Error inserting user: {e}")
             flash("An error occurred during registration.", "error")
         finally:
-            if cursor:
+            if 'cursor' in locals():
                 cursor.close()
-            if conn:
+            if 'conn' in locals():
                 conn.close()
-    
     return render_template('register_user.html')
 
-# Login endpoint
+# -------------------------------
+# Normal Login Endpoint
+# -------------------------------
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -48,17 +72,15 @@ def login():
         try:
             conn = pyodbc.connect(connection_string)
             cursor = conn.cursor()
-            # Look for a user with the given username or email
             query = """
                 SELECT id, username, email, password, active FROM Users
-                WHERE username = ?
+                WHERE username = ? OR email = ?
             """
             cursor.execute(query, (identifier, identifier))
             row = cursor.fetchone()
             if row:
-                user_id, username, stored_password, active = row
+                user_id, username, email, stored_password, active = row
                 if active and check_password_hash(stored_password, password):
-                    # Successful login, store the user id in the session
                     session['user_id'] = user_id
                     flash("Login successful!", "success")
                     return redirect(url_for('index'))
@@ -70,15 +92,74 @@ def login():
             print(f"Login error: {e}")
             flash("An error occurred during login.", "error")
         finally:
-            if cursor:
+            if 'cursor' in locals():
                 cursor.close()
-            if conn:
+            if 'conn' in locals():
                 conn.close()
-    return render_template('admin_status.html')
+    return render_template('login.html')
 
-# Logout endpoint
+# -------------------------------
+# Logout Endpoint
+# -------------------------------
 @auth_bp.route('/logout')
 def logout():
     session.pop('user_id', None)
     flash("Logged out successfully.", "success")
     return redirect(url_for('index'))
+
+# -------------------------------
+# Google Login Endpoint
+# -------------------------------
+@auth_bp.route('/login/google')
+def google_login():
+    # If not already authorized with Google, redirect to the Flask-Dance login route
+    if not google.authorized:
+        return redirect(url_for("google.login"))
+    
+    # Once authorized, fetch user info from Google
+    resp = google.get("/oauth2/v2/userinfo")
+    if not resp.ok:
+        flash("Failed to fetch user info from Google.", "error")
+        return redirect(url_for("auth.login"))
+    
+    user_info = resp.json()
+    email = user_info.get("email")
+    username = email.split("@")[0]  # derive username from email
+
+    try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+        # Check if a user with this email exists
+        query = "SELECT id FROM Users WHERE email = ?"
+        cursor.execute(query, (email,))
+        row = cursor.fetchone()
+        if row:
+            user_id = row[0]
+        else:
+            # Create new user using a random password (not used since Google handles auth)
+            random_password = uuid.uuid4().hex
+            password_hash = generate_password_hash(random_password)
+            insert_query = """
+                INSERT INTO Users (username, email, password, active)
+                VALUES (?, ?, ?, ?)
+            """
+            cursor.execute(insert_query, (username, email, password_hash, 1))
+            conn.commit()
+            # Retrieve the new user's ID using SQL Server's @@IDENTITY
+            cursor.execute("SELECT @@IDENTITY")
+            new_row = cursor.fetchone()
+            user_id = new_row[0] if new_row and new_row[0] else None
+            if user_id is None:
+                flash("Failed to create user from Google login.", "error")
+                return redirect(url_for("auth.login"))
+        cursor.close()
+        conn.close()
+    except Exception as e:
+        print(f"Database error during Google login: {e}")
+        flash("A database error occurred during Google login.", "error")
+        return redirect(url_for("auth.login"))
+    
+    # Store the user id in session to mark the user as logged in
+    session["user_id"] = user_id
+    flash("Logged in with Google successfully!", "success")
+    return redirect(url_for("index"))
