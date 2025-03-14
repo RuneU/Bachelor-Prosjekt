@@ -393,6 +393,31 @@ def search_statuses(query, krise_id=None):
         if 'conn' in locals():
             conn.close()
 
+# Function to search on Krise based on KriseNavn
+def search_krise(query, status_filter=None):
+    try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+        base_sql = "SELECT KriseID, KriseNavn, Status FROM Krise WHERE 1=1"
+        params = []
+        if query:
+            base_sql += " AND KriseNavn LIKE ?"
+            params.append(f'%{query}%')
+        if status_filter:
+            base_sql += " AND Status = ?"
+            params.append(status_filter)
+        cursor.execute(base_sql, params)
+        rows = cursor.fetchall()
+        return [{'KriseID': row[0], 'KriseNavn': row[1], 'Status': row[2]} for row in rows]
+    except pyodbc.Error as e:
+        print(f"Error in search_krise: {e}")
+        return []
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
 # Function to print Evakuerte data only when explicitly called
 def print_evakuerte_data():
     """Fetch and print data from the Evakuerte table when explicitly called."""

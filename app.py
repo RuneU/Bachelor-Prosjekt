@@ -3,7 +3,7 @@ import sys
 sys.dont_write_bytecode = True
 from flask import Flask, request, render_template, jsonify, redirect, url_for, session
 sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
-from sql.db_connection import connection_string, fetch_all_kriser, fetch_status_data, update_status, search_statuses, create_krise
+from sql.db_connection import connection_string, fetch_all_kriser, search_krise, fetch_status_data, update_status, search_statuses, create_krise
 from blueprints.admin_reg import admin_reg_bp
 from blueprints.registrer.routes import registrer_bp
 from blueprints.admin_inc.routes import admin_inc_bp
@@ -40,8 +40,14 @@ app.register_blueprint(admin_inc_bp)
 
 @app.route('/admin_status_inc')
 def admin_status_inc():
-    krise_list = fetch_all_kriser()
-    return render_template('admin_status_inc.html', krise_list=krise_list)
+    query = request.args.get('query', '')
+    status_filter = request.args.get('status_filter', '')
+    # If either a search query or a status filter is provided, search; otherwise, fetch all
+    if query or status_filter:
+        krise_list = search_krise(query, status_filter if status_filter else None)
+    else:
+        krise_list = fetch_all_kriser()
+    return render_template('admin_status_inc.html', krise_list=krise_list, query=query, status_filter=status_filter)
 
 # POST krise oppretelse til db
 @app.route('/handle_incident', methods=['POST'])
