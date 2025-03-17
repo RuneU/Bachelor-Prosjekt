@@ -169,10 +169,13 @@ def fetch_all_kriser():
     try:
         conn = pyodbc.connect(connection_string)
         cursor = conn.cursor()
-        cursor.execute("SELECT KriseID, KriseNavn FROM Krise")
+        # Updated query to select KriseID, KriseNavn, and Status
+        cursor.execute("SELECT KriseID, KriseNavn, Status FROM Krise")
         rows = cursor.fetchall()
-        krise_options = [{'KriseID': row[0], 'KriseNavn': row[1]} for row in rows]
-        print(krise_options)  # Debugging line to check the fetched data
+        # Each row now includes Status
+        krise_options = [
+            {'KriseID': row[0], 'KriseNavn': row[1], 'Status': row[2]} for row in rows
+        ]
         return krise_options
     except pyodbc.Error as e:
         print(f"Error: {e}")
@@ -182,6 +185,7 @@ def fetch_all_kriser():
             cursor.close()
         if 'conn' in locals():
             conn.close()
+
 
 def fetch_krise_by_id(krise_id):
     """
@@ -382,6 +386,31 @@ def search_statuses(query, krise_id=None):
         ]
     except pyodbc.Error as e:
         print(f"Error: {e}")
+        return []
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
+# Function to search on Krise based on KriseNavn
+def search_krise(query, status_filter=None):
+    try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+        base_sql = "SELECT KriseID, KriseNavn, Status FROM Krise WHERE 1=1"
+        params = []
+        if query:
+            base_sql += " AND KriseNavn LIKE ?"
+            params.append(f'%{query}%')
+        if status_filter:
+            base_sql += " AND Status = ?"
+            params.append(status_filter)
+        cursor.execute(base_sql, params)
+        rows = cursor.fetchall()
+        return [{'KriseID': row[0], 'KriseNavn': row[1], 'Status': row[2]} for row in rows]
+    except pyodbc.Error as e:
+        print(f"Error in search_krise: {e}")
         return []
     finally:
         if 'cursor' in locals():
