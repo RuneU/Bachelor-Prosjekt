@@ -75,10 +75,9 @@ def handle_incident():
         print('En uventet feil oppsto', 'error')
         return redirect(url_for('incident_creation'))
 
-@app.route('/incident_creation', methods=['GET', 'POST'])
+@app.route('/incident-creation', methods=['GET', 'POST'])
 def incident_creation():
-    krise_list = fetch_all_kriser()
-    return render_template('admin_status_inc.html', krise_list=krise_list)
+    return render_template('incident_creation.html')
 
 def generate_frames():
     camera = cv2.VideoCapture(0)  
