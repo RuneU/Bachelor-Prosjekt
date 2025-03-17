@@ -4,9 +4,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from sql.db_connection import connection_string
 from flask_dance.contrib.google import make_google_blueprint, google
 from functools import wraps
-from flask import session, redirect, url_for, flash
 import uuid
-
+import os
 
 def login_required(f):
     @wraps(f)
@@ -16,13 +15,14 @@ def login_required(f):
             return redirect(url_for("auth.login"))
         return f(*args, **kwargs)
     return decorated_function
+
 # Create the main auth blueprint
 auth_bp = Blueprint('auth', __name__)
 
-# Create the Flask-Dance Google blueprint (note: module name must be valid, so use an underscore)
+# Create the Flask-Dance Google blueprint
 google_bp = make_google_blueprint(
-    client_id="YOUR_GOOGLE_CLIENT_ID",
-    client_secret="YOUR_GOOGLE_CLIENT_SECRET",
+    client_id=os.environ.get("GOOGLE_CLIENT_ID"),
+    client_secret=os.environ.get("GOOGLE_CLIENT_SECRET"),
     scope=["profile", "email"],
     redirect_url="/auth/login/google/authorized"  # URL to redirect after Google auth
 )
@@ -145,7 +145,7 @@ def google_login():
             """
             cursor.execute(insert_query, (username, email, password_hash, 1))
             conn.commit()
-            # Retrieve the new user's ID using SQL Server's @@IDENTITY
+            # Retrieve the new user's ID using SQL Server's @@IDENTITY (or SCOPE_IDENTITY() if needed)
             cursor.execute("SELECT @@IDENTITY")
             new_row = cursor.fetchone()
             user_id = new_row[0] if new_row and new_row[0] else None
@@ -163,3 +163,40 @@ def google_login():
     session["user_id"] = user_id
     flash("Logged in with Google successfully!", "success")
     return redirect(url_for("index"))
+
+@auth_bp.route('/create_user', methods=['GET', 'POST'])
+@login_required
+def create_user():
+    # (Optional) You could add an admin check here if needed.
+    if request.method == 'POST':
+        username   = request.form.get('username')
+        email      = request.form.get('email')
+        password   = request.form.get('password')
+        first_name = request.form.get('first_name')
+        last_name  = request.form.get('last_name')
+        # Optional: Get the active status (if you have a checkbox, for example)
+        active     = request.form.get('active', 1)
+
+        # Hash the password
+        password_hash = generate_password_hash(password)
+        try:
+            conn = pyodbc.connect(connection_string)
+            cursor = conn.cursor()
+            insert_query = """
+                INSERT INTO Users (username, email, password, first_name, last_name, active)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """
+            cursor.execute(insert_query, (username, email, password_hash, first_name, last_name, active))
+            conn.commit()
+            flash("New user created successfully!", "success")
+            # Redirect to the same page or elsewhere as desired.
+            return redirect(url_for('auth.create_user'))
+        except pyodbc.Error as e:
+            print(f"Error creating user: {e}")
+            flash("An error occurred while creating the user.", "error")
+        finally:
+            if 'cursor' in locals():
+                cursor.close()
+            if 'conn' in locals():
+                conn.close()
+    return render_template('create_user.html')
