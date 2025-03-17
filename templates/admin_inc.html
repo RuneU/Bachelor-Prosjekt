@@ -28,6 +28,21 @@
 
             <!-- Krise Informasjon Section -->
             <h1 class="text-xl font-bold mb-4">Informasjon om krisen</h1>
+            <p>
+                Hendelse opprettet: <span class="font-bold">{{ krise_opprettet.strftime('%Y-%m-%d %H:%M') }}</span>
+            </p>
+            <h3>
+                Hendelse opprettet: <span class="font-bold">
+                    {{ krise.Opprettet.strftime('%Y-%m-%d %H:%M') if krise.Opprettet else 'N/A' }}
+                </span>
+            </h3>
+            {% if krise.Status == "Ferdig" and krise.FerdigTimestamp %}
+                <h3>
+                    FerdigTid: <span class="font-bold">
+                        {{ krise.FerdigTimestamp.strftime('%Y-%m-%d %H:%M') }}
+                    </span>
+                </h3>
+            {% endif %}
             <div class="mb-6">
                 <label for="krise-status" class="text-center block font-bold mb-2">Krise Status</label>
                 <div class="relative flex justify-center">

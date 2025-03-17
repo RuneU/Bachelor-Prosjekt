@@ -40,33 +40,38 @@ app.register_blueprint(admin_inc_bp)
 @app.route('/admin_status_inc')
 def admin_status_inc():
     query = request.args.get('query', '')
-    # Combined dropdown parameter, defaulting to show all items, newest first.
-    filter_order = request.args.get('filter_order', 'all_new')
+    # Combined filter parameter: default is "nyeste"
+    filter_order = request.args.get('filter_order', 'nyeste')
     
-    # Parse the combined value into status_filter and order_by.
-    # The value format is "status_order", e.g., "nykrise_new" or "all_old"
-    status_val, order_by = filter_order.split('_')
-    if status_val == 'all':
+    # Determine status filter and ordering based on the selection
+    if filter_order in ['nyeste', 'eldste']:
         status_filter = None
-    elif status_val == 'nykrise':
+        order_by = 'new' if filter_order == 'nyeste' else 'old'
+    elif filter_order == 'nykrise':
         status_filter = 'Ny krise'
-    elif status_val == 'paaagende':
+        order_by = 'new'
+    elif filter_order == 'paaagende':
         status_filter = 'Pågående'
-    elif status_val == 'ferdig':
+        order_by = 'new'
+    elif filter_order == 'ferdig':
         status_filter = 'Ferdig'
+        order_by = 'new'
     else:
         status_filter = None
-
-    # If a search query or a status filter is provided, use search_krise; otherwise, fetch all.
+        order_by = 'new'
+    
+    # If a search query or status filter is provided, use search_krise; otherwise, fetch all
     if query or status_filter:
         krise_list = search_krise(query, status_filter, order_by)
     else:
         krise_list = fetch_all_kriser(order_by)
     
-    return render_template('admin_status_inc.html', 
-                           krise_list=krise_list, 
-                           query=query, 
-                           filter_order=filter_order)
+    return render_template(
+        'admin_status_inc.html', 
+        krise_list=krise_list, 
+        query=query, 
+        filter_order=filter_order
+    )
 
 # POST krise oppretelse til db
 @app.route('/handle_incident', methods=['POST'])
