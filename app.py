@@ -3,10 +3,11 @@ import sys
 sys.dont_write_bytecode = True
 from flask import Flask, request, render_template, jsonify, redirect, url_for, session
 sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
-from sql.db_connection import connection_string, fetch_all_kriser, search_krise, fetch_status_data, update_status, search_statuses, create_krise
+from sql.db_connection import fetch_all_kriser, search_krise, create_krise
 from blueprints.admin_reg import admin_reg_bp
 from blueprints.registrer.routes import registrer_bp
 from blueprints.admin_inc.routes import admin_inc_bp
+from blueprints.admin_status.routes import admin_status_bp
 from dotenv import load_dotenv
 from translations import translations
 
@@ -29,8 +30,6 @@ def set_user_id():
     
     session["evakuert_id"] = int(data["evakuert_id"])
     return jsonify({"message": "User ID stored successfully"}), 200
-
-from blueprints.admin_status.routes import admin_status_bp
 
 # Register the blueprints
 app.register_blueprint(admin_status_bp)
