@@ -165,18 +165,23 @@ def update_krise(krise_id, status, krise_type, krise_navn, lokasjon, tekstboks):
             conn.close()
 
 # Function to fetch all kriser
-def fetch_all_kriser():
+def fetch_all_kriser(order_by='new'):
     try:
         conn = pyodbc.connect(connection_string)
         cursor = conn.cursor()
-        # Updated query to select KriseID, KriseNavn, and Status
-        cursor.execute("SELECT KriseID, KriseNavn, Status FROM Krise")
+        if order_by == 'new':
+            order_clause = "ORDER BY Opprettet DESC"
+        elif order_by == 'old':
+            order_clause = "ORDER BY Opprettet ASC"
+        else:
+            order_clause = ""
+        query = f"SELECT KriseID, KriseNavn, Status, Opprettet FROM Krise {order_clause}"
+        cursor.execute(query)
         rows = cursor.fetchall()
-        # Each row now includes Status
-        krise_options = [
-            {'KriseID': row[0], 'KriseNavn': row[1], 'Status': row[2]} for row in rows
+        return [
+            {'KriseID': row[0], 'KriseNavn': row[1], 'Status': row[2], 'Opprettet': row[3]}
+            for row in rows
         ]
-        return krise_options
     except pyodbc.Error as e:
         print(f"Error: {e}")
         return []
@@ -394,11 +399,11 @@ def search_statuses(query, krise_id=None):
             conn.close()
 
 # Function to search on Krise based on KriseNavn
-def search_krise(query, status_filter=None):
+def search_krise(query, status_filter=None, order_by='new'):
     try:
         conn = pyodbc.connect(connection_string)
         cursor = conn.cursor()
-        base_sql = "SELECT KriseID, KriseNavn, Status FROM Krise WHERE 1=1"
+        base_sql = "SELECT KriseID, KriseNavn, Status, Opprettet FROM Krise WHERE 1=1"
         params = []
         if query:
             base_sql += " AND KriseNavn LIKE ?"
@@ -406,9 +411,19 @@ def search_krise(query, status_filter=None):
         if status_filter:
             base_sql += " AND Status = ?"
             params.append(status_filter)
-        cursor.execute(base_sql, params)
+        if order_by == 'new':
+            order_clause = " ORDER BY Opprettet DESC"
+        elif order_by == 'old':
+            order_clause = " ORDER BY Opprettet ASC"
+        else:
+            order_clause = ""
+        final_sql = base_sql + order_clause
+        cursor.execute(final_sql, params)
         rows = cursor.fetchall()
-        return [{'KriseID': row[0], 'KriseNavn': row[1], 'Status': row[2]} for row in rows]
+        return [
+            {'KriseID': row[0], 'KriseNavn': row[1], 'Status': row[2], 'Opprettet': row[3]}
+            for row in rows
+        ]
     except pyodbc.Error as e:
         print(f"Error in search_krise: {e}")
         return []
@@ -417,6 +432,41 @@ def search_krise(query, status_filter=None):
             cursor.close()
         if 'conn' in locals():
             conn.close()
+
+
+
+def count_evakuerte_same_location(krise_id, lokasjon):
+    """
+    Returns the count of evacuees whose status location matches the crisis location.
+    """
+    conn = connection_def()
+    query = """
+        SELECT COUNT(*) 
+        FROM Evakuerte e
+        JOIN Status s ON e.EvakuertID = s.EvakuertID
+        WHERE e.KriseID = ? AND s.Lokasjon = ?
+    """
+    cur = conn.cursor()
+    cur.execute(query, (krise_id, lokasjon))
+    result = cur.fetchone()
+    conn.close()
+    return result[0] if result else 0
+
+def count_evakuerte_different_location(krise_id, lokasjon):
+    """
+    Returns the count of evacuees that are at a different location than the crisis location.
+    This is computed by subtracting the count of evacuees on the crisis location from the total evacuees.
+    """
+    conn = connection_def()
+    total_query = "SELECT COUNT(*) FROM Evakuerte WHERE KriseID = ?"
+    cur = conn.cursor()
+    cur.execute(total_query, (krise_id,))
+    total_result = cur.fetchone()
+    total_count = total_result[0] if total_result else 0
+    conn.close()
+    
+    same_count = count_evakuerte_same_location(krise_id, lokasjon)
+    return total_count - same_count
 
 # Function to print Evakuerte data only when explicitly called
 def print_evakuerte_data():
