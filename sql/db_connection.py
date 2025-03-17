@@ -179,28 +179,15 @@ def fetch_all_kriser(order_by='new'):
             conn.close()
 
 def fetch_krise_by_id(krise_id):
-    """
-    Fetches a single Krise entry by KriseID.
-    Returns a dictionary representing the row, or None if not found.
-    """
-    conn = None
-    cursor = None
     try:
-        conn = connection_def()
+        conn = pyodbc.connect(connection_string)
         cursor = conn.cursor()
-
+        # Include FerdigTimestamp in your SELECT statement
         cursor.execute("""
-            SELECT 
-                KriseID, 
-                KriseSituasjonType, 
-                KriseNavn, 
-                Status, 
-                Lokasjon, 
-                Tekstboks 
+            SELECT KriseID, KriseSituasjonType, KriseNavn, Status, Lokasjon, Tekstboks, FerdigTimestamp
             FROM Krise 
             WHERE KriseID = ?
         """, (krise_id,))
-
         row = cursor.fetchone()
         if row:
             return {
@@ -209,20 +196,20 @@ def fetch_krise_by_id(krise_id):
                 "KriseNavn": row[2],
                 "Status": row[3],
                 "Lokasjon": row[4],
-                "Tekstboks": row[5]
+                "Tekstboks": row[5],
+                "FerdigTimestamp": row[6]
             }
         else:
             return None
-
-    except Exception as e:
+    except pyodbc.Error as e:
         print(f"Error fetching Krise by ID: {e}")
         return None
-
     finally:
-        if cursor:
+        if 'cursor' in locals():
             cursor.close()
-        if conn:
+        if 'conn' in locals():
             conn.close()
+
 
 def count_evakuerte_by_krise(krise_id):
     try:
