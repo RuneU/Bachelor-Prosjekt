@@ -3,10 +3,11 @@ from flask import jsonify
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from sql.db_connection import connection_def
 sys.dont_write_bytecode = True
-
+from blueprints.auth.auth import login_required
 admin_reg_bp = Blueprint('admin_reg', __name__, template_folder='../templates')
 
 @admin_reg_bp.route('/')
+@login_required
 def admin_reg():
     return render_template("admin-reg.html")
 
@@ -15,6 +16,7 @@ def safe_int(value):
     return int(value) if value and value.isdigit() else None
 
 @admin_reg_bp.route('/handle_form', methods=['POST'])
+@login_required
 def handle_form():
     conn = None
     cursor = None
@@ -160,6 +162,7 @@ def handle_form():
 
 
 @admin_reg_bp.route('/<int:evakuert_id>')
+@login_required
 def adminreg_with_id(evakuert_id):
     conn = connection_def()
     cursor = conn.cursor()
@@ -246,6 +249,7 @@ def adminreg_with_id(evakuert_id):
 from flask import jsonify
 
 @admin_reg_bp.route('/get_krise_details/<int:krise_id>')
+@login_required
 def get_krise_details(krise_id):
     conn = connection_def()
     cursor = conn.cursor()

@@ -24,10 +24,7 @@
                 <span class="self-center text-xl font-semibold whitespace-nowrap text-white">Flowbite</span>
             </a>
             <div class="flex md:order-2">
-                <button type="button"
-                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0">
-                    {{ t['button_get_started'] }}
-                </button>
+                <a href="{{ url_for('auth.login')}}" class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0">Login</a>
                 <button data-collapse-toggle="navbar-cta" type="button"
                     class="inline-flex items-center p-2 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
                     aria-controls="navbar-cta" aria-expanded="false">

@@ -1,3 +1,4 @@
+from datetime import datetime
 from dotenv import load_dotenv
 import os
 import pyodbc
@@ -113,25 +114,16 @@ def create_krise(status, krise_situasjon_type, krise_navn, lokasjon, tekstboks):
         if 'conn' in locals():
             conn.close()
 
-# Updates Krise table
 def update_krise(krise_id, status, krise_type, krise_navn, lokasjon, tekstboks):
-    """
-    Updates a row in the Krise table.
-    :param krise_id: The ID of the Krise to update.
-    :param status: The new status.
-    :param krise_type: The new KriseSituasjonType.
-    :param krise_navn: The new KriseNavn.
-    :param lokasjon: The new Lokasjon.
-    :param tekstboks: The new Tekstboks.
-    :return: True if the update was successful, False otherwise.
-    """
     conn = None
     cursor = None
     try:
-        conn = connection_def()  # Establish database connection
+        conn = connection_def()  # Establish connection
         cursor = conn.cursor()
+        
+        # If status is "Ferdig", record the current timestamp; otherwise, set to NULL.
+        ferdig_timestamp = datetime.now() if status == "Ferdig" else None
 
-        # Query to update the Krise table
         cursor.execute("""
             UPDATE Krise
             SET 
@@ -139,7 +131,8 @@ def update_krise(krise_id, status, krise_type, krise_navn, lokasjon, tekstboks):
                 KriseNavn = ?, 
                 Status = ?, 
                 Lokasjon = ?, 
-                Tekstboks = ?
+                Tekstboks = ?,
+                FerdigTimestamp = ?
             WHERE KriseID = ?
         """, (
             krise_type,
@@ -147,33 +140,35 @@ def update_krise(krise_id, status, krise_type, krise_navn, lokasjon, tekstboks):
             status,
             lokasjon,
             tekstboks,
+            ferdig_timestamp,
             krise_id
         ))
-
-        conn.commit()  # Commit the transaction
-        return True  # Return True if the update was successful
-
+        conn.commit()
+        return True
     except Exception as e:
         print(f"Error updating Krise: {e}")
-        conn.rollback()  # Rollback the transaction in case of an error
+        conn.rollback()
         return False
-
     finally:
         if cursor:
             cursor.close()
         if conn:
             conn.close()
 
+
 # Function to fetch all kriser
-def fetch_all_kriser():
+def fetch_all_kriser(order_by='new'):
     try:
         conn = pyodbc.connect(connection_string)
         cursor = conn.cursor()
-        cursor.execute("SELECT KriseID, KriseNavn FROM Krise")
+        order_clause = "ORDER BY Opprettet DESC" if order_by == 'new' else "ORDER BY Opprettet ASC"
+        query = f"SELECT KriseID, KriseNavn, Status, Opprettet, FerdigTimestamp FROM Krise {order_clause}"
+        cursor.execute(query)
         rows = cursor.fetchall()
-        krise_options = [{'KriseID': row[0], 'KriseNavn': row[1]} for row in rows]
-        print(krise_options)  # Debugging line to check the fetched data
-        return krise_options
+        return [
+            {'KriseID': row[0], 'KriseNavn': row[1], 'Status': row[2], 'Opprettet': row[3], 'FerdigTimestamp': row[4]}
+            for row in rows
+        ]
     except pyodbc.Error as e:
         print(f"Error: {e}")
         return []
@@ -184,28 +179,15 @@ def fetch_all_kriser():
             conn.close()
 
 def fetch_krise_by_id(krise_id):
-    """
-    Fetches a single Krise entry by KriseID.
-    Returns a dictionary representing the row, or None if not found.
-    """
-    conn = None
-    cursor = None
     try:
-        conn = connection_def()
+        conn = pyodbc.connect(connection_string)
         cursor = conn.cursor()
-
+        # Include FerdigTimestamp in your SELECT statement
         cursor.execute("""
-            SELECT 
-                KriseID, 
-                KriseSituasjonType, 
-                KriseNavn, 
-                Status, 
-                Lokasjon, 
-                Tekstboks 
+            SELECT KriseID, KriseSituasjonType, KriseNavn, Status, Lokasjon, Tekstboks, FerdigTimestamp
             FROM Krise 
             WHERE KriseID = ?
         """, (krise_id,))
-
         row = cursor.fetchone()
         if row:
             return {
@@ -214,20 +196,20 @@ def fetch_krise_by_id(krise_id):
                 "KriseNavn": row[2],
                 "Status": row[3],
                 "Lokasjon": row[4],
-                "Tekstboks": row[5]
+                "Tekstboks": row[5],
+                "FerdigTimestamp": row[6]
             }
         else:
             return None
-
-    except Exception as e:
+    except pyodbc.Error as e:
         print(f"Error fetching Krise by ID: {e}")
         return None
-
     finally:
-        if cursor:
+        if 'cursor' in locals():
             cursor.close()
-        if conn:
+        if 'conn' in locals():
             conn.close()
+
 
 def count_evakuerte_by_krise(krise_id):
     try:
@@ -321,7 +303,6 @@ def get_last_inserted_id():
         row = cursor.fetchone()
         return row.ID if row else None
 
-
     except pyodbc.Error as e:
         print(f"An error occurred: {e}")
         return None
@@ -383,6 +364,85 @@ def search_statuses(query, krise_id=None):
     except pyodbc.Error as e:
         print(f"Error: {e}")
         return []
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
+# Function to search on Krise based on KriseNavn
+def search_krise(query, status_filter=None, order_by='new'):
+    try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+        base_sql = "SELECT KriseID, KriseNavn, Status, Opprettet FROM Krise WHERE 1=1"
+        params = []
+        if query:
+            base_sql += " AND KriseNavn LIKE ?"
+            params.append(f'%{query}%')
+        if status_filter:
+            base_sql += " AND Status = ?"
+            params.append(status_filter)
+        order_clause = " ORDER BY Opprettet DESC" if order_by == 'new' else " ORDER BY Opprettet ASC"
+        final_sql = base_sql + order_clause
+        cursor.execute(final_sql, params)
+        rows = cursor.fetchall()
+        return [
+            {'KriseID': row[0], 'KriseNavn': row[1], 'Status': row[2], 'Opprettet': row[3]}
+            for row in rows
+        ]
+    except pyodbc.Error as e:
+        print(f"Error in search_krise: {e}")
+        return []
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
+def count_evakuerte_same_location(krise_id, lokasjon):
+    """
+    Returns the count of evacuees whose status location matches the crisis location.
+    """
+    conn = connection_def()
+    query = """
+        SELECT COUNT(*) 
+        FROM Evakuerte e
+        JOIN Status s ON e.EvakuertID = s.EvakuertID
+        WHERE e.KriseID = ? AND s.Lokasjon = ?
+    """
+    cur = conn.cursor()
+    cur.execute(query, (krise_id, lokasjon))
+    result = cur.fetchone()
+    conn.close()
+    return result[0] if result else 0
+
+def count_evakuerte_different_location(krise_id, lokasjon):
+    """
+    Returns the count of evacuees that are at a different location than the crisis location.
+    This is computed by subtracting the count of evacuees on the crisis location from the total evacuees.
+    """
+    conn = connection_def()
+    total_query = "SELECT COUNT(*) FROM Evakuerte WHERE KriseID = ?"
+    cur = conn.cursor()
+    cur.execute(total_query, (krise_id,))
+    total_result = cur.fetchone()
+    total_count = total_result[0] if total_result else 0
+    conn.close()
+    
+    same_count = count_evakuerte_same_location(krise_id, lokasjon)
+    return total_count - same_count
+
+def fetch_krise_opprettet(krise_id):
+    try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+        cursor.execute("SELECT Opprettet FROM Krise WHERE KriseID = ?", (krise_id,))
+        row = cursor.fetchone()
+        return row.Opprettet if row else None
+    except pyodbc.Error as e:
+        print(f"An error occurred while fetching Opprettet timestamp: {e}")
+        return None
     finally:
         if 'cursor' in locals():
             cursor.close()
