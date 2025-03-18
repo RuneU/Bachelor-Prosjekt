@@ -22,6 +22,10 @@ def index():
     session['lang'] = lang
     return render_template('index.html', t=translations.get(lang, translations['no']), lang=lang)
 
+@app.route("/register-new")
+def register_new():
+    return render_template('register_new.html')
+
 @app.route('/set_user_id', methods=['POST'])
 def set_user_id():
     data = request.json

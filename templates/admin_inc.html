@@ -1,3 +1,4 @@
+{% import "components/navbar_component.html" as navbar_component %}
 <!DOCTYPE html>
 <html lang="no">
 
@@ -9,17 +10,7 @@
 </head>
 
 <body>
-    <header class="bg-gray-800 p-4 flex justify-between items-center">
-        <div class="flex items-center space-x-2">
-            <button class="bg-yellow-300 text-black font-bold py-2 px-4 rounded">Log ut</button>
-            <a href="{{ url_for('index') }}">
-                <button class="bg-yellow-300 text-black font-bold py-2 px-4 rounded">Returner</button>
-            </a>
-        </div>
-        <div class="flex items-center space-x-4">
-            <span class="text-lg font-bold text-white">Innlogget</span>
-        </div>
-    </header>
+    {{ navbar_component.render_navbar(navbar) }}
 
     <main class="container mx-auto py-10 px-6 flex-grow bg-gray-100 text-gray-800 rounded-lg">
         <form method="POST" action="{{ url_for('admin_inc.update_krise_route', krise_id=krise.KriseID) }}">

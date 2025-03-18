@@ -1,0 +1,13 @@
+{% macro render_navbar(navbar) %}
+<navbar class="bg-gray-800 p-4 flex justify-between items-center">
+    <div class="flex items-center space-x-2">
+        <button class="bg-yellow-300 text-black font-bold py-2 px-4 rounded">Log ut</button>
+        <a href="{{ url_for('index') }}">
+            <button class="bg-yellow-300 text-black font-bold py-2 px-4 rounded">Returner</button>
+        </a>
+    </div>
+    <div class="flex items-center space-x-4">
+        <span class="text-lg font-bold text-white">Innlogget</span>
+    </div>
+</navbar>
+{% endmacro %}

@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 import pyodbc
-from sql.db_connection import connection_string, fetch_all_kriser, fetch_all_locations, fetch_all_krise_situasjon_types
+from sql.db_connection import connection_string, fetch_all_locations, fetch_all_krise_situasjon_types
 
 registrer_bp = Blueprint('registrer', __name__)
 

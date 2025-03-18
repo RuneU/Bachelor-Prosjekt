@@ -1,3 +1,5 @@
+{% import "components/navbar_component.html" as navbar_component %}
+{% import "components/incident_fill_component.html" as fill_component %}
 <!DOCTYPE html>
 <html lang="no">
 
@@ -11,17 +13,8 @@
 </head>
 
 <body class="bg-blue-500 text-gray-200 font-sans flex flex-col min-h-screen">
+    {{ navbar_component.render_navbar(navbar) }}
 
-    <!-- Header Section -->
-    <header class="bg-uiared shadow-md">
-        <nav class="container mx-auto flex justify-between items-center py-4 px-6">
-            <div>
-                <button id="adminButton" class="bg-yellow-300 text-black font-bold py-2 px-4 rounded">Admin</button>
-            </div>
-            <h1 class="text-lg font-bold">Registrering</h1>
-            <span>Innlogget</span>
-        </nav>
-    </header>
     <!-- Admin Login Model (Popup) -->
     <div id="adminModel" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center z-50">
         <div
@@ -61,41 +54,10 @@
             <input type="hidden" name="kontakt_person_id" value="{{ evakuert.KontaktPersonID if evakuert else '' }}">
             <input type="hidden" name="status_id" value="{{ evakuert.StatusID if evakuert else '' }}">
 
-
-            </div>
-            <!-- Informasjon om krisen -->
-           <!-- Krise Dropdown -->
-<div class="mb-6">
-    <label for="krise-navn" class="block mt-2 text-sm font-medium text-gray-900">Hendelse navn</label>
-    <select id="krise-navn" name="krise_id"
-        class="input-field w-64 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
-        <option value="">Velg en hendelse</option>
-        {% for krise in kriser %}
-        <option value="{{ krise.KriseID }}" data-krise-type="{{ krise.KriseSituasjonType }}" data-lokasjon="{{ krise.Lokasjon }}">
-            {{ krise.KriseNavn }}
-        </option>
-        {% endfor %}
-    </select>
-</div>
-
-<!-- Read-only field for KriseSituasjonType -->
-<div class="mb-6">
-    <label for="krise-type" class="block mt-2 text-sm font-medium text-gray-900">Hendelse type</label>
-    <input type="text" id="krise-type" class="input-field w-64 bg-gray-50 border border-gray-300 text-gray-500 text-sm rounded-lg block p-2.5" disabled>
-    <input type="hidden" name="krise-type" id="hidden-krise-type">
-</div>
-
-<!-- Read-only field for Lokasjon -->
-<div class="mb-6">
-    <label for="lokasjon" class="block mt-2 text-sm font-medium text-gray-900">Lokasjon</label>
-    <input type="text" id="lokasjon" class="input-field w-64 bg-gray-50 border border-gray-300 text-gray-500 text-sm rounded-lg block p-2.5" disabled>
-    <input type="hidden" name="lokasjon" id="hidden-lokasjon">
-</div>
-
+            {{ fill_component.render_incident_fill(evakuert, kriser) }}
+            
             <div>
                 <hr class="my-12 h-0.5 border-t-0 bg-black" />
-                <div>
-                </div>
                 <h2 class="text-center font-bold text-lg mb-4">Status</h2>
                 <div class="relative flex justify-center mb-6">
                     <div class="relative justify-center mb-6">
@@ -233,22 +195,22 @@
             });
         });
         dropdownOptions.forEach(option => {
-        option.addEventListener('click', () => {
-        const colorClass = option.getAttribute('data-color');
-        const colorValue = option.getAttribute('data-value');
-        const colorName = option.textContent;
+            option.addEventListener('click', () => {
+                const colorClass = option.getAttribute('data-color');
+                const colorValue = option.getAttribute('data-value');
+                const colorName = option.textContent;
 
-        // Update the button border color and text
-        dropdownButton.className = `w-48 h-12 px-4 py-2 text-black border-2 rounded-md shadow-sm ${colorClass}`;
-        dropdownButton.textContent = colorName;
+                // Update the button border color and text
+                dropdownButton.className = `w-48 h-12 px-4 py-2 text-black border-2 rounded-md shadow-sm ${colorClass}`;
+                dropdownButton.textContent = colorName;
 
-        // Set the hidden input value and add a debug log
-        statusInput.value = colorValue;
-        console.log("Updated status input to:", colorValue);
+                // Set the hidden input value and add a debug log
+                statusInput.value = colorValue;
+                console.log("Updated status input to:", colorValue);
 
-        dropdownMenu.classList.add('hidden');
-    });
-});
+                dropdownMenu.classList.add('hidden');
+            });
+        });
 
 
         // Show the model when clicking "Admin"
@@ -288,24 +250,24 @@
         });
 
         document.getElementById("krise-navn").addEventListener("change", function () {
-        let selectedOption = this.options[this.selectedIndex];
-        let kriseType = selectedOption.getAttribute("data-krise-type");
-        let lokasjon = selectedOption.getAttribute("data-lokasjon");
+            let selectedOption = this.options[this.selectedIndex];
+            let kriseType = selectedOption.getAttribute("data-krise-type");
+            let lokasjon = selectedOption.getAttribute("data-lokasjon");
 
-        // Set visible fields (but they remain disabled)
-        document.getElementById("krise-type").value = kriseType || "";
-        document.getElementById("lokasjon").value = lokasjon || "";
+            // Set visible fields (but they remain disabled)
+            document.getElementById("krise-type").value = kriseType || "";
+            document.getElementById("lokasjon").value = lokasjon || "";
 
-        // Copy values to hidden fields to ensure they are sent in the form submission
-        document.getElementById("hidden-krise-type").value = kriseType || "";
-        document.getElementById("hidden-lokasjon").value = lokasjon || "";
-    });
+            // Copy values to hidden fields to ensure they are sent in the form submission
+            document.getElementById("hidden-krise-type").value = kriseType || "";
+            document.getElementById("hidden-lokasjon").value = lokasjon || "";
+        });
 
 
-    // Debugging: Log KriseID before submitting
-    document.querySelector("form").addEventListener("submit", function () {
-        console.log("Submitting KriseID:", document.getElementById("krise-navn").value);
-    });
+        // Debugging: Log KriseID before submitting
+        document.querySelector("form").addEventListener("submit", function () {
+            console.log("Submitting KriseID:", document.getElementById("krise-navn").value);
+        });
     </script>
 </body>
 
