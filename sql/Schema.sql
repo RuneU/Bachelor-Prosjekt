@@ -7,6 +7,7 @@ CREATE TABLE Krise (
     Lokasjon VARCHAR(256) NOT NULL,
     Tekstboks TEXT NULL,
     Opprettet DATETIME NOT NULL DEFAULT,
+    FerdigTimestamp DATETIME NULL,
     PRIMARY KEY (KriseID)
 );
 
