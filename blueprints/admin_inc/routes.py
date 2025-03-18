@@ -1,9 +1,10 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from sql.db_connection import fetch_krise_by_id, update_krise, count_evakuerte_by_krise, fetch_status_counts_for_krise
-
+from blueprints.auth.auth import login_required
 admin_inc_bp = Blueprint('admin_inc', __name__, template_folder='../templates')
 
 @admin_inc_bp.route('/admin-inc/<int:krise_id>')
+@login_required
 def admin_inc_detail(krise_id):
     """Show details for a specific KriseID along with status counters."""
     krise = fetch_krise_by_id(krise_id)
@@ -16,6 +17,7 @@ def admin_inc_detail(krise_id):
         return redirect(url_for('admin_inc.admin_inc_list'))
 
 @admin_inc_bp.route('/update_krise/<int:krise_id>', methods=['POST'])
+@login_required
 def update_krise_route(krise_id):
     """Handle updates for a specific KriseID"""
     status = request.form.get('krise-status')

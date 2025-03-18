@@ -8,7 +8,7 @@ from blueprints.admin_reg import admin_reg_bp
 from blueprints.registrer.routes import registrer_bp
 from blueprints.admin_inc.routes import admin_inc_bp
 from blueprints.auth.auth import auth_bp, google_bp
-
+from blueprints.auth.auth import login_required
 from dotenv import load_dotenv
 from translations import translations
 
@@ -44,6 +44,7 @@ app.register_blueprint(google_bp, url_prefix="/login")
 
 # POST krise oppretelse til db
 @app.route('/handle_incident', methods=['POST'])
+@login_required
 def handle_incident():
     try:
         status = request.form.get('krise-status')
@@ -69,6 +70,7 @@ def handle_incident():
         return redirect(url_for('incident_creation'))
 
 @app.route('/incident_creation', methods=['GET', 'POST'])
+@login_required
 def incident_creation():
     if request.method == 'POST':
         # Handle post if needed
