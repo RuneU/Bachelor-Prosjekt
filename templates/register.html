@@ -46,11 +46,11 @@
 </div>
 
 <!--Body/header-->
-<body class="bg-gray-150 flex flex-col items-center min-h-screen p-6">
+<body class="min-h-screen bg-gray-150 flex flex-col items-center p-0 m-0">
     <header class="w-full bg-white shadow-md py-4 px-6 flex justify-between items-center">
         <h1 class="text-xl font-bold">Registrering 👤</h1>
         <div class="flex items-center space-x-4">
-            <button id="adminButton" class="bg-yellow-300 text-black font-bold py-2 px-4 rounded">Admin</button>
+            <button id="adminButton" class="bg-yellow-300 text-black font-bold py-2 px-4 rounded hover:bg-yellow-400">Admin</button>
             <span class="text-black">Innlogget</span>
         </div>
     </header>
@@ -62,11 +62,11 @@
         <label class="block text-lg font-semibold mb-2">Hva er tilstanden din?</label>
         <div class="relative mb-4">
             <button id="dropdownButton" type="button"
-             class="w-full p-2 border rounded-lg text-gray-800 bg-gray-200">Velg tilstand
+             class="w-full p-2 border rounded-lg text-gray-800 bg-gray-200 hover:bg-gray-300">Velg tilstand
             </button>
             <ul id="dropdownMenu"
              class="absolute w-full bg-white border rounded-lg shadow-lg hidden z-10">
-                <li class="dropdown-option p-2 cursor-pointer bg-green-700 hover:bg-green-600 rounded-t-lg" data-value="Mild skade" data-color="bg-green-300">Mild skade</li>
+                <li class="dropdown-option p-2 cursor-pointer bg-green-700 hover:bg-green-600 rounded-t-lg" data-value="Mild skade" data-color="bg-green-700">Mild skade</li>
                 <li class="dropdown-option p-2 cursor-pointer bg-yellow-600 text-white hover:bg-yellow-500" data-value="Middels skade" data-color="bg-yellow-300">Middels skade</li>
                 <li class="dropdown-option p-2 cursor-pointer  bg-red-700 text-white hover:bg-red-600 rounded-b-lg" data-value="Alvorlig skade" data-color="bg-red-300">Alvorlig skade</li>
             </ul>
@@ -75,26 +75,27 @@
 
         <!-- Personal Information -->
         <div class="grid grid-cols-3 gap-2 mb-4">
-            <input type="text" id="firstName" placeholder="Fornavn" class="p-2 border rounded-lg">
-            <input type="text" id="middleName" placeholder="Mellomnavn" class="p-2 border rounded-lg">
-            <input type="text" id="lastName" placeholder="Etternavn" class="p-2 border rounded-lg">
+            <input type="text" id="fornavn" placeholder="Fornavn" class="p-2 border rounded-lg">
+            <input type="text" id="mellomnavn" placeholder="Mellomnavn" class="p-2 border rounded-lg">
+            <input type="text" id="etternavn" placeholder="Etternavn" class="p-2 border rounded-lg">
         </div>
         <div class="grid grid-cols-2 gap-2 mb-4">
-            <input type="text" id="phoneNumber" placeholder="📞 Telefon nummer" class="p-2 border rounded-lg">
-            <input type="text" id="address" placeholder="🏠 Adresse" class="p-2 border rounded-lg">
+            <input type="text" id="telefonnummer" placeholder="📞 Telefonnummer" class="p-2 border rounded-lg">
+            <input type="text" id="addresse" placeholder="🏠 Adresse" class="p-2 border rounded-lg">
         </div>
-        <input type="text" id="currentPosition" placeholder="👤 Hva er posisjonen din akkurat nå?" class="w-full p-2 border rounded-lg mb-6">
+        <div>
+            <input type="text" id="lokasjon" placeholder="👤 Hva er posisjonen din akkurat nå?" class="w-full p-2 border rounded-lg mb-6">
+        </div>
 
         <!-- Emergency Contact -->
         <h2 class="text-lg font-bold mb-2">Hvem er din nærmeste pårørende?</h2>
         <div class="grid grid-cols-3 gap-2 mb-4">
-            <input type="text" id="emergencyFirstName" placeholder="Fornavn" class="p-2 border rounded-lg">
-            <input type="text" id="emergencyMiddleName" placeholder="Mellomnavn" class="p-2 border rounded-lg">
-            <input type="text" id="emergencyLastName" placeholder="Etternavn" class="p-2 border rounded-lg">
+            <input type="text" id="parorende_fornavn" placeholder="Fornavn" class="p-2 border rounded-lg">
+            <input type="text" id="parorende_mellomnavn" placeholder="Mellomnavn" class="p-2 border rounded-lg">
+            <input type="text" id="parorende_etternavn" placeholder="Etternavn" class="p-2 border rounded-lg">
         </div>
-        <div class="grid grid-cols-2 gap-2 mb-6">
-            <input type="text" id="emergencyPhoneNumber" placeholder="📞 Telefon nummer" class="p-2 border rounded-lg">
-            <input type="text" id="emergencyAddress" placeholder="🏠 Adresse" class="p-2 border rounded-lg">
+        <div class="gap-2 mb-4">
+            <input type="text" id="parorende_telefonnummer" placeholder="📞 Telefonnummer" class="w-full p-2 border rounded-lg mb-6">
         </div>
 
         <!-- Submit Button -->
@@ -102,6 +103,11 @@
     </div>
 
     <script>
+        const adminButton = document.getElementById('adminButton');
+        const adminModel = document.getElementById('adminModel');
+        const closeModel = document.getElementById('closeModel');
+        const loginForm = document.getElementById('loginForm');
+        const errorMessage = document.getElementById('errorMessage');
         const dropdownButton = document.getElementById('dropdownButton');
         const dropdownMenu = document.getElementById('dropdownMenu');
         const dropdownOptions = dropdownMenu.querySelectorAll('.dropdown-option');
@@ -128,6 +134,59 @@
                 statusInput.value = colorValue;
                 dropdownMenu.classList.add('hidden');
             });
+        });
+
+        dropdownOptions.forEach(option => {
+            option.addEventListener('click', () => {
+                const colorClass = option.getAttribute('data-color');
+                const colorValue = option.getAttribute('data-value');
+                const colorName = option.textContent;
+
+                // Update the button background color and text
+                dropdownButton.className = `w-48 h-12 px-4 py-2 text-white border border-gray-300 rounded-md shadow-sm ${colorClass}`;
+                dropdownButton.textContent = colorName;
+
+                // Set the hidden input value
+                statusInput.value = colorValue;
+
+                dropdownMenu.classList.add('hidden');
+            });
+        });
+
+        // Show the model when clicking "Admin"
+        adminButton.addEventListener('click', () => {
+            adminModel.classList.remove('hidden');
+            dropdownButton.classList.add('bg-gray-500', 'text-white');
+        });
+
+        // Close the model when clicking "Close" button
+        closeModel.addEventListener('click', () => {
+            adminModel.classList.add('hidden');
+            dropdownButton.classList.remove('bg-gray-500', 'text-white');
+        });
+
+        // Close the model when clicking outside the model
+        adminModel.addEventListener('click', (event) => {
+            if (event.target === adminModel) {
+                adminModel.classList.add('hidden');
+                dropdownButton.classList.remove('bg-gray-500', 'text-white');
+            }
+        });
+
+        // Handle login form submission
+        loginForm.addEventListener('submit', (event) => {
+            event.preventDefault(); // Prevent page reload
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Simple hardcoded authentication check (replace with backend logic)
+            if (username === "admin" && password === "password123") {
+                alert("Login successful!");
+                adminModal.classList.add('hidden'); // Close model after successful login
+            } else {
+                errorMessage.classList.remove('hidden'); // Show error message
+            }
         });
     </script>
 </body>
