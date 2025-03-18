@@ -40,13 +40,38 @@ app.register_blueprint(admin_inc_bp)
 @app.route('/admin_status_inc')
 def admin_status_inc():
     query = request.args.get('query', '')
-    status_filter = request.args.get('status_filter', '')
-    # If either a search query or a status filter is provided, search; otherwise, fetch all
-    if query or status_filter:
-        krise_list = search_krise(query, status_filter if status_filter else None)
+    # Combined filter parameter: default is "nyeste"
+    filter_order = request.args.get('filter_order', 'nyeste')
+    
+    # Determine status filter and ordering based on the selection
+    if filter_order in ['nyeste', 'eldste']:
+        status_filter = None
+        order_by = 'new' if filter_order == 'nyeste' else 'old'
+    elif filter_order == 'nykrise':
+        status_filter = 'Ny krise'
+        order_by = 'new'
+    elif filter_order == 'paaagende':
+        status_filter = 'Pågående'
+        order_by = 'new'
+    elif filter_order == 'ferdig':
+        status_filter = 'Ferdig'
+        order_by = 'new'
     else:
-        krise_list = fetch_all_kriser()
-    return render_template('admin_status_inc.html', krise_list=krise_list, query=query, status_filter=status_filter)
+        status_filter = None
+        order_by = 'new'
+    
+    # If a search query or status filter is provided, use search_krise; otherwise, fetch all
+    if query or status_filter:
+        krise_list = search_krise(query, status_filter, order_by)
+    else:
+        krise_list = fetch_all_kriser(order_by)
+    
+    return render_template(
+        'admin_status_inc.html', 
+        krise_list=krise_list, 
+        query=query, 
+        filter_order=filter_order
+    )
 
 # POST krise oppretelse til db
 @app.route('/handle_incident', methods=['POST'])
@@ -132,7 +157,3 @@ def iot_login():
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
-
-
-
-

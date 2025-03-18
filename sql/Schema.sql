@@ -6,6 +6,7 @@ CREATE TABLE Krise (
     Status VARCHAR(256) NOT NULL,
     Lokasjon VARCHAR(256) NOT NULL,
     Tekstboks TEXT NULL,
+    Opprettet DATETIME NOT NULL DEFAULT,
     PRIMARY KEY (KriseID)
 );
 
