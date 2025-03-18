@@ -23,31 +23,36 @@
         </nav>
     </header>
     <!-- Admin Login Model (Popup) -->
-    <div id="adminModel" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center z-50">
-        <div
-            class="absolute top-20 left-1/2 transform -translate-x-1/2 bg-white text-black rounded-lg shadow-lg w-96 p-6">
-            <h2 class="text-xl font-bold text-center mb-4">Admin Login</h2>
+<div id="adminModel" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center z-50">
+    <div class="absolute top-20 left-1/2 transform -translate-x-1/2 bg-white text-black rounded-lg shadow-lg w-96 p-6">
+        <h2 class="text-xl font-bold text-center mb-4">Admin Login</h2>
 
-            <!-- Login Form -->
-            <form id="loginForm">
-                <div class="mb-4">
-                    <label class="block font-bold mb-1">Username</label>
-                    <input type="text" id="username" class="w-full p-2 border border-gray-300 rounded"
-                        placeholder="Enter your username">
-                </div>
-                <div class="mb-4">
-                    <label class="block font-bold mb-1">Password</label>
-                    <input type="password" id="password" class="w-full p-2 border border-gray-300 rounded"
-                        placeholder="Enter your password">
-                </div>
+        <!-- Login Form -->
+        <form id="loginForm">
+            <div class="mb-4">
+                <label class="block font-bold mb-1">Username</label>
+                <!-- Add name attribute if desired -->
+                <input type="text" id="username" name="identifier" class="w-full p-2 border border-gray-300 rounded"
+                    placeholder="Enter your username">
+            </div>
+            <div class="mb-4">
+                <label class="block font-bold mb-1">Password</label>
+                <input type="password" id="password" name="password" class="w-full p-2 border border-gray-300 rounded"
+                    placeholder="Enter your password">
+            </div>
 
-                <div class="flex justify-between items-center">
-                    <button type="submit"
-                        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">Login</button>
-                    <button id="closeModel" type="button"
-                        class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">Close</button>
-                </div>
-            </form>
+            <div class="flex justify-between items-center">
+                <button type="submit"
+                    class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">Login</button>
+                <button id="closeModel" type="button"
+                    class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">Close</button>
+            </div>
+        </form>
+
+        <!-- Error Message -->
+        <p id="errorMessage" class="text-red-500 text-center mt-4 hidden">Invalid login credentials</p>
+    </div>
+</div>
 
             <!-- Error Message -->
             <p id="errorMessage" class="text-red-500 text-center mt-4 hidden">Invalid login credentials</p>
@@ -251,41 +256,59 @@
 });
 
 
-        // Show the model when clicking "Admin"
-        adminButton.addEventListener('click', () => {
-            adminModel.classList.remove('hidden');
-            dropdownButton.classList.add('bg-gray-500', 'text-white');
-        });
+       // Show the model when clicking "Admin"
+    adminButton.addEventListener('click', () => {
+        adminModel.classList.remove('hidden');
+    });
 
-        // Close the model when clicking "Close" button
-        closeModel.addEventListener('click', () => {
+    // Close the model when clicking "Close" button
+    closeModel.addEventListener('click', () => {
+        adminModel.classList.add('hidden');
+    });
+
+    // Close the model when clicking outside the model
+    adminModel.addEventListener('click', (event) => {
+        if (event.target === adminModel) {
             adminModel.classList.add('hidden');
-            dropdownButton.classList.remove('bg-gray-500', 'text-white');
-        });
+        }
+    });
 
-        // Close the model when clicking outside the model
-        adminModel.addEventListener('click', (event) => {
-            if (event.target === adminModel) {
+    // Handle login form submission using AJAX (fetch)
+    loginForm.addEventListener('submit', (event) => {
+        event.preventDefault(); // Prevent default form submission
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        fetch('/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ identifier: username, password: password })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Login failed');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // Login successful: hide the modal and optionally redirect or update UI
                 adminModel.classList.add('hidden');
-                dropdownButton.classList.remove('bg-gray-500', 'text-white');
-            }
-        });
-
-        // Handle login form submission
-        loginForm.addEventListener('submit', (event) => {
-            event.preventDefault(); // Prevent page reload
-
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            // Simple hardcoded authentication check (replace with backend logic)
-            if (username === "admin" && password === "password123") {
-                alert("Login successful!");
-                adminModal.classList.add('hidden'); // Close model after successful login
+                // Optionally, you might refresh the page or update the header to show the logged-in state.
             } else {
-                errorMessage.classList.remove('hidden'); // Show error message
+                // Display error message returned from the server
+                errorMessage.textContent = data.error || "Invalid credentials";
+                errorMessage.classList.remove('hidden');
             }
+        })
+        .catch(error => {
+            errorMessage.textContent = error.message;
+            errorMessage.classList.remove('hidden');
         });
+    });
 
         document.getElementById("krise-navn").addEventListener("change", function () {
         let selectedOption = this.options[this.selectedIndex];
