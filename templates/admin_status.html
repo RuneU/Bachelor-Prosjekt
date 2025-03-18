@@ -55,12 +55,10 @@
         <!-- User Details with Collapsible Dropdown -->
         {% if statuses %}
         {% for status in statuses %}
-        <div class="bg-gray-700 p-4 rounded shadow mb-4">
+        <div class="bg-gray-700 p-4 rounded shadow mb-4 cursor-pointer statusToggleDiv">
             <div class="flex justify-between items-center">
-                <a href="/admin-reg/{{ status['EvakuertID'] }}" class="font-bold text-blue-400 hover:underline">{{
-                    status['Fornavn'] }} {{ status['Etternavn'] }}</a>
-                <span class="text-gray-300">{{ status['Status'] }}</span>
-                <button class="text-blue-400 hover:text-blue-300 focus:outline-none statusToggleBtn">Status</button>
+                <a href="/admin-reg/{{ status['EvakuertID'] }}" class="font-bold text-white bg-blue-400 hover:bg-blue-500 px-4 py-2 rounded">{{ status['Fornavn'] }} {{ status['Etternavn'] }}</a>
+                <span class="flex-1 text-center text-gray-300">{{ status['Status'] }}</span>
             </div>
             <div class="mt-4 border-t border-gray-600 pt-2 text-sm text-gray-300 statusFields" style="display: none;">
                 <form action="/update_status/{{ status['EvakuertID'] }}" method="POST">
@@ -90,6 +88,16 @@
             document.querySelectorAll('.statusToggleBtn').forEach(button => {
                 button.addEventListener('click', function () {
                     const statusFields = this.closest('.flex').nextElementSibling;
+                    statusFields.style.display = (statusFields.style.display === 'block') ? 'none' : 'block';
+                });
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.statusToggleDiv').forEach(div => {
+                div.addEventListener('click', function () {
+                    const statusFields = this.querySelector('.statusFields');
                     statusFields.style.display = (statusFields.style.display === 'block') ? 'none' : 'block';
                 });
             });
