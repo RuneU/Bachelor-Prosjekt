@@ -1,1 +1,0 @@
-SELECT * FROM Evakuerte ORDER BY EvakuertID DESC;
