@@ -1,6 +1,5 @@
 import sys
-from flask import jsonify
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify
 from sql.db_connection import connection_def
 sys.dont_write_bytecode = True
 
@@ -242,8 +241,6 @@ def adminreg_with_id(evakuert_id):
     finally:
         cursor.close()
         conn.close()
-
-from flask import jsonify
 
 @admin_reg_bp.route('/get_krise_details/<int:krise_id>')
 def get_krise_details(krise_id):
