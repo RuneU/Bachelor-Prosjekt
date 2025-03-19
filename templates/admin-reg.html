@@ -18,7 +18,6 @@
         <form method="POST" action="{{ url_for('admin_reg.handle_form') }}">
             <!-- Hidden inputs -->
             <input type="hidden" name="evakuert_id" value="{{ evakuert.EvakuertID if evakuert else '' }}">
-            <input type="hidden" name="krise_id" id="krise_id" value="{{ evakuert.KriseID if evakuert else '' }}">
             <input type="hidden" name="kontakt_person_id" value="{{ evakuert.KontaktPersonID if evakuert else '' }}">
             <input type="hidden" name="status_id" value="{{ evakuert.StatusID if evakuert else '' }}">
 

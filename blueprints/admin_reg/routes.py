@@ -1,6 +1,6 @@
 import sys
 from flask import jsonify
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for
 from sql.db_connection import connection_def
 sys.dont_write_bytecode = True
 
