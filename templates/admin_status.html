@@ -11,6 +11,7 @@
 </head>
 
 <body class="bg-gray-900 text-gray-200 font-sans flex flex-col min-h-screen">
+  
     {{ navbar_component.render_navbar(navbar) }}
 
     <!-- Main Content -->
@@ -40,24 +41,24 @@
         <!-- User Details with Collapsible Dropdown -->
         {% if statuses %}
         {% for status in statuses %}
-        <div class="bg-gray-700 p-4 rounded shadow mb-4">
+        <div class="bg-gray-700 p-4 rounded shadow mb-4 cursor-pointer statusToggleDiv hover:bg-gray-600 transition duration-300">
             <div class="flex justify-between items-center">
-                <a href="/admin-reg/{{ status['EvakuertID'] }}" class="font-bold text-blue-400 hover:underline">{{
-                    status['Fornavn'] }} {{ status['Etternavn'] }}</a>
-                <span class="text-gray-300">{{ status['Status'] }}</span>
-                <button class="text-blue-400 hover:text-blue-300 focus:outline-none statusToggleBtn">Status</button>
+                <a href="/admin-reg/{{ status['EvakuertID'] }}" class="font-bold text-white bg-blue-400 hover:bg-blue-500 px-4 py-2 rounded transition duration-300">{{ status['Fornavn'] }} {{ status['Etternavn'] }}</a>
+                <span class="flex-1 text-center text-gray-300 hover:text-white transition duration-300">{{ status['Status'] }}</span>
             </div>
-            <div class="mt-4 border-t border-gray-600 pt-2 text-sm text-gray-300 statusFields" style="display: none;">
-                <form action="/update_status/{{ status['EvakuertID'] }}" method="POST">
-                    <p><strong>Status:</strong> <input type="text" name="status" value="{{ status['Status'] }}"
-                            class="bg-gray-800 text-gray-300 p-2 rounded"></p>
-                    <p><strong>Lokasjon:</strong> <input type="text" name="lokasjon" value="{{ status['Lokasjon'] }}"
-                            class="bg-gray-800 text-gray-300 p-2 rounded"></p>
-                    <p><strong>EvakuertID:</strong> <span class="font-bold text-blue-500">{{ status['EvakuertID'] if
-                            status['EvakuertID'] else 'No data' }}</span></p>
-                    <p><strong>KriseID:</strong> <span class="font-bold text-blue-500">{{ status['KriseID'] if
-                            status['KriseID'] else 'No data' }}</span></p>
-                    <button type="submit" class="mt-2 bg-blue-700 text-white px-4 py-2 rounded">Oppdater</button>
+            <div class="mt-4 border-t border-gray-600 pt-2 text-sm text-gray-300 statusFields" style="display: none; width: 100%; max-width: 600px; margin: 0 auto;">
+                <form action="/update_status/{{ status['EvakuertID'] }}" method="POST" class="statusForm">
+                    <div class="flex flex-col space-y-2">
+                        <p><strong>Status:</strong> <input type="text" name="status" value="{{ status['Status'] }}"
+                                class="bg-gray-800 text-gray-300 p-2 rounded w-full max-w-md"></p>
+                        <p><strong>Lokasjon:</strong> <input type="text" name="lokasjon" value="{{ status['Lokasjon'] }}"
+                                class="bg-gray-800 text-gray-300 p-2 rounded w-full max-w-md"></p>
+                        <p><strong>EvakuertID:</strong> <span class="font-bold text-blue-500">{{ status['EvakuertID'] if
+                                status['EvakuertID'] else 'No data' }}</span></p>
+                        <p><strong>KriseID:</strong> <span class="font-bold text-blue-500">{{ status['KriseID'] if
+                                status['KriseID'] else 'No data' }}</span></p>
+                        <button type="submit" class="mt-2 bg-blue-700 text-white px-4 py-2 rounded max-w-xs">Oppdater</button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -76,6 +77,22 @@
                 button.addEventListener('click', function () {
                     const statusFields = this.closest('.flex').nextElementSibling;
                     statusFields.style.display = (statusFields.style.display === 'block') ? 'none' : 'block';
+                });
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.statusToggleDiv').forEach(div => {
+                div.addEventListener('click', function () {
+                    const statusFields = this.querySelector('.statusFields');
+                    statusFields.style.display = (statusFields.style.display === 'block') ? 'none' : 'block';
+                });
+            });
+
+            document.querySelectorAll('.statusForm').forEach(form => {
+                form.addEventListener('click', function (event) {
+                    event.stopPropagation();
                 });
             });
         });
