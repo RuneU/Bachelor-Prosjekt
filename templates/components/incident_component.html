@@ -1,0 +1,48 @@
+{% macro render_incident(evakuert, krise) %}
+<div class="mb-6">
+    <label for="krise-status" class="text-center block font-bold mb-2">Krise Status</label>
+    <div class="relative flex justify-center">
+        <button id="krise-status" type="button"
+            class="h-12 w-48 px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition">
+            {{ krise.Status if krise else "Velg Status" }}
+        </button>
+        <ul id="kriseDropdownMenu"
+            class="hidden absolute mt-2 w-full bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
+            <li class="h-12 px-4 py-2 text-sm hover:bg-gray-200 cursor-pointer" data-value="Ny krise">Ny
+                krise</li>
+            <li class="h-12 px-4 py-2 text-sm hover:bg-gray-200 cursor-pointer" data-value="Pågående">
+                Pågående
+            </li>
+            <li class="h-12 px-4 py-2 text-sm hover:bg-gray-200 cursor-pointer" data-value="Ferdig">Ferdig
+            </li>
+        </ul>
+        <input type="hidden" id="selected-krise-status" name="krise-status"
+            value="{{ krise.Status if krise else '' }}">
+    </div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div>
+        <label for="krise-type" class="block mb-1">Krise type</label>
+        <input type="text" id="krise-type" name="krise-type" placeholder="flåm"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+            value="{{ krise.KriseSituasjonType if krise else '' }}">
+    </div>
+    <div>
+        <label for="krise-navn" class="block mb-1">Krise navn</label>
+        <input type="text" id="krise-navn" name="krise-navn" placeholder="flåm Odda 2019"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+            value="{{ krise.KriseNavn if krise else '' }}">
+    </div>
+    <div class="mb-6">
+        <label for="krise-lokasjon" class="block mb-1">Lokasjon</label>
+        <input type="text" id="krise-lokasjon" name="krise-lokasjon" placeholder="Odda sentrum"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+            value="{{ krise.Lokasjon if krise else '' }}">
+    </div>
+</div>
+<div class="mb-6">
+    <label for="annen-info" class="block mb-1">Annen informasjon:</label>
+    <textarea id="annen-info" name="annen-info" rows="4"
+        class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500">{{ krise.Tekstboks if krise else '' }}</textarea>
+</div>
+{% endmacro %}

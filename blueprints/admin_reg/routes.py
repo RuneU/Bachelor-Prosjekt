@@ -248,7 +248,7 @@ def get_krise_details(krise_id):
     cursor = conn.cursor()
     try:
         cursor.execute("""
-            SELECT KriseSituasjonType, KriseNavn, Lokasjon, Tekstboks, Status
+            SELECT KriseSituasjonType, KriseNavn, Lokasjon, Tekstboks, Status AS status
             FROM Krise
             WHERE KriseID = ?
         """, (krise_id,))
@@ -259,7 +259,7 @@ def get_krise_details(krise_id):
                 "KriseNavn": row[1],
                 "Lokasjon": row[2],
                 "Tekstboks": row[3],
-                "Status": row[4]
+                "status": row[4]
             }
             return jsonify(data)
         else:

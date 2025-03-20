@@ -83,7 +83,11 @@
 							class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
 							placeholder="+47" />
 					</div>
-
+					<div>
+						<label for="evak-lokasjon" class="block mb-1">Lokasjon:</label>
+						<input id="evak-lokasjon" type="text" name="evak-lokasjon" placeholder="Hvor befinner du deg nå?"
+							class="border rounded p-2 w-full" value="{{ evakuert.evak_lokasjon if evakuert else '' }}">
+					</div>
 				</div>
 				<div>
 					<hr class="my-12 h-0.5 border-t-0 bg-black" />
