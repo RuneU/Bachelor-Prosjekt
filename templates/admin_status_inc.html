@@ -1,3 +1,4 @@
+{% import "components/navbar_component.html" as navbar_component %}
 <!DOCTYPE html>
 <html lang="no">
 
@@ -10,22 +11,7 @@
 </head>
 
 <body class="bg-gray-900 text-gray-200 font-sans flex flex-col min-h-screen">
-    <!-- Navigation Bar -->
-    <nav class="bg-gray-800 shadow-md">
-        <div class="container flex flex-wrap items-center justify-between mx-auto py-4 px-6">
-            <a href="" class="flex items-center">
-                <img src="https://flowbite.com/docs/images/logo.svg" class="h-6 mr-3 sm:h-9" alt="Flowbite Logo">
-                <span class="self-center text-xl font-semibold whitespace-nowrap text-white">Admin Panel</span>
-            </a>
-            <div class="flex md:order-2">
-                <a href="{{ url_for('index') }}"
-                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-3 md:mr-0">Returner</a>
-                <button
-                    class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5">Log
-                    ut</button>
-            </div>
-        </div>
-    </nav>
+    {{ navbar_component.render_navbar(navbar) }}
 
     <!-- Main Content -->
     <main class="container mx-auto py-10 px-6 flex-grow bg-gray-900 text-gray-200 rounded-lg shadow-lg">

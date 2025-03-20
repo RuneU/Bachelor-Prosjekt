@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify
 import pyodbc
-from sql.db_connection import connection_string, fetch_all_kriser, fetch_all_locations, fetch_all_krise_situasjon_types
+from sql.db_connection import connection_string, fetch_all_locations, fetch_all_krise_situasjon_types
 
 registrer_bp = Blueprint('registrer', __name__)
 
@@ -9,18 +9,18 @@ def register():
     try:
         if request.method == "POST":
             # Get form data
-            fornavn = request.form.get("fornavn")
-            mellomnavn = request.form.get("mellomnavn")
-            etternavn = request.form.get("etternavn")
-            adresse = request.form.get("adresse")
-            telefonnummer = request.form.get("telefonnummer")
+            evak_fnavn = request.form.get("evak-fnavn")
+            evak_mnavn = request.form.get("evak-mnavn")
+            evak_enavn = request.form.get("evak-enavn")
+            evak_adresse = request.form.get("evak-adresse")
+            evak_tlf = request.form.get("evak-tlf")
             status = request.form.get("status")
-            lokasjon = request.form.get("lokasjon")
+            evak_lokasjon = request.form.get("evak-lokasjon")
             krise_id = request.form.get("krise_id")
-            parorende_fornavn = request.form.get("parorende_fornavn")
-            parorende_mellomnavn = request.form.get("parorende_mellomnavn")
-            parorende_etternavn = request.form.get("parorende_etternavn")
-            parorende_telefonnummer = request.form.get("parorende_telefonnummer")
+            kon_fnavn = request.form.get("kon-fnavn")
+            kon_mnavn = request.form.get("kon-mnavn")
+            kon_enavn = request.form.get("kon-enavn")
+            kon_tlf = request.form.get("kon-tlf")
 
             print(f"Received KriseID: {krise_id}")  # Debugging
 
@@ -39,14 +39,13 @@ def register():
 
             print("Inserting into Evakuerte...")  # Debugging
 
-           
             # Insert into Evakuerte and fetch the inserted ID using OUTPUT INSERTED
             evakuert_query = """
             INSERT INTO Evakuerte (Fornavn, MellomNavn, Etternavn, Adresse, Telefonnummer, KriseID)
             OUTPUT INSERTED.EvakuertID
             VALUES (?, ?, ?, ?, ?, ?);
             """
-            cursor.execute(evakuert_query, (fornavn, mellomnavn, etternavn, adresse, telefonnummer, krise_id))
+            cursor.execute(evakuert_query, (evak_fnavn, evak_mnavn, evak_enavn, evak_adresse, evak_tlf, krise_id))
             row = cursor.fetchone()
 
             print(f"Retrieved EvakuertID: {row}")  # Debugging
@@ -62,13 +61,13 @@ def register():
                 INSERT INTO KontaktPerson (Fornavn, MellomNavn, Etternavn, Telefonnummer, EvakuertID)
                 VALUES (?, ?, ?, ?, ?);
             """
-            cursor.execute(query_kontakt, (parorende_fornavn, parorende_mellomnavn, parorende_etternavn, parorende_telefonnummer, evakuert_id))
+            cursor.execute(query_kontakt, (kon_fnavn, kon_mnavn, kon_enavn, kon_tlf, evakuert_id))
             conn.commit()
             print("Pårørende successfully inserted!")
 
             # Insert into Status table
             query_status = "INSERT INTO Status ([Status], Lokasjon, EvakuertID) VALUES (?, ?, ?)"
-            cursor.execute(query_status, (status, lokasjon, evakuert_id))
+            cursor.execute(query_status, (status, evak_lokasjon, evakuert_id))
             conn.commit()
 
             cursor.close()
@@ -80,20 +79,46 @@ def register():
         print(f"An error occurred: {e}")
         return f"<h2>An error occurred:</h2> <p>{e}</p>", 500 
 
-    # Fetch all crisis details (Auto-populate support)
+    # Fetch all crisis details (for auto-populate support)
     conn = pyodbc.connect(connection_string)
     cursor = conn.cursor()
-    cursor.execute("SELECT KriseID, KriseNavn, KriseSituasjonType, Lokasjon FROM Krise")
-    kriser = [
-        {
-            "KriseID": row[0],
-            "KriseNavn": row[1],
-            "KriseSituasjonType": row[2],
-            "Lokasjon": row[3]
-        }
-        for row in cursor.fetchall()
-    ]
+    cursor.execute("SELECT KriseID, KriseNavn, KriseSituasjonType, Lokasjon, Status FROM Krise")
+    kriser = cursor.fetchall()  # This returns tuples (assuming your DB driver does so)
+
     cursor.close()
     conn.close()
 
-    return render_template('register.html', kriser=kriser, locations=fetch_all_locations(), krise_situasjon_types=fetch_all_krise_situasjon_types())
+    return render_template('register.html', 
+                           kriser=kriser, 
+                           locations=fetch_all_locations(), 
+                           krise_situasjon_types=fetch_all_krise_situasjon_types())
+
+@registrer_bp.route('/register/get_krise_details/<krise_id>')
+def get_krise_details(krise_id):
+    """Endpoint to fetch crisis details by KriseID."""
+    try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+        query = """
+            SELECT KriseSituasjonType, KriseNavn, Lokasjon, Tekstboks, Status
+            FROM Krise
+            WHERE KriseID = ?
+        """
+        cursor.execute(query, (krise_id,))
+        row = cursor.fetchone()
+        if row:
+            data = {
+                "KriseSituasjonType": row[0],
+                "KriseNavn": row[1],
+                "Lokasjon": row[2],
+                "Tekstboks": row[3],
+                "Status": row[4]
+            }
+            return jsonify(data)
+        else:
+            return jsonify({"error": "Krise not found"}), 404
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    finally:
+        cursor.close()
+        conn.close()

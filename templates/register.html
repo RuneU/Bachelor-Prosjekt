@@ -1,335 +1,50 @@
+{% import "components/navbar_component.html" as navbar_component %}
+{% import "components/incident_fill_component.html" as fill_component %}
+{% import "components/evacuee_component.html" as evacuee_component %}
+{% import "components/contactperson_component.html" as contact_component %}
 <!DOCTYPE html>
 <html lang="no">
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <title>Registreringsside</title>
-    <link rel="stylesheet" href="{{url_for('static',filename='dist/css/output.css')}}">
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="https://cdn.tailwindcss.com"></script>
+	<title>Registreringsside</title>
+	<link rel="stylesheet" href="{{url_for('static',filename='dist/css/output.css')}}">
 </head>
 
 <body class="bg-blue-500 text-gray-200 font-sans flex flex-col min-h-screen">
 
-    <!-- Header Section -->
-    <header class="bg-uiared shadow-md">
-        <nav class="container mx-auto flex justify-between items-center py-4 px-6">
-            <div>
-                <button id="adminButton" class="bg-yellow-300 text-black font-bold py-2 px-4 rounded">Admin</button>
-            </div>
-            <h1 class="text-lg font-bold">Registrering</h1>
-            <span>Innlogget</span>
-        </nav>
-    </header>
-    <!-- Admin Login Model (Popup) -->
-<div id="adminModel" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center z-50">
-    <div class="absolute top-20 left-1/2 transform -translate-x-1/2 bg-white text-black rounded-lg shadow-lg w-96 p-6">
-        <h2 class="text-xl font-bold text-center mb-4">Admin Login</h2>
+	{{ navbar_component.render_navbar(navbar) }}
 
-        <!-- Login Form -->
-        <form id="loginForm">
-            <div class="mb-4">
-                <label class="block font-bold mb-1">Username</label>
-                <!-- Add name attribute if desired -->
-                <input type="text" id="username" name="identifier" class="w-full p-2 border border-gray-300 rounded"
-                    placeholder="Enter your username">
-            </div>
-            <div class="mb-4">
-                <label class="block font-bold mb-1">Password</label>
-                <input type="password" id="password" name="password" class="w-full p-2 border border-gray-300 rounded"
-                    placeholder="Enter your password">
-            </div>
+	<!-- Main Content -->
+	<main class="container mx-auto py-10 px-6 flex-grow bg-gray-100 text-gray-800 rounded-lg">
+		<form method="POST" action="{{ url_for('registrer.register') }}">
+			<input type="hidden" name="evakuert_id" value="{{ evakuert.EvakuertID if evakuert else '' }}">
+			<input type="hidden" name="kontakt_person_id" value="{{ evakuert.KontaktPersonID if evakuert else '' }}">
+			<input type="hidden" name="status_id" value="{{ evakuert.StatusID if evakuert else '' }}">
 
-            <div class="flex justify-between items-center">
-                <button type="submit"
-                    class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">Login</button>
-                <button id="closeModel" type="button"
-                    class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition">Close</button>
-            </div>
-        </form>
-
-        <!-- Error Message -->
-        <p id="errorMessage" class="text-red-500 text-center mt-4 hidden">Invalid login credentials</p>
-    </div>
-</div>
-
-            <!-- Error Message -->
-            <p id="errorMessage" class="text-red-500 text-center mt-4 hidden">Invalid login credentials</p>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <main class="container mx-auto py-10 px-6 flex-grow bg-gray-100 text-gray-800 rounded-lg">
-        <form method="POST" action="{{ url_for('registrer.register') }}">
-            <input type="hidden" name="evakuert_id" value="{{ evakuert.EvakuertID if evakuert else '' }}">
-            <input type="hidden" name="kontakt_person_id" value="{{ evakuert.KontaktPersonID if evakuert else '' }}">
-            <input type="hidden" name="status_id" value="{{ evakuert.StatusID if evakuert else '' }}">
+			<!-- Render Hendelse Info Component -->
+			{{ fill_component.render_incident_fill(evakuert, kriser) }}
 
 
-            </div>
-            <!-- Informasjon om krisen -->
-           <!-- Krise Dropdown -->
-<div class="mb-6">
-    <label for="krise-navn" class="block mt-2 text-sm font-medium text-gray-900">Hendelse navn</label>
-    <select id="krise-navn" name="krise_id"
-        class="input-field w-64 bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5">
-        <option value="">Velg en hendelse</option>
-        {% for krise in kriser %}
-        <option value="{{ krise.KriseID }}" data-krise-type="{{ krise.KriseSituasjonType }}" data-lokasjon="{{ krise.Lokasjon }}">
-            {{ krise.KriseNavn }}
-        </option>
-        {% endfor %}
-    </select>
-</div>
+			<hr class="my-12 border-t border-gray-300">
 
-<!-- Read-only field for KriseSituasjonType -->
-<div class="mb-6">
-    <label for="krise-type" class="block mt-2 text-sm font-medium text-gray-900">Hendelse type</label>
-    <input type="text" id="krise-type" class="input-field w-64 bg-gray-50 border border-gray-300 text-gray-500 text-sm rounded-lg block p-2.5" disabled>
-    <input type="hidden" name="krise-type" id="hidden-krise-type">
-</div>
+			<!-- Render Evakuertes Info Component -->
+			{{ evacuee_component.render_evacuee(evakuert) }}
 
-<!-- Read-only field for Lokasjon -->
-<div class="mb-6">
-    <label for="lokasjon" class="block mt-2 text-sm font-medium text-gray-900">Lokasjon</label>
-    <input type="text" id="lokasjon" class="input-field w-64 bg-gray-50 border border-gray-300 text-gray-500 text-sm rounded-lg block p-2.5" disabled>
-    <input type="hidden" name="lokasjon" id="hidden-lokasjon">
-</div>
+			<hr class="my-12 border-t border-gray-300">
 
-            <div>
-                <hr class="my-12 h-0.5 border-t-0 bg-black" />
-                <div>
-                </div>
-                <h2 class="text-center font-bold text-lg mb-4">Status</h2>
-                <div class="relative flex justify-center mb-6">
-                    <div class="relative justify-center mb-6">
-                        <button id="dropdownButton" type="button"
-                            class="h-12 w-48 px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition">
-                            Velg en farge
-                        </button>
-                        <ul id="dropdownMenu"
-                            class="hidden absolute mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none left-1/2 transform -translate-x-1/2">
-                            <li class="h-12 px-4 py-2 text-sm border-2 border-green-700 text-black cursor-pointer"
-                                data-color="border-green-700" data-value="Ok">Ok</li>
-                            <li class="h-12 px-4 py-2 text-sm border-2 border-yellow-600 text-black cursor-pointer"
-                                data-color="border-yellow-600" data-value="Mindre skader">Mindre skader</li>
-                            <li class="h-12 px-4 py-2 text-sm border-2 border-red-700 text-black cursor-pointer"
-                                data-color="border-red-700" data-value="Hard Skadet">Hard Skadet</li>
-                        </ul>
-                        <input type="hidden" id="status" name="status" value="">
-                    </div>
-                </div>
-                <label class="block font-bold mb-2">Personlig Informasjon</label>
-                <div class="grid gap-6 mb-6 md:grid-cols-3">
-                    <div>
-                        <label for="fornavn" class="block mb-2 text-sm font-medium text-gray-900">Fornavn</label>
-                        <input type="text" id="fornavn" name="fornavn"
-                            class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                            placeholder="Ola" />
-                    </div>
-                    <div>
-                        <label for="mellomnavn" class="block mb-2 text-sm font-medium text-gray-900">Mellomnavn</label>
-                        <input type="text" id="mellomnavn" name="mellomnavn"
-                            class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                            placeholder="Mellomnavn" />
-                    </div>
-                    <div>
-                        <label for="etternavn" class="block mb-2 text-sm font-medium text-gray-900">Etternavn</label>
-                        <input type="text" id="etternavn" name="etternavn"
-                            class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                            placeholder="Normann" />
-                    </div>
-                </div>
-                <div class="grid gap-6 mb-6 md:grid-cols-2">
-                    <div>
-                        <label for="adresse" class="block mb-2 text-sm font-medium text-gray-900">Adresse</label>
-                        <input type="text" id="adresse" name="adresse"
-                            class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                            placeholder="Osloveien 1" />
-                    </div>
-                    <div>
-                        <label for="telefonnummer"
-                            class="block mb-2 text-sm font-medium text-gray-900">Telefonnummer</label>
-                        <input type="tel" id="telefonnummer" name="telefonnummer"
-                            class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                            placeholder="+47" />
-                    </div>
+			<!-- Render Kontaktperson Info Component -->
+			{{ contact_component.render_contactperson(evakuert) }}
 
-                </div>
-                <div>
-                    <hr class="my-12 h-0.5 border-t-0 bg-black" />
-                </div>
-                <!-- Pårørende Info Section -->
-                <label class="block font-bold mb-2">Pårørende Informasjon</label>
-                <div class="grid gap-6 mb-6 md:grid-cols-3">
-                    <div>
-                        <label for="parorende_fornavn"
-                            class="block mb-2 text-sm font-medium text-gray-900">Fornavn</label>
-                        <input type="text" id="parorende_fornavn" name="parorende_fornavn"
-                            class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                            placeholder="Ola" value="{{ evakuert.parorende_fornavn if evakuert else '' }}" />
-                    </div>
-                    <div>
-                        <label for="parorende_mellomnavn"
-                            class="block mb-2 text-sm font-medium text-gray-900">Mellomnavn</label>
-                        <input type="text" id="parorende_mellomnavn" name="parorende_mellomnavn"
-                            class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                            placeholder="Mellomnavn" />
-                    </div>
-                    <div>
-                        <label for="parorende_etternavn"
-                            class="block mb-2 text-sm font-medium text-gray-900">Etternavn</label>
-                        <input type="text" id="parorende_etternavn" name="parorende_etternavn"
-                            class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                            placeholder="Normann" />
-                    </div>
-                </div>
-                <div class="grid gap-6 mb-6 md:grid-cols-2">
-                    <div>
-                        <label for="parorende_telefonnummer"
-                            class="block mb-2 text-sm font-medium text-gray-900">Telefonnummer</label>
-                        <input type="tel" id="parorende_telefonnummer" name="parorende_telefonnummer"
-                            class="bg-gray-50 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                            placeholder="+47" />
-                    </div>
-                </div>
+			<div class="text-center">
+				<button type="submit" class="bg-gray-700 text-white px-6 py-2 rounded">Bekreft</button>
+			</div>
+		</form>
+	</main>
 
-                <div class="text-center">
-                    <button type="submit" class="bg-gray-700 text-white px-6 py-2 rounded">Bekreft</button>
-                </div>
-        </form>
-    </main>
-    <script>
-        const adminButton = document.getElementById('adminButton');
-        const adminModel = document.getElementById('adminModel');
-        const closeModel = document.getElementById('closeModel');
-        const loginForm = document.getElementById('loginForm');
-        const errorMessage = document.getElementById('errorMessage');
-        const dropdownButton = document.getElementById('dropdownButton');
-        const dropdownMenu = document.getElementById('dropdownMenu');
-        const dropdownOptions = dropdownMenu.querySelectorAll('li');
-        const statusInput = document.getElementById('status');
-
-        dropdownButton.addEventListener('click', () => {
-            dropdownMenu.classList.toggle('hidden');
-        });
-
-        document.addEventListener('click', (event) => {
-            if (!dropdownButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
-                dropdownMenu.classList.add('hidden');
-            }
-        });
-
-        dropdownOptions.forEach(option => {
-            option.addEventListener('click', () => {
-                const colorClass = option.getAttribute('data-color');
-                const colorValue = option.getAttribute('data-value');
-                const colorName = option.textContent;
-
-                // Update the button border color and text
-                dropdownButton.className = `w-48 h-12 px-4 py-2 text-black border-2 rounded-md shadow-sm ${colorClass}`;
-                dropdownButton.textContent = colorName;
-
-                // Set the hidden input value
-                statusInput.value = colorValue;
-
-                dropdownMenu.classList.add('hidden');
-            });
-        });
-        dropdownOptions.forEach(option => {
-        option.addEventListener('click', () => {
-        const colorClass = option.getAttribute('data-color');
-        const colorValue = option.getAttribute('data-value');
-        const colorName = option.textContent;
-
-        // Update the button border color and text
-        dropdownButton.className = `w-48 h-12 px-4 py-2 text-black border-2 rounded-md shadow-sm ${colorClass}`;
-        dropdownButton.textContent = colorName;
-
-        // Set the hidden input value and add a debug log
-        statusInput.value = colorValue;
-        console.log("Updated status input to:", colorValue);
-
-        dropdownMenu.classList.add('hidden');
-    });
-});
-
-
-       // Show the model when clicking "Admin"
-    adminButton.addEventListener('click', () => {
-        adminModel.classList.remove('hidden');
-    });
-
-    // Close the model when clicking "Close" button
-    closeModel.addEventListener('click', () => {
-        adminModel.classList.add('hidden');
-    });
-
-    // Close the model when clicking outside the model
-    adminModel.addEventListener('click', (event) => {
-        if (event.target === adminModel) {
-            adminModel.classList.add('hidden');
-        }
-    });
-
-    // Handle login form submission using AJAX (fetch)
-    loginForm.addEventListener('submit', (event) => {
-        event.preventDefault(); // Prevent default form submission
-
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-
-        fetch('/login', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ identifier: username, password: password })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Login failed');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                // Login successful: hide the modal and optionally redirect or update UI
-                adminModel.classList.add('hidden');
-                // Optionally, you might refresh the page or update the header to show the logged-in state.
-            } else {
-                // Display error message returned from the server
-                errorMessage.textContent = data.error || "Invalid credentials";
-                errorMessage.classList.remove('hidden');
-            }
-        })
-        .catch(error => {
-            errorMessage.textContent = error.message;
-            errorMessage.classList.remove('hidden');
-        });
-    });
-
-        document.getElementById("krise-navn").addEventListener("change", function () {
-        let selectedOption = this.options[this.selectedIndex];
-        let kriseType = selectedOption.getAttribute("data-krise-type");
-        let lokasjon = selectedOption.getAttribute("data-lokasjon");
-
-        // Set visible fields (but they remain disabled)
-        document.getElementById("krise-type").value = kriseType || "";
-        document.getElementById("lokasjon").value = lokasjon || "";
-
-        // Copy values to hidden fields to ensure they are sent in the form submission
-        document.getElementById("hidden-krise-type").value = kriseType || "";
-        document.getElementById("hidden-lokasjon").value = lokasjon || "";
-    });
-
-
-    // Debugging: Log KriseID before submitting
-    document.querySelector("form").addEventListener("submit", function () {
-        console.log("Submitting KriseID:", document.getElementById("krise-navn").value);
-    });
-    </script>
-</body>
-
+    <script src="{{ url_for('static', filename='js/register_logic.js') }}"></script>
+    
 </html>
