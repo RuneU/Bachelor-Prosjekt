@@ -1,6 +1,7 @@
 {% import "components/log_table_component.html" as log_component %}
 {% import "components/navbar_component.html" as navbar_component %}
 {% import "components/incident_fill_component.html" as fill_component %}
+{% import "components/evacuee_contactperson_component.html" as evac_component %}
 <!DOCTYPE html>
 <html lang="no">
 
@@ -25,95 +26,12 @@
 
             <hr class="my-12 border-t border-gray-300">
 
-            <!-- Evakuertes Info Section -->
-            <h1 class="text-xl font-bold mb-4">Personlig Informasjon</h1>
-            <div class="mb-6">
-                <label class="text-center block font-bold mb-2">Evakuert Status</label>
-                <div class="relative flex justify-center">
-                    <button id="evak_status" type="button"
-                        class="h-12 w-48 px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition">
-                        {{ evakuert.evak_status if evakuert and evakuert.evak_status else "Velg Status" }}
-                    </button>
-                    <ul id="dropdownMenu"
-                    class="hidden absolute mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                    <li class="h-12 px-4 py-2 text-sm rounded-t bg-green-700 text-white hover:bg-green-600 cursor-pointer"
-                        data-color="bg-green-700" data-value="1">OK</li>
-                    <li class="h-12 px-4 py-2 text-sm bg-yellow-600 text-white hover:bg-yellow-500 cursor-pointer"
-                        data-color="bg-yellow-600" data-value="2">Mindre skader</li>
-                    <li class="h-12 px-4 py-2 text-sm rounded-b bg-red-700 text-white hover:bg-red-600 cursor-pointer"
-                        data-color="bg-red-700" data-value="3">Kritisk</li>
-                    </ul>
-                    <input type="hidden" id="selected-status" name="status"
-                        value="{{ evakuert.evak_status if evakuert and evakuert.evak_status else '' }}">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div>
-                    <label for="evak-fnavn" class="block mb-1">Fornavn:</label>
-                    <input id="evak-fnavn" type="text" name="evak-fnavn" placeholder="Ola"
-                        class="border rounded p-2 w-full" value="{{ evakuert.evak_fnavn if evakuert else '' }}">
-                </div>
-                <div>
-                    <label for="evak-mnavn" class="block mb-1">Mellomnavn:</label>
-                    <input id="evak-mnavn" type="text" name="evak-mnavn" placeholder="Sylvert"
-                        class="border rounded p-2 w-full" value="{{ evakuert.evak_mnavn if evakuert else '' }}">
-                </div>
-                <div>
-                    <label for="evak-enavn" class="block mb-1">Etternavn:</label>
-                    <input id="evak-enavn" type="text" name="evak-enavn" placeholder="Nordmann"
-                        class="border rounded p-2 w-full" value="{{ evakuert.evak_enavn if evakuert else '' }}">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div>
-                    <label for="evak-tlf" class="block mb-1">Tlf:</label>
-                    <input id="evak-tlf" type="tel" name="evak-tlf" placeholder="Telefonnummer"
-                        class="border rounded p-2 w-full" value="{{ evakuert.evak_tlf if evakuert else '' }}">
-                </div>
-                <div>
-                    <label for="evak-adresse" class="block mb-1">Adresse:</label>
-                    <input id="evak-adresse" type="text" name="evak-adresse" placeholder="Adresse"
-                        class="border rounded p-2 w-full" value="{{ evakuert.evak_adresse if evakuert else '' }}">
-                </div>
-                <div>
-                    <label for="evak-lokasjon" class="block mb-1">Lokasjon:</label>
-                    <input id="evak-lokasjon" type="text" name="evak-lokasjon" placeholder="Hvor befinner du deg nå?"
-                        class="border rounded p-2 w-full" value="{{ evakuert.evak_lokasjon if evakuert else '' }}">
-                </div>
-            </div>
+            <!-- Render Evakuertes & Kontaktperson Info Component -->
+            {{ evac_component.render_evac_contactperson(evakuert) }}
 
             <h1 class="text-l text-center font-bold mb-4">Lokasjons logg</h1>
             <div class="">
                 {{ log_component.render_log_table(logs) }}
-            </div>
-
-            <hr class="my-12 border-t border-gray-300">
-
-            <!-- Kontaktperson Informasjon Section -->
-            <h1 class="text-xl font-bold mb-4">Pårørende Info</h1>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div>
-                    <label for="kon-fnavn" class="block mb-1">Fornavn:</label>
-                    <input id="kon-fnavn" type="text" name="kon-fnavn" placeholder="Ola"
-                        class="border rounded p-2 w-full" value="{{ evakuert.kon_fnavn if evakuert else '' }}">
-                </div>
-                <div>
-                    <label for="kon-mnavn" class="block mb-1">Mellomnavn:</label>
-                    <input id="kon-mnavn" type="text" name="kon-mnavn" placeholder="Mellomnavn"
-                        class="border rounded p-2 w-full" value="{{ evakuert.kon_mnavn if evakuert else '' }}">
-                </div>
-                <div>
-                    <label for="kon-enavn" class="block mb-1">Etternavn:</label>
-                    <input id="kon-enavn" type="text" name="kon-enavn" placeholder="Etternavn"
-                        class="border rounded p-2 w-full" value="{{ evakuert.kon_enavn if evakuert else '' }}">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div>
-                    <label for="kon-tlf" class="block mb-1">Tlf:</label>
-                    <input id="kon-tlf" type="tel" name="kon-tlf" placeholder="Telefonnummer"
-                        class="border rounded p-2 w-full" value="{{ evakuert.kon_tlf if evakuert else '' }}">
-                </div>
             </div>
 
             <div class="text-center">
