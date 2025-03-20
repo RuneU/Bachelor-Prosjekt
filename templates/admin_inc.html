@@ -62,19 +62,27 @@
             Status blant evakuerte
         </p>
         <div class="flex justify-around my-4">
+            <div class="bg-black text-white p-4 rounded shadow">
+                <h3 class="text-xl font-bold">Livløs</h3>
+                <p class="text-3xl">{{ status_counts.get('Livløs', 0) }}</p>
+            </div>
             <div class="bg-red-500 text-white p-4 rounded shadow">
-                <h3 class="text-xl font-bold">Kritisk</h3>
-                <p class="text-3xl">{{ status_counts.get('Kritisk', 0) }}</p>
+                <h3 class="text-xl font-bold">Akutt</h3>
+                <p class="text-3xl">{{ status_counts.get('Akutt', 0) }}</p>
             </div>
             <div class="bg-yellow-500 text-white p-4 rounded shadow">
-                <h3 class="text-xl font-bold">Mindre skader</h3>
-                <p class="text-3xl">{{ status_counts.get('Mindre skader', 0) }}</p>
+                <h3 class="text-xl font-bold">Haster</h3>
+                <p class="text-3xl">{{ status_counts.get('Haster', 0) }}</p>
             </div>
             <div class="bg-green-500 text-white p-4 rounded shadow">
-                <h3 class="text-xl font-bold">OK</h3>
-                <p class="text-3xl">{{ status_counts.get('OK', 0) }}</p>
+                <h3 class="text-xl font-bold">Vanlig</h3>
+                <p class="text-3xl">{{ status_counts.get('Vanlig', 0) }}</p>
             </div>
             <div class="bg-blue-500 text-white p-4 rounded shadow">
+                <h3 class="text-xl font-bold">Fysisk uskadet</h3>
+                <p class="text-3xl">{{ status_counts.get('Fysisk uskadet', 0) }}</p>
+            </div>
+            <div class="bg-orange-500 text-white p-4 rounded shadow">
                 <h3 class="text-xl font-bold">Other</h3>
                 <p class="text-3xl">{{ status_counts.get('Other', 0) }}</p>
             </div>
