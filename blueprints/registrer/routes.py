@@ -9,18 +9,18 @@ def register():
     try:
         if request.method == "POST":
             # Get form data
-            fornavn = request.form.get("fornavn")
-            mellomnavn = request.form.get("mellomnavn")
-            etternavn = request.form.get("etternavn")
-            adresse = request.form.get("adresse")
-            telefonnummer = request.form.get("telefonnummer")
+            evak_fnavn = request.form.get("evak-fnavn")
+            evak_mnavn = request.form.get("evak-mnavn")
+            evak_enavn = request.form.get("evak-enavn")
+            evak_adresse = request.form.get("evak-adresse")
+            evak_tlf = request.form.get("evak-tlf")
             status = request.form.get("status")
             evak_lokasjon = request.form.get("evak-lokasjon")
             krise_id = request.form.get("krise_id")
-            parorende_fornavn = request.form.get("parorende_fornavn")
-            parorende_mellomnavn = request.form.get("parorende_mellomnavn")
-            parorende_etternavn = request.form.get("parorende_etternavn")
-            parorende_telefonnummer = request.form.get("parorende_telefonnummer")
+            kon_fnavn = request.form.get("kon-fnavn")
+            kon_mnavn = request.form.get("kon-mnavn")
+            kon_enavn = request.form.get("kon-enavn")
+            kon_tlf = request.form.get("kon-tlf")
 
             print(f"Received KriseID: {krise_id}")  # Debugging
 
@@ -45,7 +45,7 @@ def register():
             OUTPUT INSERTED.EvakuertID
             VALUES (?, ?, ?, ?, ?, ?);
             """
-            cursor.execute(evakuert_query, (fornavn, mellomnavn, etternavn, adresse, telefonnummer, krise_id))
+            cursor.execute(evakuert_query, (evak_fnavn, evak_mnavn, evak_enavn, evak_adresse, evak_tlf, krise_id))
             row = cursor.fetchone()
 
             print(f"Retrieved EvakuertID: {row}")  # Debugging
@@ -61,7 +61,7 @@ def register():
                 INSERT INTO KontaktPerson (Fornavn, MellomNavn, Etternavn, Telefonnummer, EvakuertID)
                 VALUES (?, ?, ?, ?, ?);
             """
-            cursor.execute(query_kontakt, (parorende_fornavn, parorende_mellomnavn, parorende_etternavn, parorende_telefonnummer, evakuert_id))
+            cursor.execute(query_kontakt, (kon_fnavn, kon_mnavn, kon_enavn, kon_tlf, evakuert_id))
             conn.commit()
             print("Pårørende successfully inserted!")
 
