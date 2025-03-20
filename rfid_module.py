@@ -1,20 +1,24 @@
 import sys
 import time
 import pyodbc
+import serial  
 from datetime import datetime
 from sql.db_connection import connection_string
+from rfid_receiver import get_rfid_uid  
+from flask import Flask, Response, request, render_template, jsonify, redirect, url_for, session, send_from_directory
 
-# Check if running on Raspberry Pi
-ON_RASPBERRY_PI = "arm" in sys.platform
 
-if ON_RASPBERRY_PI:
-    from mfrc522 import SimpleMFRC522
-    import RPi.GPIO as GPIO
-    MIFAREReader = SimpleMFRC522()
-    GPIO.setmode(GPIO.BOARD)
-else:
-    print("Running in development mode (RFID will be simulated)")
-    MIFAREReader = None
+# Configure Serial Communication (Arduino)
+
+SERIAL_PORT = "/dev/ttyACM0"
+BAUD_RATE = 115200
+
+try:
+    ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
+    print(f"Connected to Arduino on {SERIAL_PORT}")
+except serial.SerialException as e:
+    print(f"❌ Error connecting to Arduino: {e}")
+    sys.exit(1)
 
 # Database connection
 def connect_db():
@@ -25,78 +29,209 @@ def connect_db():
         print(f"Database connection error: {e}")
         return None
 
-def register_user_with_rfid(user_id):
-    """Writes user_id to an RFID card"""
-    if not user_id:
-        return {'error': 'User ID is required'}
+# Register user with RFID
+def RFIDregister(evakuert_id, chip_id):
+    """Registers RFID ChipID to an Evakuerte."""
+    conn = connect_db()
+    if not conn:
+        return {"error": "Database connection failed"}
 
     try:
-        if ON_RASPBERRY_PI:
-            print("Place an RFID card to register...")
-            MIFAREReader.write(user_id)
-            return {'message': f'Successfully wrote User ID: {user_id} to RFID card'}
-        else:
-            return {'message': f'Simulated writing of User ID: {user_id} (development mode)'}
+        cursor = conn.cursor()
+
+        # Check if Evakuert ID exists
+        cursor.execute("SELECT EvakuertID FROM Evakuerte WHERE EvakuertID = ?", (evakuert_id,))
+        if not cursor.fetchone():
+            return {"error": "Evakuert ID not found"}
+
+        # Check if the ChipID already exists in the database
+        cursor.execute("SELECT EvakuertID FROM RFID WHERE ChipID = ?", (chip_id,))
+        existing_rfid = cursor.fetchone()
+
+        if existing_rfid:
+            return {"error": "This RFID ChipID is already assigned to another user"}
+
+        # Update ChipID for this EvakuertID
+        cursor.execute("UPDATE RFID SET ChipID = ? WHERE EvakuertID = ?", (chip_id, evakuert_id))
+        conn.commit()
+
+        return {"message": "RFID ChipID Registered Successfully!", "chip_id": chip_id}
+
     except Exception as e:
-        return {'error': str(e)}
+        return {"error": str(e)}
+    finally:
+        conn.close()
 
 def scan_rfid():
-    """Scans an RFID card and records entry"""
-    if ON_RASPBERRY_PI:
-        print("Waiting for RFID card...")
-        rfid_uid, text = MIFAREReader.read()
-        rfid_uid_str = str(rfid_uid)
-    else:
-        time.sleep(2)
-        rfid_uid_str = "SIMULATED_UID_12345"
+    """Scans an RFID card, links it to an EvakuertID if new, updates location, and logs scans."""
+    print("🔄 Scanning RFID card...")
+
+    rfid_uid = get_rfid_uid()  # Get the RFID UID from Arduino
+    if not rfid_uid:
+        return {"error": "No RFID card detected"}
+
+    print(f"✅ RFID Scanned: {rfid_uid}")
 
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    location = "Office"  # Change dynamically per Raspberry Pi site
+    location = "Safe Zone"  # Adjust based on Raspberry Pi site
 
-    user_id = get_user_id_by_rfid(rfid_uid_str)
-    if not user_id:
-        return {'error': 'RFID card not registered to any user'}
+    # Check if RFID UID is already linked to an EvakuertID
+    evakuert_id = get_evakuert_id_by_chipid(rfid_uid)
 
-    store_scan_data(rfid_uid_str, user_id, timestamp, location)
+    if evakuert_id:
+        # Log location update
+        log_location_change(evakuert_id, location)
+        return {
+            'message': 'RFID already linked to an evacuee.',
+            'uid': rfid_uid,
+            'evakuert_id': evakuert_id,
+            'timestamp': timestamp,
+            'location': location,
+            'history': get_location_history(evakuert_id)
+        }
 
-    return {
-        'uid': rfid_uid_str,
-        'user_id': user_id,
-        'timestamp': timestamp,
-        'location': location,
-        'history': get_scan_history(rfid_uid_str)
-    }
+    # RFID is new, check if the user in session already has an RFID
+    if "evakuert_id" not in session:
+        return {"error": "No EvakuertID found in session. Cannot register RFID."}
 
-def get_user_id_by_rfid(uid):
-    """Fetch the associated User ID from RFID UID"""
+    evakuert_id_session = session["evakuert_id"]
+
+    # Check if the EvakuertID already has an RFID assigned
     conn = connect_db()
     if conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT UserID FROM Users WHERE UID = ?", (uid,))
-        row = cursor.fetchone()
-        conn.close()
-        return row[0] if row else None
-    return None
+        cursor.execute("SELECT ChipID FROM RFID WHERE EvakuertID = ?", (evakuert_id_session,))
+        existing_rfid = cursor.fetchone()
 
-def store_scan_data(uid, user_id, timestamp, location):
-    """Log scan data and update user location"""
-    conn = connect_db()
-    if conn:
-        cursor = conn.cursor()
-        cursor.execute("INSERT INTO ScanLogs (UID, UserID, Timestamp, Location) VALUES (?, ?, ?, ?)",
-                       (uid, user_id, timestamp, location))
-        cursor.execute("UPDATE Users SET LastLocation = ?, LastScanTime = ? WHERE UID = ?",
-                       (location, timestamp, uid))
+        if existing_rfid:
+            conn.close()
+            return {"error": f"Evakuert ID {evakuert_id_session} already has an RFID assigned."}
+
+        # If EvakuertID has no RFID, link the scanned RFID to the user
+        cursor.execute("INSERT INTO RFID (ChipID, EvakuertID) VALUES (?, ?)", (rfid_uid, evakuert_id_session))
         conn.commit()
         conn.close()
 
-def get_scan_history(uid):
-    """Retrieve scan history of an RFID card"""
+        return {
+            'message': 'RFID registered successfully!',
+            'uid': rfid_uid,
+            'evakuert_id': evakuert_id_session,
+            'timestamp': timestamp,
+            'location': location
+        }
+
+    return {"error": "Database connection failed. Could not register RFID."}
+
+
+
+def get_evakuert_id_by_chipid(chip_id):
+    """Fetch the associated Evakuert ID from the database based on RFID ChipID."""
     conn = connect_db()
     if conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT Timestamp, Location FROM ScanLogs WHERE UID = ? ORDER BY Timestamp DESC", (uid,))
+    
+        cursor.execute("SELECT EvakuertID FROM RFID WHERE ChipID = ?", (chip_id,))
+        
+        row = cursor.fetchone()
+        conn.close()
+        
+        return row[0] if row else None
+    return None
+
+
+
+from rfid_receiver import get_rfid_uid  # Import function to read RFID from Arduino
+
+def scan_rfid_with_history():
+    """Scans an RFID card using rfid_receiver and retrieves scan history."""
+    
+    print("🔄 Scanning RFID card...")
+    rfid_uid = get_rfid_uid()  # Get the RFID UID from Arduino
+
+    if not rfid_uid:
+        return {"error": "No RFID card detected"}
+
+    print(f" RFID Scanned: {rfid_uid}")
+
+    conn = connect_db()
+    if not conn:
+        return {"error": "Database connection failed"}
+
+    try:
+        cursor = conn.cursor()
+        
+        # Step 1: Check if the RFID ChipID is registered
+        cursor.execute("SELECT EvakuertID FROM RFID WHERE ChipID = ?", (rfid_uid,))
+        row = cursor.fetchone()
+
+        if not row:
+            conn.close()
+            return {"error": f"RFID {rfid_uid} is not registered to any Evakuert."}
+
+        evakuert_id = row[0]
+
+        # Retrieve scan history for the EvakuertID
+        cursor.execute("""
+            SELECT L.change_date, L.old_lokasjon, L.new_lokasjon
+            FROM Lokasjon_log L
+            JOIN Status S ON L.status_id = S.StatusID
+            WHERE S.EvakuertID = ?
+            ORDER BY L.change_date DESC
+        """, (evakuert_id,))
+        
         history = cursor.fetchall()
         conn.close()
-        return [{'timestamp': row[0], 'location': row[1]} for row in history]
+
+        # Format the history data
+        scan_history = []
+        for scan in history:
+            scan_history.append({
+                "timestamp": scan[0].strftime("%Y-%m-%d %H:%M:%S"),
+                "from": scan[1] if scan[1] else "Unknown",
+                "to": scan[2] if scan[2] else "Unknown"
+            })
+
+        return {
+            "message": "RFID Scan History Retrieved Successfully",
+            "rfid_uid": rfid_uid,
+            "evakuert_id": evakuert_id,
+            "scan_history": scan_history
+        }
+
+    except Exception as e:
+        return {"error": f"Database query error: {e}"}
+
+
+
+# Log location change
+def log_location_change(evakuert_id, new_location):
+    conn = connect_db()
+    if conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT Lokasjon FROM Status WHERE EvakuertID = ?", (evakuert_id,))
+        row = cursor.fetchone()
+        old_location = row[0] if row else "Unknown"
+
+        cursor.execute("INSERT INTO Lokasjon_log (evakuert_id, old_lokasjon, new_lokasjon, change_date) VALUES (?, ?, ?, GETDATE())", 
+                       (evakuert_id, old_location, new_location))
+        cursor.execute("UPDATE Status SET Lokasjon = ? WHERE EvakuertID = ?", (new_location, evakuert_id))
+        conn.commit()
+        conn.close()
+
+# Get location history
+def get_location_history(evakuert_id):
+    conn = connect_db()
+    if conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT change_date, old_lokasjon, new_lokasjon FROM Lokasjon_log WHERE evakuert_id = ? ORDER BY change_date DESC", (evakuert_id,))
+        history = cursor.fetchall()
+        conn.close()
+        return [{'timestamp': row[0], 'from': row[1], 'to': row[2]} for row in history]
     return []
+
+
+if __name__ == "__main__":
+    print("Starting RFID Scanner...")
+    while True:
+        result = scan_rfid()
+        print(result)

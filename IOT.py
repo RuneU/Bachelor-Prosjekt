@@ -17,7 +17,7 @@ from blueprints.admin_reg import admin_reg_bp
 from dotenv import load_dotenv
 import logging
 from translations import translations
-from rfid_module import register_user_with_rfid, scan_rfid
+from rfid_module import RFIDregister, scan_rfid, scan_rfid_with_history, get_evakuert_id_by_chipid
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -52,8 +52,23 @@ if AZURE_CONNECTION_STRING is None:
 CONTAINER_NAME = os.getenv("AZURE_CONTAINER_NAME")
 
 
+
 def get_db_connection():
-    return mysql.connector.connect(AZURE_CONNECTION_STRING)
+    """Establish and return a connection using pyodbc (SQL Server)."""
+    try:
+        conn = pyodbc.connect(
+            f"DRIVER={os.getenv('DB_DRIVER')};"
+            f"SERVER={os.getenv('DB_SERVER')};"
+            f"DATABASE={os.getenv('DB_DATABASE')};"
+            f"UID={os.getenv('DB_UID')};"
+            f"PWD={os.getenv('DB_PWD')};"
+            f"Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
+        )
+        return conn
+    except pyodbc.Error as e:
+        print(f"❌ Database connection error: {e}")
+        return None
+    
 
 
 @app.route("/")
@@ -130,6 +145,8 @@ def prepare_image(image):
 @app.route("/noID")
 def noID():
     return render_template("noID.html")
+
+
 
 
 @app.route("/fingerLogin")
@@ -335,7 +352,7 @@ def register():
 
     if request.method == 'POST':
         evakuert_id = session["evakuert_id"]
-        result = register_user_with_rfid(evakuert_id)
+        result = get_evakuert_id_by_chipid(evakuert_id)
         return jsonify(result)
 
     return render_template('RFIDregister.html', evakuert_id=session["evakuert_id"])
@@ -348,18 +365,64 @@ def api_scan():
 
     scan_result = scan_rfid()
     if "uid" in scan_result:
-        uid = scan_result["uid"]
+        uid = scan_result["uid"]  # This is the scanned RFID UID
         evakuert_id = session["evakuert_id"]
-        
-        conn = pyodbc.connect(connection_string)
+
+        conn = get_db_connection()
         if conn:
             cursor = conn.cursor()
-            cursor.execute("UPDATE Evakuerte SET UID = ? WHERE EvakuertID = ?", (uid, evakuert_id))
+            
+            # Store the scanned RFID in `ChipID`
+            cursor.execute("UPDATE RFID SET ChipID = ? WHERE EvakuertID = ?", (uid, evakuert_id))
             conn.commit()
             conn.close()
+
         return jsonify({'message': f'RFID {uid} linked to EvakuertID {evakuert_id}'})
-    
+
     return jsonify(scan_result)
+
+
+@app.route('/api/register_new_rfid', methods=['POST'])
+def register_new_rfid():
+    """Registers a new RFID card (ChipID) to the provided EvakuertID."""
+    data = request.json
+    evakuert_id = data.get("evakuert_id")
+    chip_id = data.get("chip_id")
+
+    if not evakuert_id or not chip_id:
+        return jsonify({"error": "Missing Evakuert ID or RFID ChipID"}), 400
+
+    conn = get_db_connection()
+    if conn:
+        cursor = conn.cursor()
+
+        # Chick if EvakuertID exists in `Evakuerte`
+        cursor.execute("SELECT EvakuertID FROM Evakuerte WHERE EvakuertID = ?", (evakuert_id,))
+        if not cursor.fetchone():
+            return jsonify({"error": "Invalid Evakuert ID"}), 400
+
+        # Insert new RFID into the table
+        cursor.execute("INSERT INTO RFID (ChipID, EvakuertID) VALUES (?, ?)", (chip_id, evakuert_id))
+        conn.commit()
+        conn.close()
+
+        return jsonify({"message": f"RFID {chip_id} successfully linked to EvakuertID {evakuert_id}"}), 200
+
+    return jsonify({"error": "Database connection failed"}), 500
+
+
+
+@app.route('/api/scan_rfid', methods=['GET'])
+def api_scan_rfid():
+    """API endpoint to scan an RFID card and get its history."""
+    return jsonify(scan_rfid_with_history())
+
+
+@app.route("/scan_rfid")
+def scan_rfid():
+    return render_template("scan_rfid.html")
+
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
