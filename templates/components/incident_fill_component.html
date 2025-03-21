@@ -3,17 +3,17 @@
 <section id="krise-inf-section">
     <h1 class="text-xl font-bold mb-4">Informasjon om hendelsen</h1>
     <div class="mb-6">
-        <label for="krise-status" class="text-center block font-bold mb-2">Hendelse Status</label>
+        <label for="krise-status" class="text-center block font-bold mb-2">Hendelsestatus</label>
         <div class="relative flex justify-center">
             <button id="krise-status" type="button"
-                class="h-12 w-48 px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition readonly">
+                class="h-10.5 w-full px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition readonly">
                 {{ evakuert.krise_status if evakuert and evakuert.krise_status else "Velg Status" }}
             </button>
             <ul id="kriseDropdownMenu"
-                class="hidden absolute mt-2 w-full bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
-                <li class="h-12 px-4 py-2 text-sm hover:bg-gray-200 cursor-pointer" data-value="Ny krise">Ny krise</li>
-                <li class="h-12 px-4 py-2 text-sm hover:bg-gray-200 cursor-pointer" data-value="Pågående">Pågående</li>
-                <li class="h-12 px-4 py-2 text-sm hover:bg-gray-200 cursor-pointer" data-value="Ferdig">Ferdig</li>
+                class="absolute top-0 left-0 w-full bg-white border border-gray-300 rounded-md shadow-lg z-50 hidden">
+                <li class="h-12 px-4 py-2 text-sm text-center hover:bg-gray-200 cursor-pointer" data-value="Ny krise">Ny krise</li>
+                <li class="h-12 px-4 py-2 border-t-2 border-gray-400 text-sm text-center hover:bg-gray-200 cursor-pointer" data-value="Pågående">Pågående</li>
+                <li class="h-12 px-4 py-2 border-t-2 border-gray-400 text-sm text-center hover:bg-gray-200 cursor-pointer" data-value="Ferdig">Ferdig</li>
             </ul>
             <input type="hidden" id="selected-krise-status" name="krise-status" value="{{ evakuert.krise_status if evakuert and evakuert.krise_status else '' }}">
         </div>
@@ -21,17 +21,17 @@
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div>
-            <label for="krise-type" class="block mb-1">Hendelse type</label>
-            <input type="text" id="krise-type" name="krise-type" placeholder="flåm" readonly
+            <label for="krise-type" class="block mb-1">Hendelsetype</label>
+            <input type="text" id="krise-type" name="krise-type" placeholder="Flom" readonly
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
                 value="{{ evakuert.krise_type if evakuert else '' }}">
         </div>
         <div>
-            <label for="krise-navn-dropdown" class="block mb-1">Hendelse navn</label>
-            <div class="relative">
-                <button id="krise-navn-dropdown" type="button"
-                    class="h-12 w-full px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition">
-                    {{ evakuert.krise_navn if evakuert and evakuert.krise_navn else "Velg Krise" }}
+            <label for="krise-navn-dropdown" class="block mb-1">Hendelsenavn</label>
+                <div class="relative">
+                    <button id="krise-navn-dropdown" type="button"
+                        class="h-10.5 w-full px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition">
+                        {{ evakuert.krise_navn if evakuert and evakuert.krise_navn else "Velg Krise" }}
                 </button>
                 <ul id="krise-navn-menu"
                     class="hidden absolute mt-2 w-full bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 max-h-60 overflow-auto">
