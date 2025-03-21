@@ -7,6 +7,8 @@ from sql.db_connection import fetch_all_kriser, search_krise, create_krise
 from blueprints.admin_reg import admin_reg_bp
 from blueprints.registrer.routes import registrer_bp
 from blueprints.admin_inc.routes import admin_inc_bp
+from blueprints.auth.auth import auth_bp, google_bp
+from blueprints.auth.auth import login_required
 from blueprints.admin_status.routes import admin_status_bp
 from dotenv import load_dotenv
 from translations import translations
@@ -22,6 +24,10 @@ def index():
     session['lang'] = lang
     return render_template('index.html', t=translations.get(lang, translations['no']), lang=lang)
 
+@app.route("/register-new")
+def register_new():
+    return render_template('register_new.html')
+
 @app.route('/set_user_id', methods=['POST'])
 def set_user_id():
     data = request.json
@@ -36,6 +42,8 @@ app.register_blueprint(admin_status_bp)
 app.register_blueprint(admin_reg_bp, url_prefix='/admin-reg')
 app.register_blueprint(registrer_bp)
 app.register_blueprint(admin_inc_bp)
+app.register_blueprint(auth_bp) 
+app.register_blueprint(google_bp, url_prefix="/login")
 
 @app.route('/admin_status_inc')
 def admin_status_inc():
@@ -75,6 +83,7 @@ def admin_status_inc():
 
 # POST krise oppretelse til db
 @app.route('/handle_incident', methods=['POST'])
+@login_required
 def handle_incident():
     try:
         status = request.form.get('krise-status')
@@ -99,7 +108,9 @@ def handle_incident():
         print('En uventet feil oppsto', 'error')
         return redirect(url_for('incident_creation'))
 
-@app.route('/incident-creation', methods=['GET', 'POST'])
+
+@app.route('/incident_creation', methods=['GET', 'POST'])
+@login_required
 def incident_creation():
     return render_template('incident_creation.html')
 

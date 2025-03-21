@@ -245,8 +245,8 @@ def fetch_status_counts_for_krise(krise_id):
         for row in rows:
             counts[row[0]] = row[1]
 
-        # Calculate the count for statuses that are not "Kritisk", "Mindre Skadet", or "OK"
-        other_count = sum(value for key, value in counts.items() if key not in ("Kritisk", "Mindre Skadet", "OK"))
+        # Calculate the count for statuses that are not "Akutt", "Haster", or "Vanlig"
+        other_count = sum(value for key, value in counts.items() if key not in ("Fysisk uskadet", "Akutt", "Haster", "Vanlig", "Livløs"))
         counts["Other"] = other_count
 
         return counts
