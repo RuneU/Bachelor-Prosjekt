@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RFID Reader & Writer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="w-full max-w-lg bg-white p-6 rounded-lg shadow-lg">
+        <h1 class="text-2xl font-bold text-center mb-6">RFID Reader & Writer</h1>
+
+        <h2 class="text-xl font-semibold mb-4">Register User ID</h2>
+        <form method="POST" action="/register" class="mb-6">
+            <input type="text" name="user_id" placeholder="Enter User ID" class="w-full p-3 border rounded-lg" required>
+            <button type="submit" class="w-full mt-2 bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition">Register User</button>
+        </form>
+
+        <h2 class="text-xl font-semibold mb-4">Scan RFID</h2>
+        <form method="POST" action="/scan" class="mb-6">
+            <button type="submit" class="w-full bg-green-500 text-white p-3 rounded-lg hover:bg-green-600 transition">Scan RFID</button>
+        </form>
+        
+        {% if scanned_data %}
+        <div class="bg-gray-200 p-4 rounded-lg">
+            <p><strong>Card UID:</strong> {{ scanned_data.uid }}</p>
+            <p><strong>Stored User ID:</strong> {{ scanned_data.user_id if scanned_data.user_id else 'No ID Found' }}</p>
+            <p><strong>Scan Count:</strong> {{ scanned_data.scan_count }}</p>
+            <p><strong>Timestamp:</strong> {{ scanned_data.timestamp }}</p>
+            <p><strong>Location:</strong> {{ scanned_data.location }}</p>
+        </div>
+        {% endif %}
+
+        <h2 class="text-xl font-semibold mb-4 mt-6">Write to RFID</h2>
+        <form method="POST" action="/write">
+            <input type="text" name="user_id" placeholder="Enter User ID to Write" class="w-full p-3 border rounded-lg" required>
+            <button type="submit" class="w-full mt-2 bg-red-500 text-white p-3 rounded-lg hover:bg-red-600 transition">Write to RFID</button>
+        </form>
+
+
+        <div class="mt-4">
+            <a href="{{ url_for('finish') }}" class="text-blue-500 hover:text-blue-600 transition duration-300">
+              RFID
+            </a>
+        </div>
+
+        
+
+        {% if write_message %}
+        <p class="mt-4 text-green-600 font-bold">{{ write_message }}</p>
+        {% endif %}
+
+        {% if error_message %}
+        <p class="mt-4 text-red-600 font-bold">{{ error_message }}</p>
+        {% endif %}
+    </div>
+</body>
+</html>
