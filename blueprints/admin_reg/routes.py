@@ -1,6 +1,5 @@
 import sys
-from flask import jsonify
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify
 from sql.db_connection import connection_def
 sys.dont_write_bytecode = True
 from blueprints.auth.auth import login_required
@@ -246,8 +245,6 @@ def adminreg_with_id(evakuert_id):
         cursor.close()
         conn.close()
 
-from flask import jsonify
-
 @admin_reg_bp.route('/get_krise_details/<int:krise_id>')
 @login_required
 def get_krise_details(krise_id):
@@ -255,7 +252,7 @@ def get_krise_details(krise_id):
     cursor = conn.cursor()
     try:
         cursor.execute("""
-            SELECT KriseSituasjonType, KriseNavn, Lokasjon, Tekstboks, Status
+            SELECT KriseSituasjonType, KriseNavn, Lokasjon, Tekstboks, Status AS status
             FROM Krise
             WHERE KriseID = ?
         """, (krise_id,))
@@ -266,7 +263,7 @@ def get_krise_details(krise_id):
                 "KriseNavn": row[1],
                 "Lokasjon": row[2],
                 "Tekstboks": row[3],
-                "Status": row[4]
+                "status": row[4]
             }
             return jsonify(data)
         else:

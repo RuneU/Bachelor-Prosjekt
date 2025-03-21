@@ -1,3 +1,5 @@
+{% import "components/navbar_component.html" as navbar_component %}
+{% import "components/incident_component.html" as incident_component %}
 <!DOCTYPE html>
 <html lang="no">
 
@@ -9,68 +11,14 @@
 </head>
 
 <body>
-    <header class="bg-gray-800 p-4 flex justify-between items-center">
-        <div class="flex items-center space-x-2">
-            <button class="bg-yellow-300 text-black font-bold py-2 px-4 rounded">Log ut</button>
-            <a href="{{ url_for('index') }}">
-                <button class="bg-yellow-300 text-black font-bold py-2 px-4 rounded">Returner</button>
-            </a>
-        </div>
-        <div class="flex items-center space-x-4">
-            <span class="text-lg font-bold text-white">Innlogget</span>
-        </div>
-    </header>
+    {{ navbar_component.render_navbar(navbar) }}
 
     <main class="container mx-auto py-10 px-6 flex-grow bg-gray-100 text-gray-800 rounded-lg">
         <form method="POST" action="{{ url_for('handle_incident') }}">
 
             <!-- Krise Informasjon Section -->
             <h1 class="text-xl font-bold mb-4">Informasjon om krisen</h1>
-            <div class="mb-6">
-                <label for="krise-status" class="text-center block font-bold mb-2">Krise Status</label>
-                <div class="relative flex justify-center">
-                    <button id="krise-status" type="button"
-                        class="h-12 w-48 px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition">
-                        {{ evakuert.krise_status if evakuert and evakuert.krise_status else "Velg Status" }}
-                    </button>
-                    <ul id="kriseDropdownMenu"
-                        class="hidden absolute mt-2 w-full bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5">
-                        <li class="h-12 px-4 py-2 text-sm hover:bg-gray-200 cursor-pointer" data-value="Ny krise">Ny krise
-                        </li>
-                        <li class="h-12 px-4 py-2 text-sm hover:bg-gray-200 cursor-pointer" data-value="Pågående">Pågående
-                        </li>
-                        <li class="h-12 px-4 py-2 text-sm hover:bg-gray-200 cursor-pointer" data-value="Ferdig">Ferdig</li>
-                    </ul>
-                    <input type="hidden" id="selected-krise-status" name="krise-status"
-                        value="{{ evakuert.krise_status if evakuert and evakuert.krise_status else '' }}">
-                </div>
-            </div>
-            </br>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                <div>
-                    <label for="krise-type" class="block mb-1">Krise type</label>
-                    <input type="text" id="krise-type" name="krise-type" placeholder="flåm"
-                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        value="{{ evakuert.krise_type if evakuert else '' }}">
-                </div>
-                <div>
-                    <label for="krise-navn" class="block mb-1">Krise navn</label>
-                    <input type="text" id="krise-navn" name="krise-navn" placeholder="flåm Odda 2019"
-                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        value="{{ evakuert.krise_navn if evakuert else '' }}">
-                </div>
-                <div class="mb-6">
-                    <label for="krise-lokasjon" class="block mb-1">Lokasjon</label>
-                    <input type="text" id="krise-lokasjon" name="krise-lokasjon" placeholder="Odda sentrum"
-                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
-                        value="{{ evakuert.krise_lokasjon if evakuert else '' }}">
-                </div>
-            </div>
-            <div class="mb-6">
-                <label for="annen-info" class="block mb-1">Annen informasjon:</label>
-                <textarea id="annen-info" name="annen-info" rows="4" placeholder="Legg til informasjon om hendelsen her"
-                    class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500">{{ evakuert.annen_info if evakuert else '' }}</textarea>
-            </div>
+            {{ incident_component.render_incident(evakuert, kriser) }}
 
             <div class="text-center">
                 <button type="submit" class="bg-gray-700 text-white px-6 py-2 rounded">Bekreft</button>
