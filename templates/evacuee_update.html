@@ -1,0 +1,95 @@
+{% import "components/navbar_component.html" as navbar_component %}
+{% import "components/evacuee_component.html" as evacuee_component %}
+{% import "components/contactperson_component.html" as contact_component %}
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="https://cdn.tailwindcss.com"></script>
+	<title>Evakuert informasjon</title>
+	<link rel="stylesheet" href="{{ url_for('static', filename='dist/css/output.css') }}">
+</head>
+<body>
+
+	{{ navbar_component.render_navbar(navbar) }}
+
+    <main class="container mx-auto py-10 px-6 flex-grow bg-gray-100 text-gray-800 rounded-lg">
+        <!-- The form element -->
+        <form id="evacueeForm" method="POST" action="{{ url_for('evacuee_update.handle_form') }}">
+            <!-- Hidden inputs -->
+            <input type="hidden" name="evakuert_id" value="{{ evakuert.EvakuertID if evakuert else '' }}">
+            <input type="hidden" name="kontakt_person_id" value="{{ evakuert.KontaktPersonID if evakuert else '' }}">
+            <input type="hidden" name="status_id" value="{{ evakuert.StatusID if evakuert else '' }}">
+
+			<!-- Render Evakuertes Info Component -->
+			{{ evacuee_component.render_evacuee(evakuert) }}
+
+            <hr class="my-12 border-t border-gray-300">
+
+			<!-- Render Kontaktperson Info Component -->
+			{{ contact_component.render_contactperson(evakuert) }}
+
+            <div class="text-center">
+                <!-- Change the button type to "button" so it doesn't auto-submit -->
+                <button type="button" id="openModalBtn" class="bg-gray-700 text-white px-6 py-2 rounded">Bekreft</button>
+            </div>
+        </form>
+    </main>
+
+    <!-- Confirmation Modal (hidden by default) -->
+    <div id="confirmationModal" class="fixed inset-0 flex items-center justify-center hidden bg-black bg-opacity-50">
+      <div class="bg-white rounded-lg p-6 w-11/12 md:w-1/2">
+        <h2 class="text-xl font-bold mb-4">Bekreft informasjon</h2>
+        <div id="modalContent" class="mb-4">
+          <!-- The user inputs will be inserted here -->
+        </div>
+        <div class="flex justify-end">
+          <button id="cancelBtn" class="bg-gray-500 text-white px-4 py-2 rounded mr-2">Avbryt</button>
+          <button id="confirmBtn" class="bg-blue-500 text-white px-4 py-2 rounded">Bekreft</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+        // Get references to elements
+        const form = document.getElementById('evacueeForm');
+        const openModalBtn = document.getElementById('openModalBtn');
+        const modal = document.getElementById('confirmationModal');
+        const modalContent = document.getElementById('modalContent');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const confirmBtn = document.getElementById('confirmBtn');
+
+        // Function to gather all form data and format it for the modal
+        function gatherFormData() {
+            const formData = new FormData(form);
+            let contentHtml = '<ul class="list-disc pl-5">';
+            for (const [key, value] of formData.entries()) {
+                // Exclude hidden inputs if you don't want to show them.
+                if (['evakuert_id', 'kontakt_person_id', 'status_id'].includes(key)) continue;
+                contentHtml += `<li><strong>${key}:</strong> ${value}</li>`;
+            }
+            contentHtml += '</ul>';
+            return contentHtml;
+        }
+
+        // When the user clicks the "Bekreft" button, prevent submission and show the modal
+        openModalBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            // Fill modal with user input summary
+            modalContent.innerHTML = gatherFormData();
+            modal.classList.remove('hidden');
+        });
+
+        // When cancel is clicked, hide the modal
+        cancelBtn.addEventListener('click', function () {
+            modal.classList.add('hidden');
+        });
+
+        // When confirm is clicked, submit the form
+        confirmBtn.addEventListener('click', function () {
+            modal.classList.add('hidden');
+            form.submit();
+        });
+    </script>
+    <script src="{{ url_for('static', filename='js/register_logic.js') }}"></script>
+</body>
