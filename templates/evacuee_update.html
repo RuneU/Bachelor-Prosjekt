@@ -1,0 +1,39 @@
+{% import "components/navbar_component.html" as navbar_component %}
+{% import "components/evacuee_component.html" as evacuee_component %}
+{% import "components/contactperson_component.html" as contact_component %}
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<script src="https://cdn.tailwindcss.com"></script>
+	<title>Registreringsside</title>
+	<link rel="stylesheet" href="{{url_for('static',filename='dist/css/output.css')}}">
+</head>
+<body>
+
+	{{ navbar_component.render_navbar(navbar) }}
+
+    <main class="container mx-auto py-10 px-6 flex-grow bg-gray-100 text-gray-800 rounded-lg">
+        <form method="POST" action="{{ url_for('evacuee_update.handle_form') }}">
+            <!-- Hidden inputs -->
+            <input type="hidden" name="evakuert_id" value="{{ evakuert.EvakuertID if evakuert else '' }}">
+            <input type="hidden" name="kontakt_person_id" value="{{ evakuert.KontaktPersonID if evakuert else '' }}">
+            <input type="hidden" name="status_id" value="{{ evakuert.StatusID if evakuert else '' }}">
+
+			<!-- Render Evakuertes Info Component -->
+			{{ evacuee_component.render_evacuee(evakuert) }}
+
+            <hr class="my-12 border-t border-gray-300">
+
+			<!-- Render Kontaktperson Info Component -->
+			{{ contact_component.render_contactperson(evakuert) }}
+
+            <div class="text-center">
+                <button type="submit" class="bg-gray-700 text-white px-6 py-2 rounded">Bekreft</button>
+            </div>
+        </form>
+    </main>>
+
+    <script src="{{ url_for('static', filename='js/register_logic.js') }}"></script>
+
+</body>

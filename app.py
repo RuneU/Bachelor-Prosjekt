@@ -10,6 +10,7 @@ from blueprints.admin_inc.routes import admin_inc_bp
 from blueprints.auth.auth import auth_bp, google_bp
 from blueprints.auth.auth import login_required
 from blueprints.admin_status.routes import admin_status_bp
+from blueprints.evacuee_update.routes import evacuee_update_bp
 from dotenv import load_dotenv
 from translations import translations
 
@@ -23,10 +24,6 @@ def index():
     lang = request.args.get('lang', session.get('lang', 'no'))
     session['lang'] = lang
     return render_template('index.html', t=translations.get(lang, translations['no']), lang=lang)
-
-@app.route("/register-new")
-def register_new():
-    return render_template('register_new.html')
 
 @app.route('/set_user_id', methods=['POST'])
 def set_user_id():
@@ -44,6 +41,7 @@ app.register_blueprint(registrer_bp)
 app.register_blueprint(admin_inc_bp)
 app.register_blueprint(auth_bp) 
 app.register_blueprint(google_bp, url_prefix="/login")
+app.register_blueprint(evacuee_update_bp)
 
 @app.route('/admin_status_inc')
 def admin_status_inc():
