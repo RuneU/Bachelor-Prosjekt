@@ -15,11 +15,10 @@ def handle_form():
     try:
         form_data = {
             'evakuert_id': request.form.get('evakuert_id'),
-            'krise_id': request.form.get('krise_id'),  # no longer used in DB operations
+            'krise_id': request.form.get('krise_id'), 
             'kontakt_person_id': request.form.get('kontakt_person_id'),
             'status_id': request.form.get('status_id'),
             'status': request.form.get('status'),
-            # Removed crisis fields: 'krise-status', 'krise-type', 'krise-navn', 'annen-info'
             'evak_fnavn': request.form.get('evak-fnavn'),
             'evak_mnavn': request.form.get('evak-mnavn'),
             'evak_enavn': request.form.get('evak-enavn'),
@@ -117,7 +116,7 @@ def handle_form():
                 evakuert_id
             ))
         conn.commit()
-        return redirect(url_for('admin_status.admin'))
+        return redirect(url_for('index'))
     except ValueError as ve:
         conn.rollback()
         return f"Invalid input format: {str(ve)}", 400

@@ -1,7 +1,8 @@
 import os
 import sys
 sys.dont_write_bytecode = True
-from flask import Flask, request, render_template, jsonify, redirect, url_for, session
+from flask import Flask, request, render_template, jsonify, redirect, url_for, flash, session
+from sql.db_connection import connection_def
 sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
 from sql.db_connection import fetch_all_kriser, search_krise, create_krise
 from blueprints.admin_reg import admin_reg_bp
@@ -112,9 +113,36 @@ def handle_incident():
 def incident_creation():
     return render_template('incident_creation.html')
 
-@app.route("/evacuee-search")
+@app.route("/evacuee-search", methods=["GET", "POST"])
 def evacuee_search():
-    return render_template('evacuee_search.html')
+    if request.method == "POST":
+        evakuert_id = request.form.get("evakuertID")
+
+        if not evakuert_id.isdigit():
+            flash("Vennligst skriv inn en gyldig evakuertID.", "error")
+            return redirect(url_for("evacuee_search"))
+
+        evakuert_id = int(evakuert_id)
+
+        conn = connection_def()
+        cursor = conn.cursor()
+        cursor.execute("SELECT COUNT(*) FROM Evakuerte WHERE EvakuertID = ?", (evakuert_id,))
+        result = cursor.fetchone()
+        cursor.close()
+        conn.close()
+
+        if result[0] > 0:
+            return redirect(url_for("evacuee_update", evakuertID=evakuert_id))
+        else:
+            flash("Denne evakuertID finnes ikke.", "error")
+            return redirect(url_for("evacuee_search"))
+
+    return render_template("evacuee_search.html")
+
+@app.route("/evacuee-update/<int:evakuertID>")
+def evacuee_update(evakuertID):
+    return f"Oppdateringsside for evakuertID {evakuertID}"
+
 
 def generate_frames():
     camera = cv2.VideoCapture(0)  
