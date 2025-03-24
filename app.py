@@ -112,6 +112,10 @@ def handle_incident():
 def incident_creation():
     return render_template('incident_creation.html')
 
+@app.route("/evacuee-search")
+def evacuee_search():
+    return render_template('evacuee_search.html')
+
 def generate_frames():
     camera = cv2.VideoCapture(0)  
     while True:
