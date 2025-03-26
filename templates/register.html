@@ -14,12 +14,12 @@
 	<link rel="stylesheet" href="{{url_for('static',filename='dist/css/output.css')}}">
 </head>
 
-<body class="bg-blue-500 text-gray-200 font-sans flex flex-col min-h-screen">
+<body class="min-h-screen bg-gray-150 text-black font-sans flex flex-col">
 
 	{{ navbar_component.render_navbar(navbar) }}
 
 	<!-- Main Content -->
-	<main class="container mx-auto py-10 px-6 flex-grow bg-gray-100 text-gray-800 rounded-lg">
+	<main class="w-full max-w-2xl bg-white self-center p-6 rounded-lg shadow-md mt-6">
 		<form method="POST" action="{{ url_for('registrer.register') }}">
 			<input type="hidden" name="evakuert_id" value="{{ evakuert.EvakuertID if evakuert else '' }}">
 			<input type="hidden" name="kontakt_person_id" value="{{ evakuert.KontaktPersonID if evakuert else '' }}">
