@@ -14,7 +14,7 @@
     {{ navbar_component.render_navbar(navbar) }}
 
     <main class="container mx-auto py-10 px-6 flex-grow bg-gray-100 text-gray-800 rounded-lg">
-        <form method="POST" action="{{ url_for('handle_incident') }}">
+        <form method="POST" action="{{ url_for('incident_creation.handle_incident') }}">
 
             <!-- Krise Informasjon Section -->
             <h1 class="text-xl font-bold mb-4">Informasjon om krisen</h1>

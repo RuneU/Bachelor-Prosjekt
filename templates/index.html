@@ -56,8 +56,16 @@
                             {{ t['nav_contact'] }}
                         </a>
                     </li>
-                    <li><a href="{{ url_for('incident_creation') }}" class="text-blue-400 hover:text-blue-300 transition duration-300">Hendelse opprettelse</a></li>
-                    <li><a href="{{ url_for('evacuee_search') }}" class="text-blue-400 hover:text-blue-300 transition duration-300">Evakuerte søk</a></li>
+                    <li>
+                        <a href="{{ url_for('incident_creation.incident_creation') }}" class="text-blue-400 hover:text-blue-300 transition duration-300">
+                          Hendelse opprettelse
+                        </a>
+                      </li>                                            
+                    <li>
+                        <a href="{{ url_for('evacuee_search') }}" class="text-blue-400 hover:text-blue-300 transition duration-300">
+                            Evakuerte søk
+                        </a>
+                    </li>
                     <li>
                         <a href="{{ url_for('registrer.register') }}"
                            class="text-blue-400 hover:text-blue-300 transition duration-300">
