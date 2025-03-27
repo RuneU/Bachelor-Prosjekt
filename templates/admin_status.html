@@ -10,14 +10,14 @@
     <title>Admin Side</title>
 </head>
 
-<body class="bg-gray-900 text-gray-200 font-sans flex flex-col min-h-screen">
+<body class="bg-white text-gray-200 font-sans flex flex-col min-h-screen">
   
     {{ navbar_component.render_navbar(navbar) }}
 
     <!-- Main Content -->
-    <main class="container mx-auto py-10 px-6 flex-grow bg-gray-900 text-gray-200 rounded-lg shadow-lg">
-        <h1 class="text-5xl text-center font-extrabold dark:text-white">Evakuerte</h1>
-        </br>
+    <main class="container mx-auto py-10 px-6 flex-grow bg-white text-gray-900 rounded-lg shadow-lg">
+        <h1 class="text-5xl text-center font-extrabold bg-white">Evakuerte</h1>
+    </br>
         <div class="relative flex justify-center mb-6">
             <!-- link to kriser -->
             <a href="{{ url_for('admin_status_inc', lang='no') }}" class="absolute left-0 top-0 h-full bg-blue-700 text-white px-4 rounded-r text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
@@ -26,7 +26,7 @@
 
             <form action="{{ url_for('admin_status.search') }}" method="GET" class="w-full max-w-md">
                 <input type="text" name="query" placeholder="Søk:"
-                    class="w-full p-2 border rounded bg-gray-700 text-gray-300">
+                    class="w-full p-2 border rounded bg-gray-700 text-gray-300 placeholder-white">
                 <select name="KriseID" class="w-full p-2 border rounded bg-gray-700 text-gray-300 mt-2">
                     <option value="">Alle</option>
                     {% for krise in krise_options %}
