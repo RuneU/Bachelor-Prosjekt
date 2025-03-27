@@ -10,27 +10,27 @@
     <title>Admin Side</title>
 </head>
 
-<body class="bg-gray-900 text-gray-200 font-sans flex flex-col min-h-screen">
+<body class="bg-gray-100 text-gray-900 font-sans flex flex-col min-h-screen">
     {{ navbar_component.render_navbar(navbar) }}
 
     <!-- Main Content -->
-    <main class="container mx-auto py-10 px-6 flex-grow bg-gray-900 text-gray-200 rounded-lg shadow-lg">
-        <h1 class="text-5xl text-center font-extrabold dark:text-white">Hendelser</h1>
+    <main class="container mx-auto py-10 px-6 flex-grow bg-white text-gray-900 rounded-lg shadow-lg">
+        <h1 class="text-5xl text-center font-extrabold">Hendelser</h1>
         </br>
         <!-- Search Form and Combined Filter -->
         <div class="relative flex justify-center mb-6">
             <a href="{{ url_for('admin_status.admin') }}"
-                class="absolute left-0 top-0 h-full bg-blue-700 text-white px-4 rounded-r hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium text-sm py-2.5">
+                class="absolute left-0 top-0 h-full bg-blue-500 text-white px-4 rounded-md hover:bg-blue-600 focus:ring-4 focus:ring-blue-300 font-medium text-sm py-2.5">
                 Gå til evakuerte
             </a>
 
             <form action="{{ url_for('admin_status_inc') }}" method="GET" class="w-full max-w-md relative">
                 <!-- Search Input -->
                 <input type="text" name="query" placeholder="Søk:" value="{{ query }}"
-                    class="w-full p-2 border rounded bg-gray-700 text-gray-300">
+                    class="w-full p-2 border rounded bg-gray-200 text-gray-900">
 
                 <!-- Combined Dropdown Filter -->
-                <select name="filter_order" class="w-full p-2 border rounded bg-gray-700 text-gray-300 mt-2">
+                <select name="filter_order" class="w-full p-2 border rounded bg-gray-200 text-gray-900 mt-2">
                     <option value="nyeste" {% if filter_order=='nyeste' %}selected{% endif %}>Nyeste</option>
                     <option value="eldste" {% if filter_order=='eldste' %}selected{% endif %}>Eldste</option>
                     <option value="nykrise" {% if filter_order=='nykrise' %}selected{% endif %}>Ny krise</option>
@@ -38,7 +38,7 @@
                     <option value="ferdig" {% if filter_order=='ferdig' %}selected{% endif %}>Ferdig</option>
                 </select>
                 <button type="submit"
-                    class="absolute right-0 top-0 h-full bg-blue-700 text-white px-4 rounded-r hover:bg-blue-800">Søk</button>
+                    class="absolute right-0 top-0 h-full bg-blue-500 text-white px-4 rounded-r hover:bg-blue-600">Søk</button>
             </form>
         </div>
 
@@ -47,15 +47,15 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {% for krise in krise_list %}
                 <a href="/admin-inc/{{ krise.KriseID }}" class="block">
-                    <div class="bg-gray-800 p-4 rounded shadow hover:bg-gray-700 transition duration-200">
+                    <div class="bg-gray-100 p-4 rounded shadow hover:bg-gray-200 transition duration-200">
                         <h3 class="text-xl font-bold">{{ krise.KriseNavn }}</h3>
                         <p class="mt-2">Status:
                             {% if krise.Status == "Ferdig" %}
-                            <span class="font-semibold text-green-400">{{ krise.Status }}</span>
+                            <span class="font-semibold text-green-600">{{ krise.Status }}</span>
                             {% elif krise.Status == "Pågående" %}
-                            <span class="font-semibold text-yellow-400">{{ krise.Status }}</span>
+                            <span class="font-semibold text-yellow-600">{{ krise.Status }}</span>
                             {% else %}
-                            <span class="font-semibold text-red-400">{{ krise.Status }}</span>
+                            <span class="font-semibold text-red-600">{{ krise.Status }}</span>
                             {% endif %}
                         </p>
                         <p>
