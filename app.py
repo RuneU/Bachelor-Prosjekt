@@ -14,6 +14,7 @@ from blueprints.evacuee_update.routes import evacuee_update_bp
 from blueprints.incident_creation.routes import incident_creation_bp
 from dotenv import load_dotenv
 from translations import translations
+from blueprints.auth.auth import login_required
 
 load_dotenv()
 
