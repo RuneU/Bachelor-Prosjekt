@@ -125,3 +125,49 @@ document.querySelector("form").addEventListener("submit", function () {
   document.getElementById("selected-krise-status").value =
     kriseDropdownButton.textContent.trim();
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.querySelector('form');
+    const modal = document.getElementById('confirmationModal');
+    const confirmationContent = document.getElementById('confirmationContent');
+    const cancelButton = document.getElementById('cancelButton');
+    const confirmButton = document.getElementById('confirmButton');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Gather form data
+        const formData = new FormData(form);
+        let contentHTML = '';
+
+        // Set of keys to ignore
+        const ignoreKeys = new Set([
+            'kontakt_person_id',
+            'status_id',
+            'krise-status',
+            'krise-type',
+            'krise_id',
+            'krise-lokasjon',
+            'annen-info'
+        ]);
+
+        // Loop through the form data and add fields not in the ignore list
+        for (const [key, value] of formData.entries()) {
+            if (!ignoreKeys.has(key)) {
+                contentHTML += `<p><strong>${key}:</strong> ${value}</p>`;
+            }
+        }
+        confirmationContent.innerHTML = contentHTML;
+
+        modal.classList.remove('hidden');
+    });
+
+    cancelButton.addEventListener('click', () => {
+        modal.classList.add('hidden');
+    });
+
+    confirmButton.addEventListener('click', () => {
+        modal.classList.add('hidden');
+        form.submit();
+    });
+});
