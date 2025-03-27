@@ -18,9 +18,10 @@
                 <a href="{{ url_for('index', lang='no') }}" class="px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition">Norsk</a>
             </div>
 
+
             <!-- Right Section: Login Button -->
             <div>
-                <a href="{{ url_for('auth.login') }}" class="px-5 py-2.5 bg-blue-700 text-white rounded-lg shadow-md hover:bg-blue-800 transition">Login</a>
+                <a href="{{ url_for('auth.logout') }}" class="px-5 py-2.5 bg-blue-700 text-white rounded-lg shadow-md hover:bg-blue-800 transition">Log ut</a>
             </div>
         </div>
     </nav>
@@ -33,16 +34,28 @@
 
         <!-- Button Container -->
         <div class="flex justify-center space-x-6">
-            <!-- Button 1: Register -->
-            <a href="{{ url_for('registrer.register') }}"
+            <!-- Button 1: Incident Creation -->
+            <a href="{{ url_for('incident_creation') }}"
                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-10 px-10 rounded-lg shadow-lg text-xl flex items-center justify-center w-40 h-40">
-                {{ t['nav_register'] }}
+                Hendelse Opprettelse
             </a>
 
-            <!-- Button 2: Evacuee Update -->
+            <!-- Button 2: admin_status page -->
+            <a href="{{ url_for('admin_status.admin') }}"
+               class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-10 px-10 rounded-lg shadow-lg text-xl flex items-center justify-center w-40 h-40">
+                Admin Status
+            </a>
+
+            <!-- Button 3: Evacuee Search -->
             <a href="{{ url_for('evacuee_search') }}"
                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-10 px-10 rounded-lg shadow-lg text-xl flex items-center justify-center w-40 h-40">
-                Oppdater din info
+                Søk etter evakuerte med ID
+            </a>
+            
+            <!-- Button 4: Create new user -->
+            <a href="{{ url_for('auth.create_user') }}"
+               class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-10 px-10 rounded-lg shadow-lg text-xl flex items-center justify-center w-40 h-40">
+                Registrer ny bruker
             </a>
         </div>
     </main>
