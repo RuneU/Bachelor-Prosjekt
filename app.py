@@ -9,9 +9,9 @@ from blueprints.admin_reg import admin_reg_bp
 from blueprints.registrer.routes import registrer_bp
 from blueprints.admin_inc.routes import admin_inc_bp
 from blueprints.auth.auth import auth_bp, google_bp
-from blueprints.auth.auth import login_required
 from blueprints.admin_status.routes import admin_status_bp
 from blueprints.evacuee_update.routes import evacuee_update_bp
+from blueprints.incident_creation.routes import incident_creation_bp
 from dotenv import load_dotenv
 from translations import translations
 
@@ -43,6 +43,7 @@ app.register_blueprint(admin_inc_bp)
 app.register_blueprint(auth_bp) 
 app.register_blueprint(google_bp, url_prefix="/login")
 app.register_blueprint(evacuee_update_bp)
+app.register_blueprint(incident_creation_bp)
 
 @app.route('/admin_page')
 @login_required
@@ -87,39 +88,6 @@ def admin_status_inc():
         query=query, 
         filter_order=filter_order
     )
-
-# POST krise oppretelse til db
-@app.route('/handle_incident', methods=['POST'])
-@login_required
-def handle_incident():
-    try:
-        status = request.form.get('krise-status')
-        krise_situasjon_type = request.form.get('krise-type') 
-        krise_navn = request.form.get('krise-navn')
-        lokasjon = request.form.get('krise-lokasjon')
-        tekstboks = request.form.get('annen-info')
-
-        if not all([status, krise_situasjon_type, krise_navn, lokasjon]):
-            print('Vennligst fyll ut alle obligatoriske felt', 'error')
-            return redirect(url_for('incident_creation'))
-
-        if create_krise(status, krise_situasjon_type, krise_navn, lokasjon, tekstboks):
-            print('Krise opprettet vellykket!', 'success')
-        else:
-            print('Feil ved opprettelse av krise', 'error')
-            
-        return redirect(url_for('index'))
-
-    except Exception as e:
-        print(f"Error: {str(e)}")
-        print('En uventet feil oppsto', 'error')
-        return redirect(url_for('incident_creation'))
-
-
-@app.route('/incident_creation', methods=['GET', 'POST'])
-@login_required
-def incident_creation():
-    return render_template('incident_creation.html')
 
 @app.route("/evacuee-search", methods=["GET", "POST"])
 def evacuee_search():
