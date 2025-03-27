@@ -45,7 +45,15 @@ app.register_blueprint(google_bp, url_prefix="/login")
 app.register_blueprint(evacuee_update_bp)
 app.register_blueprint(incident_creation_bp)
 
+@app.route('/admin_page')
+@login_required
+def admin_page():
+    lang = request.args.get('lang', session.get('lang', 'no'))
+    session['lang'] = lang
+    return render_template('admin_page.html', t=translations.get(lang, translations['no']), lang=lang)
+
 @app.route('/admin_status_inc')
+@login_required
 def admin_status_inc():
     query = request.args.get('query', '')
     # Combined filter parameter: default is "nyeste"
