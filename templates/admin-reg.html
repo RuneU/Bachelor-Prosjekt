@@ -27,8 +27,8 @@
 
             <hr class="my-12 border-t border-gray-300">
 
-			<!-- Render Evakuertes Info Component -->
-			{{ evacuee_component.render_evacuee(evakuert) }}
+            <!-- Render Evakuertes Info Component -->
+            {{ evacuee_component.render_evacuee(evakuert) }}
 
             <h1 class="text-l text-center font-bold mb-4">Lokasjons logg</h1>
             <div class="">
@@ -37,17 +37,28 @@
 
             <hr class="my-12 border-t border-gray-300">
 
-			<!-- Render Kontaktperson Info Component -->
-			{{ contact_component.render_contactperson(evakuert) }}
+            <!-- Render Kontaktperson Info Component -->
+            {{ contact_component.render_contactperson(evakuert) }}
 
             <div class="text-center">
-                <button type="submit" class="bg-gray-700 text-white px-6 py-2 rounded">Bekreft</button>
+                <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded">Bekreft</button>
             </div>
         </form>
     </main>
 
     <script src="{{ url_for('static', filename='js/register_logic.js') }}"></script>
 
+    <!-- Confirmation Modal -->
+    <div id="confirmationModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center">
+        <div class="bg-white p-6 rounded-lg max-w-md w-full">
+            <h2 class="text-2xl font-bold mb-4">Bekreft dine opplysninger</h2>
+            <div id="confirmationContent" class="mb-4 overflow-auto max-h-80 text-l"></div>
+            <div class="flex justify-end">
+                <button id="cancelButton" class="mr-2 bg-gray-300 px-4 py-2 rounded text-lg">Tilbake</button>
+                <button id="confirmButton" class="bg-green-600 text-white px-4 py-2 rounded text-lg">Bekreft</button>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
