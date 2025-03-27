@@ -83,7 +83,7 @@ def login():
                 if active and check_password_hash(stored_password, password):
                     session['user_id'] = user_id
                     flash("Login successful!", "success")
-                    return redirect(url_for('index'))
+                    return redirect(url_for('admin_page'))
                 else:
                     flash("Invalid credentials or inactive account.", "error")
             else:

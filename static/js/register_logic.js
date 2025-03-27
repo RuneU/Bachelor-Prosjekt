@@ -24,17 +24,20 @@ document.addEventListener("click", (event) => {
 });
 
 dropdownOptions.forEach((option) => {
-  option.addEventListener("click", () => {
-    const colorClass = option.getAttribute("data-color");
-    const colorName = option.textContent;
-
-    // Update the button background color and text
-    dropdownButton.className = `w-full h-12 px-4 py-2 text-white border border-gray-300 rounded-md shadow-sm ${colorClass}`;
-    dropdownButton.textContent = colorName;
-
-    dropdownMenu.classList.add("hidden");
+	option.addEventListener("click", () => {
+	  const colorClass = option.getAttribute("data-color");
+	  const colorName = option.textContent;
+  
+	  // Update the button background color and text
+	  dropdownButton.className = `h-12 w-48 px-4 py-2 text-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition ${colorClass}`;
+	  dropdownButton.textContent = colorName;
+  
+	  // Update the hidden input's value with the selected status text
+	  document.getElementById("selected-status").value = colorName;
+  
+	  dropdownMenu.classList.add("hidden");
+	});
   });
-});
 
 // Krise status dropdown code (unchanged)
 const kriseDropdownButton = document.getElementById("krise-status");

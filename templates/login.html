@@ -12,7 +12,7 @@
   <!-- Navigation Bar -->
   <nav class="bg-gray-100 shadow-md">
     <div class="container mx-auto px-6 py-4">
-      <a href="{{ url_for('index') }}" class="text-xl font-bold text-gray-800">My App</a>
+      <a href="{{ url_for('index') }}" class="text-xl font-bold text-gray-800">Pålogging</a>
     </div>
   </nav>
   
@@ -39,23 +39,25 @@
           <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
             Sign In
           </button>
-          <a class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" href="{{ url_for('auth.register_user') }}">
+          <!-- <a class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800" href="{{ url_for('auth.register_user') }}">
             Register
           </a>
+          -->
         </div>
       </form>
-      <div class="mt-6 text-center">
+     <!-- <div class="mt-6 text-center">
         <p class="text-gray-600">or</p>
         <a href="{{ url_for('auth.google_login') }}" class="mt-2 inline-block bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded">
           Sign in with Google
         </a>
+        -->
       </div>
     </div>
   </main>
   
   <!-- Footer (optional) -->
   <footer class="bg-gray-100 text-gray-600 text-center py-4">
-    <p>&copy; 2025 My App. All rights reserved.</p>
+    <p>&copy; 2025 Gruppe 4. All rights reserved.</p>
   </footer>
   
   <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
