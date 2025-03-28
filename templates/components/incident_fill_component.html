@@ -54,10 +54,5 @@
                 value="{{ evakuert.krise_lokasjon if evakuert else '' }}">
         </div>
     </div>
-    <div class="mb-6">
-        <label for="annen-info" class="block mb-1">Annen informasjon:</label>
-        <textarea id="annen-info" name="annen-info" rows="4" readonly
-            class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500">{{ evakuert.annen_info if evakuert else '' }}</textarea>
-    </div>
 </section>
 {% endmacro %}

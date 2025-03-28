@@ -1,6 +1,6 @@
 translations = {
     'en': {
-        'title': "Flowbite Flask",
+        'title': "Evacuation Management System",
         'nav_about': "About Us",
         'nav_services': "Services",
         'nav_contact': "Contact Us",
@@ -10,10 +10,20 @@ translations = {
         'nav_admin': "Admin",
         'button_get_started': "Get started",
         'welcome_heading': "Welcome to Group 4's Project",
-        'welcome_paragraph': "Welcome to Group 4's bachelor's project for 2025. This project was developed during the Spring Semester 2025 with CIEM as the client."
+        'welcome_paragraph': "Welcome to Group 4's bachelor's project for 2025. This project was developed during the Spring Semester 2025 with CIEM as the client.",
+        'nav_evacuee_update': "Update your info",
+        'admin_incident_creation': "Incident Creation",
+        'admin_status': "Admin Status",
+        'admin_evacuee_search': "Search for evacuees by ID",
+        'admin_create_user': "Register new user",
+        'logout': "Log out",
+        'login' : "Log in",
+        'english': "English",
+        'norwegian': "Norwegian",
+        'confirm': "Confirm",
     },
     'no': {
-        'title': "Flowbite Flask",
+        'title': "Evakueringsstyringssystem",
         'nav_about': "Om oss",
         'nav_services': "Tjenester",
         'nav_contact': "Kontakt oss",
@@ -23,6 +33,16 @@ translations = {
         'nav_admin': "Admin",
         'button_get_started': "Kom i gang",
         'welcome_heading': "Velkommen til Gruppe 4 sitt prosjekt",
-        'welcome_paragraph': "Velkommen til gruppe 4 sitt bachelorprosjekt for 2025. Dette prosjektet er utviklet over vårsemesteret 2025 med CIEM som oppdragsgiver."
+        'welcome_paragraph': "Velkommen til gruppe 4 sitt bachelorprosjekt for 2025. Dette prosjektet er utviklet over vårsemesteret 2025 med CIEM som oppdragsgiver.",
+        'nav_evacuee_update': "Oppdater din info",
+        'admin_incident_creation': "Hendelse Opprettelse",
+        'admin_status': "Admin Status",
+        'admin_evacuee_search': "Søk etter evakuerte med ID",
+        'admin_create_user': "Registrer ny bruker",
+        'logout': "Logg ut",
+        'login' : "Logg inn",
+        'english': "Engelsk",
+        'norwegian': "Norsk",
+        'confirm': "Bekreft",
     }
 }
