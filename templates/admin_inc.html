@@ -47,6 +47,39 @@
             {{ kart_map | safe }}
         </div>
 
+        <hr class="my-12 border-t border-gray-300">
+
+        <!-- Evakuerte Status Table -->
+        <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-8">
+            <table class="w-full text-sm text-left text-gray-500">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">Navn</th>
+                        <th scope="col" class="px-6 py-3">Status</th>
+                        <th scope="col" class="px-6 py-3">Lokasjon</th>
+                        <th scope="col" class="px-6 py-3">Rediger</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in evakuerte_statuses %}
+                    <tr class="odd:bg-white even:bg-gray-50 border-b">
+                        <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                            {{ record.FullName }}
+                        </th>
+                        <td class="px-6 py-4">{{ record.Status }}</td>
+                        <td class="px-6 py-4">{{ record.Lokasjon }}</td>
+                        <td class="px-6 py-4">
+                            <a href="{{ url_for('admin_reg.adminreg_with_id', evakuert_id=record.EvakuertID) }}"
+                               class="font-medium text-blue-600 hover:underline">
+                                Rediger
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
         <h1 class="text-xl font-bold mb-4">Status Evakuerte</h1>
         <div class="flex justify-around my-4">
             <p class="mb-4 text-lg">

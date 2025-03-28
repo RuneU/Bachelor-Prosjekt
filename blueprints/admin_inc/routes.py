@@ -1,7 +1,11 @@
 import folium
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from blueprints.auth.auth import login_required
-from sql.db_connection import fetch_krise_by_id, update_krise, count_evakuerte_by_krise, fetch_status_counts_for_krise, count_evakuerte_same_location, count_evakuerte_different_location, fetch_krise_opprettet
+from sql.db_connection import (
+    fetch_krise_by_id, update_krise, count_evakuerte_by_krise, fetch_status_counts_for_krise,
+    count_evakuerte_same_location, count_evakuerte_different_location, fetch_krise_opprettet,
+    fetch_combined_evakuerte_status_by_krise
+)
 
 admin_inc_bp = Blueprint('admin_inc', __name__, template_folder='../templates')
 
@@ -30,15 +34,20 @@ def admin_inc_detail(krise_id):
             icon=folium.Icon(color="red")
         ).add_to(m)
         kart_map = m._repr_html_()  # Alternative method to get HTML
+
+        # New: Fetch evacuee status for the table using the newly added function
+        evakuerte_statuses = fetch_combined_evakuerte_status_by_krise(krise_id)
+
         return render_template('admin_inc.html',
-                               krise=krise, 
-                               evakuert_count=evakuert_count, 
+                               krise=krise,
+                               evakuert_count=evakuert_count,
                                status_counts=status_counts,
                                krise_opprettet=krise_opprettet,
                                same_count=same_count,
                                diff_count=diff_count,
                                opprettet=opprettet,
-                               kart_map=kart_map)
+                               kart_map=kart_map,
+                               evakuerte_statuses=evakuerte_statuses)
     else:
         flash(f"Krise with ID {krise_id} not found", "error")
         return redirect(url_for('admin_inc.admin_inc_list'))
