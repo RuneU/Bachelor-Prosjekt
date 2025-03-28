@@ -73,7 +73,8 @@ def register():
             cursor.close()
             conn.close()
 
-            return redirect(url_for("index"))
+            # Redirect user to the temporary page showing their evakuertID
+            return redirect(url_for("registrer.show_evakuert", evakuert_id=evakuert_id))
 
     except Exception as e:
         print(f"An error occurred: {e}")
@@ -92,6 +93,12 @@ def register():
                            kriser=kriser, 
                            locations=fetch_all_locations(), 
                            krise_situasjon_types=fetch_all_krise_situasjon_types())
+
+
+@registrer_bp.route("/register/show_evakuert/<int:evakuert_id>")
+def show_evakuert(evakuert_id):
+    return render_template("show_evakuertID.html", evakuertID=evakuert_id)
+
 
 @registrer_bp.route('/register/get_krise_details/<krise_id>')
 def get_krise_details(krise_id):
