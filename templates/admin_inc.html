@@ -32,7 +32,7 @@
                 </span>
             </h3>
             {% endif %}
-        
+
 
             {{ incident_component.render_incident(evakuert, krise) }}
 
@@ -41,6 +41,11 @@
                 <button type="submit" class="bg-gray-700 text-white px-6 py-2 rounded">Oppdater Krise</button>
             </div>
         </form>
+
+        <!-- Embed the dynamically generated map -->
+        <div class="flex items-center justify-center h-screen border border-gray-300 shadow-lg">
+            {{ kart_map | safe }}
+        </div>
 
         <h1 class="text-xl font-bold mb-4">Status Evakuerte</h1>
         <div class="flex justify-around my-4">
@@ -90,7 +95,8 @@
 
 
         <!-- Updated Confirmation Modal -->
-        <div id="confirmationModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center">
+        <div id="confirmationModal"
+            class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center">
             <div class="bg-white p-6 rounded-lg max-w-md w-full">
                 <h2 class="text-2xl font-bold mb-4">Bekreft dine opplysninger</h2>
                 <div id="confirmationContent" class="mb-4 overflow-auto max-h-80 text-l">
@@ -102,7 +108,8 @@
                 </div>
                 <div class="flex justify-end">
                     <button id="cancelButton" class="mr-2 bg-gray-300 px-4 py-2 rounded text-lg">Tilbake</button>
-                    <button id="confirmButton" class="bg-green-600 text-white px-4 py-2 rounded text-lg">Bekreft</button>
+                    <button id="confirmButton"
+                        class="bg-green-600 text-white px-4 py-2 rounded text-lg">Bekreft</button>
                 </div>
             </div>
         </div>
