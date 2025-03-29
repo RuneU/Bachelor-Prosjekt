@@ -52,7 +52,13 @@
                 Søk etter evakuerte med ID
             </a>
             
-            <!-- Button 4: Create new user -->
+            <!-- Button 4: Evacuee registration -->
+            <a href="{{ url_for('registrer.register') }}"
+            class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-10 px-10 rounded-lg shadow-lg text-xl flex items-center justify-center w-40 h-40">
+             {{ t['nav_register'] }}
+            </a>
+            
+            <!-- Button 5: Create new user -->
             <a href="{{ url_for('auth.create_user') }}"
                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-10 px-10 rounded-lg shadow-lg text-xl flex items-center justify-center w-40 h-40">
                 Registrer ny bruker
