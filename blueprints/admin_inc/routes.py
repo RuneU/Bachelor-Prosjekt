@@ -1,4 +1,6 @@
 import folium
+from folium.plugins import MarkerCluster
+from geopy.geocoders import Nominatim
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from blueprints.auth.auth import login_required
 from sql.db_connection import (
@@ -21,22 +23,84 @@ def admin_inc_detail(krise_id):
         same_count = count_evakuerte_same_location(krise['KriseID'], krise['Lokasjon'])
         diff_count = count_evakuerte_different_location(krise['KriseID'], krise['Lokasjon'])
         opprettet = fetch_krise_opprettet(krise['KriseID'])
-        # Convert the string location to a list of floats if necessary
+
+        # Process the "Lokasjon" field: if it's coordinates, reverse geocode; if it's an address, geocode.
         location_data = krise['Lokasjon']
-        if isinstance(location_data, str):
-            location_data = [float(coord.strip()) for coord in location_data.split(',')]
-        # Generate the folium map using the parsed location data
-        m = folium.Map(location=location_data, zoom_start=11)
+        geolocator = Nominatim(user_agent="my_flask_app")
+        try:
+            # Attempt to parse location_data as coordinates.
+            coords = [float(coord.strip()) for coord in location_data.split(',')]
+            # Reverse geocode to get a human-readable address.
+            location_result = geolocator.reverse(coords)
+            if location_result:
+                print("Address:", location_result.address)
+            else:
+                print("No address found for the given coordinates.")
+            map_location = coords
+        except ValueError:
+            # If parsing fails, treat location_data as an address.
+            location_result = geolocator.geocode(location_data)
+            if location_result:
+                coords = (location_result.latitude, location_result.longitude)
+                print("Coordinates:", coords)
+                map_location = [location_result.latitude, location_result.longitude]
+            else:
+                print("No coordinates found for the given address.")
+                map_location = [0, 0]  # Fallback coordinates
+            
+        # Generate the folium map using the determined coordinates
+        m = folium.Map(location=map_location, zoom_start=11)
+        marker_cluster = MarkerCluster().add_to(m)
+        
+        # Add the primary marker to the cluster
         folium.Marker(
-            location=location_data,
+            location=map_location,
             tooltip="Click me!",
             popup=f"Lokasjon: {location_data}",
             icon=folium.Icon(color="red")
-        ).add_to(m)
-        kart_map = m._repr_html_()  # Alternative method to get HTML
-
-        # New: Fetch evacuee status for the table using the newly added function
+        ).add_to(marker_cluster)
+        
+        # Fetch evacuee status for the table using the newly added function
         evakuerte_statuses = fetch_combined_evakuerte_status_by_krise(krise_id)
+        
+        # Dictionary to track markers placed at the same exact location
+        placed_markers = {}
+        
+        # Add green marker(s) for each evacuee location into the cluster
+        for evac in evakuerte_statuses:
+            evac_location = evac.get('Lokasjon')
+            # Use FullName from the DB result instead of Navn.
+            navn = evac.get('FullName', 'N/A')
+            status = evac.get('Status', 'N/A')
+            try:
+                # Attempt to parse evac_location as coordinates
+                evac_coords = [float(coord.strip()) for coord in evac_location.split(',')]
+            except ValueError:
+                # Treat evac_location as an address if parsing fails
+                evac_result = geolocator.geocode(evac_location)
+                if evac_result:
+                    evac_coords = [evac_result.latitude, evac_result.longitude]
+                else:
+                    evac_coords = [0, 0]  # Fallback coordinates if geocoding fails
+            
+            # Use a tuple for the coordinate key (rounded to avoid floating point issues)
+            key = (round(evac_coords[0], 6), round(evac_coords[1], 6))
+            count = placed_markers.get(key, 0)
+            if count > 0:
+                # Apply a slight offset depending on how many markers are already here.
+                offset = 0.00005 * count
+                evac_coords[0] += offset
+                evac_coords[1] += offset
+            placed_markers[key] = count + 1
+            
+            folium.Marker(
+                location=evac_coords,
+                tooltip=f"Evakuert Lokasjon: {evac_location}",
+                popup=f"Evakuerte Lokasjon: {evac_location}<br>Navn: {navn}<br>Status: {status}",
+                icon=folium.Icon(color="green")
+            ).add_to(marker_cluster)
+            
+        kart_map = m._repr_html_()  # Alternative method to get HTML
 
         return render_template('admin_inc.html',
                                krise=krise,
@@ -68,4 +132,4 @@ def update_krise_route(krise_id):
         flash('Error updating incident', 'error')
 
     # Redirect to the index page after update
-    return redirect(url_for('index'))
+    return redirect(url_for('admin_status_inc'))
