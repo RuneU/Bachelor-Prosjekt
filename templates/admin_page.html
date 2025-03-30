@@ -29,9 +29,9 @@
     </nav>
 
     <main class="container mx-auto text-center py-20 px-6 flex-grow">
-        <h1 class="text-4xl font-bold text-gray-800 mb-6">{{ t['welcome_heading'] }}</h1>
+        <h1 class="text-4xl font-bold text-gray-800 mb-6">{{ t['admin_welcome_heading'] }}</h1>
         <p class="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed mb-12">
-            {{ t['welcome_paragraph'] }}
+            {{ t['admin_welcome_paragraph'] }}
         </p>
 
         <!-- Button Container -->
@@ -53,7 +53,11 @@
                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-10 px-10 rounded-lg shadow-lg text-xl flex items-center justify-center w-40 h-40">
                 {{ t['admin_evacuee_search'] }}
             </a>
-            
+            <!-- Button 4: Evacuee registration -->
+            <a href="{{ url_for('registrer.register') }}"
+                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-10 px-10 rounded-lg shadow-lg text-xl flex items-center justify-center w-40 h-40">
+                 {{ t['admin_evacuee_registration'] }}
+            </a>
             <!-- Button 4: Create new user -->
             <a href="{{ url_for('auth.create_user') }}"
                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-10 px-10 rounded-lg shadow-lg text-xl flex items-center justify-center w-40 h-40">

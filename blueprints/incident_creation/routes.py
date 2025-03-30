@@ -1,7 +1,7 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, session
 from sql.db_connection import create_krise
 from blueprints.auth.auth import login_required
-
+from translations import translations
 incident_creation_bp = Blueprint('incident_creation', __name__)
 
 # POST krise oppretelse til db
@@ -25,7 +25,7 @@ def handle_incident():
             print('Feil ved opprettelse av krise', 'error')
             
         return redirect(url_for('index'))
-
+    
     except Exception as e:
         print(f"Error: {str(e)}")
         print('En uventet feil oppsto', 'error')
@@ -35,4 +35,6 @@ def handle_incident():
 @incident_creation_bp.route('/incident_creation', methods=['GET', 'POST'])
 @login_required
 def incident_creation():
-    return render_template('incident_creation.html')
+    lang = request.args.get('lang', session.get('lang', 'no'))
+    session['lang'] = lang
+    return render_template('incident_creation.html', t=translations.get(lang, translations['no']), lang=lang)

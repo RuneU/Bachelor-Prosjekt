@@ -11,7 +11,7 @@
 </head>
 
 <body>
-    {{ navbar_component.render_navbar(navbar) }}
+    {{ navbar_component.render_navbar(navbar, t=t) }}
 
     <main class="container mx-auto py-10 px-6 flex-grow bg-gray-100 text-gray-800 rounded-lg">
         <form method="POST" action="{{ url_for('admin_inc.update_krise_route', krise_id=krise.KriseID) }}">
@@ -34,7 +34,7 @@
             {% endif %}
         
 
-            {{ incident_component.render_incident(evakuert, krise) }}
+            {{ incident_component.render_incident(evakuert, krise, t=t) }}
 
             <!-- Submit Button -->
             <div class="text-center">
@@ -42,7 +42,7 @@
             </div>
         </form>
 
-        <h1 class="text-xl font-bold mb-4">Status Evakuerte</h1>
+        <h1 class="text-xl font-bold mb-4">{{ t['evak_status_label'] }}</h1>
         <div class="flex justify-around my-4">
             <p class="mb-4 text-lg">
                 Antall Evakuerte: <span class="font-bold">{{ evakuert_count }}</span>
