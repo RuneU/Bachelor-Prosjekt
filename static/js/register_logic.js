@@ -142,6 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Set of keys to ignore
         const ignoreKeys = new Set([
+            'evakuert_id',
             'kontakt_person_id',
             'status_id',
             'krise-status',

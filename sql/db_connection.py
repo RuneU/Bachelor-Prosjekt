@@ -468,5 +468,76 @@ def print_evakuerte_data():
         if 'conn' in locals():
             conn.close()
 
+def fetch_combined_evakuerte_status():
+    """
+    Returns a list of dictionaries, each with the full name (combined Fornavn, MellomNavn, Etternavn),
+    Status from the Status table, and Lokasjon from the Status table.
+    """
+    conn = None
+    cursor = None
+    try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT e.Fornavn, e.MellomNavn, e.Etternavn, s.Status, s.Lokasjon
+            FROM Status s
+            JOIN Evakuerte e ON s.EvakuertID = e.EvakuertID
+        """)
+        rows = cursor.fetchall()
+        result = []
+        for row in rows:
+            # Combine names, filtering out any None values
+            full_name = " ".join(filter(None, [row[0], row[1], row[2]]))
+            result.append({
+                'FullName': full_name,
+                'Status': row[3],
+                'Lokasjon': row[4]
+            })
+        return result
+    except pyodbc.Error as e:
+        print(f"Error in fetch_combined_evakuerte_status: {e}")
+        return []
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+def fetch_combined_evakuerte_status_by_krise(krise_id):
+    """
+    Returns a list of dictionaries for evacuee status (full name, status, lokasjon, evakuert id)
+    for a specific KriseID.
+    """
+    conn = None
+    cursor = None
+    try:
+        conn = pyodbc.connect(connection_string)
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT e.Fornavn, e.MellomNavn, e.Etternavn, s.Status, s.Lokasjon, e.EvakuertID
+            FROM Status s
+            JOIN Evakuerte e ON s.EvakuertID = e.EvakuertID
+            WHERE e.KriseID = ?
+        """, (krise_id,))
+        rows = cursor.fetchall()
+        result = []
+        for row in rows:
+            full_name = " ".join(filter(None, [row[0], row[1], row[2]]))
+            result.append({
+                'FullName': full_name,
+                'Status': row[3],
+                'Lokasjon': row[4],
+                'EvakuertID': row[5]
+            })
+        return result
+    except pyodbc.Error as e:
+        print(f"Error in fetch_combined_evakuerte_status_by_krise: {e}")
+        return []
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
 # Uncomment the next line if you want to manually enable debugging prints
 # print_evakuerte_data()
