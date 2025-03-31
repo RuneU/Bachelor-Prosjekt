@@ -8,6 +8,9 @@ admin_inc_bp = Blueprint('admin_inc', __name__, template_folder='../templates')
 @admin_inc_bp.route('/admin-inc/<int:krise_id>')
 @login_required
 def admin_inc_detail(krise_id):
+
+    lang = request.args.get('lang', session.get('lang', 'no'))
+    session['lang'] = lang
     """Show details for a specific KriseID along with status counters."""
     krise = fetch_krise_by_id(krise_id)
     if krise:
@@ -18,7 +21,7 @@ def admin_inc_detail(krise_id):
         same_count = count_evakuerte_same_location(krise['KriseID'], krise['Lokasjon'])
         diff_count = count_evakuerte_different_location(krise['KriseID'], krise['Lokasjon'])
         opprettet = fetch_krise_opprettet(krise['KriseID'])
-        return render_template('admin_inc.html', 
+        return render_template('admin_inc.html', t=translations.get(lang, translations['no']), lang=lang,
                                krise=krise, 
                                evakuert_count=evakuert_count, 
                                status_counts=status_counts,
@@ -28,9 +31,8 @@ def admin_inc_detail(krise_id):
                                opprettet=opprettet,
                                )
     else:
-        flash(f"Krise with ID {krise_id} not found", "error")
-        lang = request.args.get('lang', session.get('lang', 'no'))
-        session['lang'] = lang
+        flash(f"Krise with ID {krise_id} not found", "error", t=translations.get(lang, translations['no']), lang=lang)
+
         return redirect(url_for('admin_inc.admin_inc_list', t=translations.get(lang, translations['no']), lang=lang))
 
 @admin_inc_bp.route('/update_krise/<int:krise_id>', methods=['POST'])
@@ -47,6 +49,6 @@ def update_krise_route(krise_id):
         flash('Incident updated successfully', 'success')
     else:
         flash('Error updating incident', 'error')
-
+    
     # Redirect to the index page after update
     return redirect(url_for('index'))
