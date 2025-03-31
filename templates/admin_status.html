@@ -74,16 +74,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.statusToggleBtn').forEach(button => {
-                button.addEventListener('click', function () {
-                    const statusFields = this.closest('.flex').nextElementSibling;
-                    statusFields.style.display = (statusFields.style.display === 'block') ? 'none' : 'block';
-                });
-            });
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
             document.querySelectorAll('.statusToggleDiv').forEach(div => {
                 div.addEventListener('click', function () {
                     const statusFields = this.querySelector('.statusFields');
