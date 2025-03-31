@@ -1,9 +1,9 @@
 import sys
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify
 from sql.db_connection import connection_def
 sys.dont_write_bytecode = True
 evacuee_update_bp = Blueprint('evacuee_update', __name__, template_folder='../templates')
-
+from translations import translations
 def safe_int(value):
     """Helper function to safely convert to integer"""
     return int(value) if value and value.isdigit() else None
@@ -116,7 +116,10 @@ def handle_form():
                 evakuert_id
             ))
         conn.commit()
-        return redirect(url_for('index'))
+        
+        lang = request.args.get('lang', session.get('lang', 'no'))
+        session['lang'] = lang
+        return redirect(url_for('index', t=translations.get(lang, translations['no']), lang=lang))
     except ValueError as ve:
         conn.rollback()
         return f"Invalid input format: {str(ve)}", 400
@@ -131,6 +134,10 @@ def handle_form():
 
 @evacuee_update_bp.route('/evacuee-update/<int:evakuert_id>')
 def adminreg_with_id(evakuert_id):
+    lang = request.args.get('lang', session.get('lang', 'no'))
+    session['lang'] = lang
+    t = translations.get(lang, translations['no'])
+
     conn = connection_def()
     cursor = conn.cursor()
     try:
@@ -193,7 +200,8 @@ def adminreg_with_id(evakuert_id):
         cursor.execute("SELECT KriseID, KriseNavn FROM Krise")
         kriser = cursor.fetchall()
 
-        return render_template("evacuee_update.html", evakuert=evakuert_data, logs=logs, kriser=kriser)
+
+        return render_template("evacuee_update.html", t=t, lang=lang, evakuert=evakuert_data, logs=logs, kriser=kriser)
     
     except Exception as e:
         return f"Database error: {e}", 500

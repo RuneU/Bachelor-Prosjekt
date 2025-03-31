@@ -14,7 +14,8 @@
 </head>
 <body>
 
-	{{ navbar_component.render_navbar(navbar) }}
+	{{ navbar_component.render_navbar(navbar, t=t) }}
+
 
     <main class="container mx-auto py-10 px-6 flex-grow bg-gray-100 text-gray-800 rounded-lg">
         <!-- The form element -->
@@ -25,12 +26,12 @@
             <input type="hidden" name="status_id" value="{{ evakuert.StatusID if evakuert else '' }}">
 
 			<!-- Render Evakuertes Info Component -->
-			{{ evacuee_component.render_evacuee(evakuert) }}
+			{{ evacuee_component.render_evacuee(evakuert, t=t) }}
 
             <hr class="my-12 border-t border-gray-300">
 
 			<!-- Render Kontaktperson Info Component -->
-			{{ contact_component.render_contactperson(evakuert) }}
+			{{ contact_component.render_contactperson(evakuert, t=t) }}
 
             <div class="text-center">
                 <!-- Change the button type to "button" so it doesn't auto-submit -->

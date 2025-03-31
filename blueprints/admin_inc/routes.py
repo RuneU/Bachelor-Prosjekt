@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from blueprints.auth.auth import login_required
 from sql.db_connection import fetch_krise_by_id, update_krise, count_evakuerte_by_krise, fetch_status_counts_for_krise, count_evakuerte_same_location, count_evakuerte_different_location, fetch_krise_opprettet
+from translations import translations
 
 admin_inc_bp = Blueprint('admin_inc', __name__, template_folder='../templates')
 
@@ -28,7 +29,9 @@ def admin_inc_detail(krise_id):
                                )
     else:
         flash(f"Krise with ID {krise_id} not found", "error")
-        return redirect(url_for('admin_inc.admin_inc_list'))
+        lang = request.args.get('lang', session.get('lang', 'no'))
+        session['lang'] = lang
+        return redirect(url_for('admin_inc.admin_inc_list', t=translations.get(lang, translations['no']), lang=lang))
 
 @admin_inc_bp.route('/update_krise/<int:krise_id>', methods=['POST'])
 @login_required
