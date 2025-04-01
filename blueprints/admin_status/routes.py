@@ -22,7 +22,9 @@ def update_status_route(evakuert_id):
     status = request.form['status']
     lokasjon = request.form['lokasjon']
     update_status(evakuert_id, status, lokasjon)
-    return redirect(url_for('admin_status.admin'))
+    lang = request.args.get('lang', session.get('lang', 'no'))
+    session['lang'] = lang
+    return redirect(url_for('admin_status.admin', t=translations.get(lang, translations['no']), lang=lang))
 
 
 @admin_status_bp.route("/search", methods=["GET"])

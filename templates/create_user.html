@@ -1,79 +1,67 @@
+{% import "components/navbar_component.html" as navbar_component %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ lang }}">
 <head>
   <meta charset="UTF-8">
-  <title>Create New User</title>
+  <title>{{ t['create_user_title'] }}</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/output.css') }}">
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-white text-gray-800 font-sans flex flex-col min-h-screen">
   <!-- Navigation Bar -->
-  <nav class="bg-gray-100 shadow-md">
-    <div class="container mx-auto px-6 py-4">
-      <a href="{{ url_for('index') }}" class="text-xl font-bold text-gray-800">My App</a>
-    </div>
-  </nav>
+  {{ navbar_component.render_navbar(navbar, t=t) }}
 
   <!-- Main Content -->
   <main class="container mx-auto flex flex-col items-center justify-center flex-grow px-6 py-10">
     <div class="w-full max-w-md bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-      <h2 class="text-2xl font-bold mb-6 text-center">Create New User</h2>
+      <h2 class="text-2xl font-bold mb-6 text-center">{{ t['create_user_heading'] }}</h2>
       <form method="POST" action="{{ url_for('auth.create_user') }}">
         <div class="mb-4">
           <label class="block text-gray-700 text-sm font-bold mb-2" for="username">
-            Username
+            {{ t['create_user_username_label'] }}
           </label>
-          <input id="username" name="username" type="text" placeholder="Username"
+          <input id="username" name="username" type="text" placeholder="{{ t['create_user_username_placeholder'] }}"
                  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
         </div>
         <div class="mb-4">
           <label class="block text-gray-700 text-sm font-bold mb-2" for="email">
-            Email
+            {{ t['create_user_email_label'] }}
           </label>
-          <input id="email" name="email" type="email" placeholder="Email"
+          <input id="email" name="email" type="email" placeholder="{{ t['create_user_email_placeholder'] }}"
                  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
         </div>
         <div class="mb-4">
           <label class="block text-gray-700 text-sm font-bold mb-2" for="password">
-            Password
+            {{ t['create_user_password_label'] }}
           </label>
-          <input id="password" name="password" type="password" placeholder="Password"
+          <input id="password" name="password" type="password" placeholder="{{ t['create_user_password_placeholder'] }}"
                  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
         </div>
         <div class="mb-4">
           <label class="block text-gray-700 text-sm font-bold mb-2" for="first_name">
-            First Name
+            {{ t['create_user_first_name_label'] }}
           </label>
-          <input id="first_name" name="first_name" type="text" placeholder="First Name"
+          <input id="first_name" name="first_name" type="text" placeholder="{{ t['create_user_first_name_placeholder'] }}"
                  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
         </div>
         <div class="mb-4">
           <label class="block text-gray-700 text-sm font-bold mb-2" for="last_name">
-            Last Name
+            {{ t['create_user_last_name_label'] }}
           </label>
-          <input id="last_name" name="last_name" type="text" placeholder="Last Name"
+          <input id="last_name" name="last_name" type="text" placeholder="{{ t['create_user_last_name_placeholder'] }}"
                  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
-        </div>
-        <!-- Optionally, include a checkbox for active status -->
-        <div class="mb-6">
-          <label class="inline-flex items-center">
-            <input type="checkbox" name="active" value="1" class="form-checkbox text-blue-500" checked>
-            <span class="ml-2">Active</span>
-          </label>
         </div>
         <div class="flex items-center justify-between">
           <button class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
-            Create User
+            {{ t['create_user_button'] }}
           </button>
         </div>
       </form>
     </div>
   </main>
 
-  <!-- Footer (optional) -->
-  <footer class="bg-gray-100 text-gray-600 text-center py-4">
-    <p>&copy; 2025 My App. All rights reserved.</p>
-  </footer>
+  <!-- Include Footer Component -->
+  {% include 'footer.html' %}
   
   <script src="https://cdn.jsdelivr.net/npm/flowbite@2.5.2/dist/flowbite.min.js"></script>
 </body>

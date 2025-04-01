@@ -6,7 +6,7 @@ from flask_dance.contrib.google import make_google_blueprint, google
 from functools import wraps
 import uuid
 import os
-
+from translations import translations
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -59,13 +59,18 @@ def register_user():
                 cursor.close()
             if 'conn' in locals():
                 conn.close()
-    return render_template('register_user.html')
+            lang = request.args.get('lang', session.get('lang', 'no'))
+            session['lang'] = lang
+    return render_template('register_user.html', t=translations.get(lang, translations['no']), lang=lang)
 
 # -------------------------------
 # Normal Login Endpoint
 # -------------------------------
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
+    # Ensure `lang` is always defined
+    lang = request.args.get('lang', session.get('lang', 'no'))
+    session['lang'] = lang
     if request.method == 'POST':
         identifier = request.form.get('identifier')  # can be username or email
         password = request.form.get('password')
@@ -83,7 +88,7 @@ def login():
                 if active and check_password_hash(stored_password, password):
                     session['user_id'] = user_id
                     flash("Login successful!", "success")
-                    return redirect(url_for('admin_page'))
+                    return redirect(url_for('admin_page', lang=lang))
                 else:
                     flash("Invalid credentials or inactive account.", "error")
             else:
@@ -96,7 +101,7 @@ def login():
                 cursor.close()
             if 'conn' in locals():
                 conn.close()
-    return render_template('login.html')
+    return render_template('login.html', t=translations.get(lang, translations['no']), lang=lang)
 
 # -------------------------------
 # Logout Endpoint
@@ -167,7 +172,10 @@ def google_login():
 @auth_bp.route('/create_user', methods=['GET', 'POST'])
 @login_required
 def create_user():
-    # (Optional) You could add an admin check here if needed.
+    # Ensure `lang` is always defined
+    lang = request.args.get('lang', session.get('lang', 'no'))
+    session['lang'] = lang
+
     if request.method == 'POST':
         username   = request.form.get('username')
         email      = request.form.get('email')
@@ -190,7 +198,7 @@ def create_user():
             conn.commit()
             flash("New user created successfully!", "success")
             # Redirect to the same page or elsewhere as desired.
-            return redirect(url_for('auth.create_user'))
+            return redirect(url_for('auth.create_user', lang=lang))
         except pyodbc.Error as e:
             print(f"Error creating user: {e}")
             flash("An error occurred while creating the user.", "error")
@@ -199,4 +207,5 @@ def create_user():
                 cursor.close()
             if 'conn' in locals():
                 conn.close()
-    return render_template('create_user.html')
+
+    return render_template('create_user.html', t=translations.get(lang, translations['no']), lang=lang)

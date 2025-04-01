@@ -1,13 +1,13 @@
 {% import "components/navbar_component.html" as navbar_component %}
 {% import "components/incident_component.html" as incident_component %}
 <!DOCTYPE html>
-<html lang="no">
+<html lang="{{ lang }}">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
-    <title>Admin Side</title>
+    <title>{{ t['admin_inc_title'] }}</title>
 </head>
 
 <body>
@@ -19,15 +19,15 @@
             <input type="hidden" name="krise_id" value="{{ krise.KriseID if krise else '' }}">
 
             <!-- Krise Informasjon Section -->
-            <h1 class="text-xl font-bold mb-4">Informasjon om krisen</h1>
+            <h1 class="text-xl font-bold mb-4">{{ t['admin_inc_heading'] }}</h1>
             <h3>
-                Hendelse opprettet: <span>
+                {{ t['admin_inc_created'] }} <span>
                     {{ krise_opprettet.strftime('%Y-%m-%d %H:%M') if krise_opprettet else 'N/A' }}
                 </span>
             </h3>
             {% if krise.Status == "Ferdig" and krise.FerdigTimestamp %}
             <h3>
-                Ferdig: <span>
+                {{ t['admin_inc_finished'] }} <span>
                     {{ krise.FerdigTimestamp.strftime('%Y-%m-%d %H:%M') }}
                 </span>
             </h3>
@@ -38,20 +38,20 @@
 
             <!-- Submit Button -->
             <div class="text-center">
-                <button type="submit" class="bg-gray-700 text-white px-6 py-2 rounded">Oppdater Krise</button>
+                <button type="submit" class="bg-gray-700 text-white px-6 py-2 rounded">{{ t['admin_inc_update_button'] }}</button>
             </div>
         </form>
 
-        <h1 class="text-xl font-bold mb-4">{{ t['evak_status_label'] }}</h1>
+        <h1 class="text-xl font-bold mb-4">{{ t['admin_inc_evacuee_status_heading'] }}</h1>
         <div class="flex justify-around my-4">
             <p class="mb-4 text-lg">
-                Antall Evakuerte: <span class="font-bold">{{ evakuert_count }}</span>
+                {{ t['admin_inc_evacuee_count'] }} <span class="font-bold">{{ evakuert_count }}</span>
             </p>
             <p class="mb-4 text-lg">
-                Evakuerte på hendelse sted: <span class="font-bold">{{ same_count }}</span>
+                {{ t['admin_inc_same_location'] }} <span class="font-bold">{{ same_count }}</span>
             </p>
             <p class="mb-4 text-lg">
-                Evakuerte registert på annet sted: <span class="font-bold">{{ diff_count }}</span>
+                {{ t['admin_inc_diff_location'] }} <span class="font-bold">{{ diff_count }}</span>
             </p>
         </div>
 
@@ -59,31 +59,31 @@
 
         <!-- Status Counters Section -->
         <p class="text-center mb-4 text-lg">
-            Status blant evakuerte
+            {{ t['admin_inc_status_heading'] }}
         </p>
         <div class="flex justify-around my-4">
             <div class="bg-black text-white p-4 rounded shadow">
-                <h3 class="text-xl font-bold">Livløs</h3>
+                <h3 class="text-xl font-bold">{{ t['admin_inc_status_lifeless'] }}</h3>
                 <p class="text-3xl">{{ status_counts.get('Livløs', 0) }}</p>
             </div>
             <div class="bg-red-500 text-white p-4 rounded shadow">
-                <h3 class="text-xl font-bold">Akutt</h3>
+                <h3 class="text-xl font-bold">{{ t['admin_inc_status_critical'] }}</h3>
                 <p class="text-3xl">{{ status_counts.get('Akutt', 0) }}</p>
             </div>
             <div class="bg-yellow-500 text-white p-4 rounded shadow">
-                <h3 class="text-xl font-bold">Haster</h3>
+                <h3 class="text-xl font-bold">{{ t['admin_inc_status_urgent'] }}</h3>
                 <p class="text-3xl">{{ status_counts.get('Haster', 0) }}</p>
             </div>
             <div class="bg-green-500 text-white p-4 rounded shadow">
-                <h3 class="text-xl font-bold">Vanlig</h3>
+                <h3 class="text-xl font-bold">{{ t['admin_inc_status_normal'] }}</h3>
                 <p class="text-3xl">{{ status_counts.get('Vanlig', 0) }}</p>
             </div>
             <div class="bg-blue-500 text-white p-4 rounded shadow">
-                <h3 class="text-xl font-bold">Fysisk uskadet</h3>
+                <h3 class="text-xl font-bold">{{ t['admin_inc_status_unharmed'] }}</h3>
                 <p class="text-3xl">{{ status_counts.get('Fysisk uskadet', 0) }}</p>
             </div>
             <div class="bg-orange-500 text-white p-4 rounded shadow">
-                <h3 class="text-xl font-bold">Other</h3>
+                <h3 class="text-xl font-bold">{{ t['admin_inc_status_other'] }}</h3>
                 <p class="text-3xl">{{ status_counts.get('Other', 0) }}</p>
             </div>
         </div>
@@ -92,17 +92,17 @@
         <!-- Updated Confirmation Modal -->
         <div id="confirmationModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center">
             <div class="bg-white p-6 rounded-lg max-w-md w-full">
-                <h2 class="text-2xl font-bold mb-4">Bekreft dine opplysninger</h2>
+                <h2 class="text-2xl font-bold mb-4">{{ t['confirmation_modal_heading'] }}</h2>
                 <div id="confirmationContent" class="mb-4 overflow-auto max-h-80 text-l">
-                    <p><strong>Status:</strong> <span id="confirmStatus"></span></p>
-                    <p><strong>Situasjonstype:</strong> <span id="confirmType"></span></p>
-                    <p><strong>Navn:</strong> <span id="confirmName"></span></p>
-                    <p><strong>Lokasjon:</strong> <span id="confirmLocation"></span></p>
-                    <p><strong>Annen info:</strong> <span id="confirmInfo"></span></p>
+                    <p><strong>{{ t['confirmation_modal_status'] }}</strong> <span id="confirmStatus"></span></p>
+                    <p><strong>{{ t['confirmation_modal_type'] }}</strong> <span id="confirmType"></span></p>
+                    <p><strong>{{ t['confirmation_modal_name'] }}</strong> <span id="confirmName"></span></p>
+                    <p><strong>{{ t['confirmation_modal_location'] }}</strong> <span id="confirmLocation"></span></p>
+                    <p><strong>{{ t['confirmation_modal_info'] }}</strong> <span id="confirmInfo"></span></p>
                 </div>
                 <div class="flex justify-end">
-                    <button id="cancelButton" class="mr-2 bg-gray-300 px-4 py-2 rounded text-lg">Tilbake</button>
-                    <button id="confirmButton" class="bg-green-600 text-white px-4 py-2 rounded text-lg">Bekreft</button>
+                    <button id="cancelButton" class="mr-2 bg-gray-300 px-4 py-2 rounded text-lg">{{ t['confirmation_modal_back'] }}</button>
+                    <button id="confirmButton" class="bg-green-600 text-white px-4 py-2 rounded text-lg">{{ t['confirmation_modal_confirm'] }}</button>
                 </div>
             </div>
         </div>
