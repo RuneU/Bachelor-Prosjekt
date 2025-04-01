@@ -14,7 +14,8 @@
 </head>
 <body>
 
-	{{ navbar_component.render_navbar(navbar) }}
+	{{ navbar_component.render_navbar(navbar, t=t) }}
+
 
     <main class="container mx-auto py-10 px-6 flex-grow bg-gray-100 text-gray-800 rounded-lg">
         <!-- The form element -->
@@ -25,12 +26,12 @@
             <input type="hidden" name="status_id" value="{{ evakuert.StatusID if evakuert else '' }}">
 
 			<!-- Render Evakuertes Info Component -->
-			{{ evacuee_component.render_evacuee(evakuert) }}
+			{{ evacuee_component.render_evacuee(evakuert, t=t) }}
 
             <hr class="my-12 border-t border-gray-300">
 
 			<!-- Render Kontaktperson Info Component -->
-			{{ contact_component.render_contactperson(evakuert) }}
+			{{ contact_component.render_contactperson(evakuert, t=t) }}
 
             <div class="text-center">
                 <!-- Change the button type to "button" so it doesn't auto-submit -->
@@ -42,11 +43,11 @@
     <!-- Confirmation Modal (hidden by default) -->
     <div id="confirmationModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center">
       <div class="bg-white p-6 rounded-lg max-w-md w-full">
-        <h2 class="text-2xl font-bold mb-4">Bekreft dine opplysninger</h2>
+        <h2 class="text-2xl font-bold mb-4">{{ t['confirmation_modal_heading'] }}</h2>
         <div id="confirmationContent" class="mb-4 overflow-auto max-h-80"></div>
         <div class="flex justify-end">
-          <button id="cancelButton" class="mr-2 bg-gray-300 px-4 py-2 rounded">Tilbake</button>
-          <button id="confirmButton" class="bg-green-600 text-white px-4 py-2 rounded">Bekreft</button>
+          <button id="cancelButton" class="mr-2 bg-gray-300 px-4 py-2 rounded">{{ t['confirmation_modal_back'] }}</button>
+          <button id="confirmButton" class="bg-green-600 text-white px-4 py-2 rounded">{{ t['confirmation_modal_confirm'] }}</button>
         </div>
       </div>
     </div>

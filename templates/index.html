@@ -14,12 +14,12 @@
         <div class="container flex justify-between items-center mx-auto py-4 px-6">
             <!-- Left Section: Language Change -->
             <div class="flex space-x-4">
-                <a href="{{ url_for('index', lang='en') }}" class="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition">English</a>
-                <a href="{{ url_for('index', lang='no') }}" class="px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition">Norsk</a>
+                <a href="{{ url_for('index', lang='en') }}" class="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition">{{t['english']}}</a>
+                <a href="{{ url_for('index', lang='no') }}" class="px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition">{{t['norwegian']}}</a>
             </div>
             <!-- Right Section: Login Button -->
             <div>
-                <a href="{{ url_for('auth.login') }}" class="px-5 py-2.5 bg-blue-700 text-white rounded-lg shadow-md hover:bg-blue-800 transition">Login</a>
+                <a href="{{ url_for('auth.login') }}" class="px-5 py-2.5 bg-blue-700 text-white rounded-lg shadow-md hover:bg-blue-800 transition">{{t['login']}}</a>
 
             </div>
         </div>
@@ -42,7 +42,7 @@
             <!-- Button 2: Evacuee Update -->
             <a href="{{ url_for('evacuee_search') }}"
                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-10 px-10 rounded-lg shadow-lg text-xl flex items-center justify-center w-40 h-40">
-                Oppdater din info
+                {{ t['nav_evacuee_update'] }}
             </a>
         </div>
     </main>

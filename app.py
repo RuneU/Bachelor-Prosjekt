@@ -83,11 +83,13 @@ def admin_status_inc():
     else:
         krise_list = fetch_all_kriser(order_by)
     
+    lang = request.args.get('lang', session.get('lang', 'no'))
+    session['lang'] = lang
     return render_template(
         'admin_status_inc.html', 
         krise_list=krise_list, 
         query=query, 
-        filter_order=filter_order
+        filter_order=filter_order, t=translations.get(lang, translations['no']), lang=lang
     )
 
 @app.route("/evacuee-search", methods=["GET", "POST"])
@@ -112,9 +114,11 @@ def evacuee_search():
             return redirect(url_for("evacuee_update", evakuertID=evakuert_id))
         else:
             flash("Denne evakuertID finnes ikke.", "error")
-            return redirect(url_for("evacuee_search"))
 
-    return render_template("evacuee_search.html")
+            return redirect(url_for("evacuee_search"))
+    lang = request.args.get('lang', session.get('lang', 'no'))
+    session['lang'] = lang
+    return render_template("evacuee_search.html", t=translations.get(lang, translations['no']), lang=lang)
 
 @app.route("/evacuee-update/<int:evakuertID>")
 def evacuee_update(evakuertID):

@@ -1,27 +1,27 @@
-{% macro render_contactperson(evakuert) %}
+{% macro render_contactperson(evakuert, t={}) %}
 <!-- Kontaktperson Informasjon Section -->
-<h1 class="text-xl font-bold mb-4">Pårørende Info</h1>
+<h1 class="text-xl font-bold mb-4">{{ t['contactperson_info_heading'] }}</h1>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
     <div>
-        <label for="kon-fnavn" class="block mb-1">Fornavn:</label>
-        <input id="kon-fnavn" type="text" name="kon-fnavn" placeholder="Ola" class="border rounded p-2 w-full"
+        <label for="kon-fnavn" class="block mb-1">{{ t['contactperson_fnavn_label'] }}</label>
+        <input id="kon-fnavn" type="text" name="kon-fnavn" placeholder="{{ t['contactperson_fnavn_placeholder'] }}" class="border rounded p-2 w-full"
             value="{{ evakuert.kon_fnavn if evakuert else '' }}">
     </div>
     <div>
-        <label for="kon-mnavn" class="block mb-1">Mellomnavn:</label>
-        <input id="kon-mnavn" type="text" name="kon-mnavn" placeholder="Mellomnavn" class="border rounded p-2 w-full"
+        <label for="kon-mnavn" class="block mb-1">{{ t['contactperson_mnavn_label'] }}</label>
+        <input id="kon-mnavn" type="text" name="kon-mnavn" placeholder="{{ t['contactperson_mnavn_placeholder'] }}" class="border rounded p-2 w-full"
             value="{{ evakuert.kon_mnavn if evakuert else '' }}">
     </div>
     <div>
-        <label for="kon-enavn" class="block mb-1">Etternavn:</label>
-        <input id="kon-enavn" type="text" name="kon-enavn" placeholder="Etternavn" class="border rounded p-2 w-full"
+        <label for="kon-enavn" class="block mb-1">{{ t['contactperson_enavn_label'] }}</label>
+        <input id="kon-enavn" type="text" name="kon-enavn" placeholder="{{ t['contactperson_enavn_placeholder'] }}" class="border rounded p-2 w-full"
             value="{{ evakuert.kon_enavn if evakuert else '' }}">
     </div>
 </div>
 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
     <div>
-        <label for="kon-tlf" class="block mb-1">Telefon:</label>
-        <input id="kon-tlf" type="tel" name="kon-tlf" placeholder="📞 Telefonnummer" class="border rounded p-2 w-full"
+        <label for="kon-tlf" class="block mb-1">{{ t['contactperson_tlf_label'] }}</label>
+        <input id="kon-tlf" type="tel" name="kon-tlf" placeholder="{{ t['contactperson_tlf_placeholder'] }}" class="border rounded p-2 w-full"
             value="{{ evakuert.kon_tlf if evakuert else '' }}">
     </div>
 </div>

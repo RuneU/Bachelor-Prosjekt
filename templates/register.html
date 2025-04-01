@@ -3,20 +3,28 @@
 {% import "components/evacuee_component.html" as evacuee_component %}
 {% import "components/contactperson_component.html" as contact_component %}
 <!DOCTYPE html>
-<html lang="no">
+<html lang="{{ lang }}">
 
 <head>
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<script src="https://cdn.tailwindcss.com"></script>
-	<title>Registreringsside</title>
+	<title>{{ t['registration_page'] }}</title>
 	<link rel="stylesheet" href="{{url_for('static',filename='dist/css/output.css')}}">
 </head>
 
 <body class="min-h-screen bg-gray-150 text-black font-sans flex flex-col">
 
-	{{ navbar_component.render_navbar(navbar) }}
+	{{ navbar_component.render_navbar(navbar, t=t) }}
+
+    <!-- Language Buttons -->
+    <div class=" py-2">
+		<div class="container mx-auto flex justify-end space-x-4 px-6">
+			<a href="{{ url_for('registrer.register', lang='en') }}" class="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition">{{ t['english'] }}</a>
+			<a href="{{ url_for('registrer.register', lang='no') }}" class="px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition">{{ t['norwegian'] }}</a>
+		</div>
+    </div>
 
 	<!-- Main Content -->
 	<main class="w-full max-w-2xl bg-white self-center p-6 rounded-lg shadow-md mt-6">
@@ -26,21 +34,21 @@
 			<input type="hidden" name="status_id" value="{{ evakuert.StatusID if evakuert else '' }}">
 
 			<!-- Render Hendelse Info Component -->
-			{{ fill_component.render_incident_fill(evakuert, kriser) }}
+			{{ fill_component.render_incident_fill(evakuert, kriser, t=t) }}
 
 
 			<hr class="my-12 border-t border-gray-300">
 
 			<!-- Render Evakuertes Info Component -->
-			{{ evacuee_component.render_evacuee(evakuert) }}
+			{{ evacuee_component.render_evacuee(evakuert, t=t) }}
 
 			<hr class="my-12 border-t border-gray-300">
 
 			<!-- Render Kontaktperson Info Component -->
-			{{ contact_component.render_contactperson(evakuert) }}
+			{{ contact_component.render_contactperson(evakuert, t=t) }}
 
 			<div class="text-center">
-				<button type="submit" class="bg-green-600 text-white px-6 py-2 rounded">Bekreft</button>
+				<button type="submit" class="bg-green-600 text-white px-6 py-2 rounded">{{ t['confirm'] }}</button>
 			</div>
 		</form>
 	</main>
@@ -50,11 +58,11 @@
     <!-- Confirmation Modal -->
     <div id="confirmationModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center">
         <div class="bg-white p-6 rounded-lg max-w-md w-full">
-            <h2 class="text-2xl font-bold mb-4">Bekreft dine opplysninger</h2>
+            <h2 class="text-2xl font-bold mb-4">{{ t['confirm_your_information'] }}</h2>
             <div id="confirmationContent" class="mb-4 overflow-auto max-h-80 text-l"></div>
             <div class="flex justify-end">
-                <button id="cancelButton" class="mr-2 bg-gray-300 px-4 py-2 rounded text-lg">Tilbake</button>
-                <button id="confirmButton" class="bg-green-600 text-white px-4 py-2 rounded text-lg">Bekreft</button>
+                <button id="cancelButton" class="mr-2 bg-gray-300 px-4 py-2 rounded text-lg">{{ t['evak_back'] }}</button>
+                <button id="confirmButton" class="bg-green-600 text-white px-4 py-2 rounded text-lg">{{ t['evak_confirm'] }}</button>
             </div>
         </div>
     </div>

@@ -1,19 +1,23 @@
 import folium
 from folium.plugins import MarkerCluster
 from geopy.geocoders import Nominatim
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, session
 from blueprints.auth.auth import login_required
 from sql.db_connection import (
     fetch_krise_by_id, update_krise, count_evakuerte_by_krise, fetch_status_counts_for_krise,
     count_evakuerte_same_location, count_evakuerte_different_location, fetch_krise_opprettet,
     fetch_combined_evakuerte_status_by_krise
 )
+from translations import translations
+
 
 admin_inc_bp = Blueprint('admin_inc', __name__, template_folder='../templates')
 
 @admin_inc_bp.route('/admin-inc/<int:krise_id>')
 @login_required
 def admin_inc_detail(krise_id):
+    lang = request.args.get('lang', session.get('lang', 'no'))
+    session['lang'] = lang
     """Show details for a specific KriseID along with status counters and a map."""
     krise = fetch_krise_by_id(krise_id)
     if krise:
@@ -23,7 +27,6 @@ def admin_inc_detail(krise_id):
         same_count = count_evakuerte_same_location(krise['KriseID'], krise['Lokasjon'])
         diff_count = count_evakuerte_different_location(krise['KriseID'], krise['Lokasjon'])
         opprettet = fetch_krise_opprettet(krise['KriseID'])
-
         # Process the "Lokasjon" field: if it's coordinates, reverse geocode; if it's an address, geocode.
         location_data = krise['Lokasjon']
         geolocator = Nominatim(user_agent="my_flask_app")
@@ -102,7 +105,7 @@ def admin_inc_detail(krise_id):
             
         kart_map = m._repr_html_()  # Alternative method to get HTML
 
-        return render_template('admin_inc.html',
+        return render_template('admin_inc.html', t=translations.get(lang, translations['no']), lang=lang,
                                krise=krise,
                                evakuert_count=evakuert_count,
                                status_counts=status_counts,
@@ -113,8 +116,9 @@ def admin_inc_detail(krise_id):
                                kart_map=kart_map,
                                evakuerte_statuses=evakuerte_statuses)
     else:
-        flash(f"Krise with ID {krise_id} not found", "error")
-        return redirect(url_for('admin_inc.admin_inc_list'))
+        flash(f"Krise with ID {krise_id} not found", "error", t=translations.get(lang, translations['no']), lang=lang)
+
+        return redirect(url_for('admin_inc.admin_inc_list', t=translations.get(lang, translations['no']), lang=lang))
 
 @admin_inc_bp.route('/update_krise/<int:krise_id>', methods=['POST'])
 @login_required
@@ -130,6 +134,6 @@ def update_krise_route(krise_id):
         flash('Incident updated successfully', 'success')
     else:
         flash('Error updating incident', 'error')
-
+    
     # Redirect to the index page after update
     return redirect(url_for('admin_status_inc'))

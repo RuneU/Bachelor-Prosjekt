@@ -1,6 +1,7 @@
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify, session
 import pyodbc
 from sql.db_connection import connection_string, fetch_all_locations, fetch_all_krise_situasjon_types
+from translations import translations
 
 registrer_bp = Blueprint('registrer', __name__)
 
@@ -88,8 +89,10 @@ def register():
 
     cursor.close()
     conn.close()
+    lang = request.args.get('lang', session.get('lang', 'no'))
+    session['lang'] = lang
 
-    return render_template('register.html', 
+    return render_template('register.html', t=translations.get(lang, translations['no']), lang=lang,
                            kriser=kriser, 
                            locations=fetch_all_locations(), 
                            krise_situasjon_types=fetch_all_krise_situasjon_types())

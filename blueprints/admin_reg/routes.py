@@ -1,14 +1,17 @@
 import sys
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify, session
 from sql.db_connection import connection_def
 sys.dont_write_bytecode = True
 from blueprints.auth.auth import login_required
+from translations import translations
 admin_reg_bp = Blueprint('admin_reg', __name__, template_folder='../templates')
 
 @admin_reg_bp.route('/')
 @login_required
 def admin_reg():
-    return render_template("admin-reg.html")
+    lang = request.args.get('lang', session.get('lang', 'no'))
+    session['lang'] = lang
+    return render_template("admin-reg.html", t=translations.get(lang, translations['no']), lang=lang)
 
 def safe_int(value):
     """Helper function to safely convert to integer"""
@@ -17,6 +20,8 @@ def safe_int(value):
 @admin_reg_bp.route('/handle_form', methods=['POST'])
 @login_required
 def handle_form():
+    lang = request.args.get('lang', session.get('lang', 'no'))
+    session['lang'] = lang
     conn = None
     cursor = None
     try:
@@ -146,7 +151,7 @@ def handle_form():
                 evakuert_id
             ))
         conn.commit()
-        return redirect(url_for('admin_status.admin'))
+        return redirect(url_for('admin_status.admin', t=translations.get(lang, translations['no']), lang=lang))
     except ValueError as ve:
         conn.rollback()
         return f"Invalid input format: {str(ve)}", 400
@@ -235,8 +240,9 @@ def adminreg_with_id(evakuert_id):
         # Also fetch all crisis records for the dropdown.
         cursor.execute("SELECT KriseID, KriseNavn FROM Krise")
         kriser = cursor.fetchall()
-
-        return render_template("admin-reg.html", evakuert=evakuert_data, logs=logs, kriser=kriser)
+        lang = request.args.get('lang', session.get('lang', 'no'))
+        session['lang'] = lang
+        return render_template("admin-reg.html", evakuert=evakuert_data, logs=logs, kriser=kriser, t=translations.get(lang, translations['no']), lang=lang)
     
     except Exception as e:
         return f"Database error: {e}", 500
