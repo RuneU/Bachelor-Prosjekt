@@ -32,7 +32,7 @@
                 </span>
             </h3>
             {% endif %}
-        
+
 
             {{ incident_component.render_incident(evakuert, krise, t=t) }}
 
@@ -41,6 +41,47 @@
                 <button type="submit" class="bg-gray-700 text-white px-6 py-2 rounded">{{ t['admin_inc_update_button'] }}</button>
             </div>
         </form>
+
+
+        <h1 class="text-xl font-bold mb-4">{{ t['admin_inc_evacuee_status_heading'] }}</h1>
+
+        <!-- Embed the dynamically generated map -->
+        <div class="flex items-center justify-center h-screen border border-gray-300 shadow-lg">
+            {{ kart_map | safe }}
+        </div>
+
+        <hr class="my-12 border-t border-gray-300">
+
+        <!-- Evakuerte Status Table -->
+        <div class="relative overflow-x-auto shadow-md sm:rounded-lg mb-8">
+            <table class="w-full text-sm text-left text-gray-500">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3">Navn</th>
+                        <th scope="col" class="px-6 py-3">Status</th>
+                        <th scope="col" class="px-6 py-3">Lokasjon</th>
+                        <th scope="col" class="px-6 py-3">Rediger</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in evakuerte_statuses %}
+                    <tr class="odd:bg-white even:bg-gray-50 border-b">
+                        <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
+                            {{ record.FullName }}
+                        </th>
+                        <td class="px-6 py-4">{{ record.Status }}</td>
+                        <td class="px-6 py-4">{{ record.Lokasjon }}</td>
+                        <td class="px-6 py-4">
+                            <a href="{{ url_for('admin_reg.adminreg_with_id', evakuert_id=record.EvakuertID) }}"
+                               class="font-medium text-blue-600 hover:underline">
+                                Rediger
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
         <h1 class="text-xl font-bold mb-4">{{ t['admin_inc_evacuee_status_heading'] }}</h1>
         <div class="flex justify-around my-4">
@@ -90,7 +131,8 @@
 
 
         <!-- Updated Confirmation Modal -->
-        <div id="confirmationModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center">
+        <div id="confirmationModal"
+            class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center">
             <div class="bg-white p-6 rounded-lg max-w-md w-full">
                 <h2 class="text-2xl font-bold mb-4">{{ t['confirmation_modal_heading'] }}</h2>
                 <div id="confirmationContent" class="mb-4 overflow-auto max-h-80 text-l">
