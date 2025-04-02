@@ -1,5 +1,7 @@
 import os
 import sys
+import folium
+import json
 import requests
 from io import BytesIO
 import cv2
@@ -13,7 +15,6 @@ from datetime import datetime
 from flask import Flask, Response, request, render_template, jsonify, redirect, url_for, session, send_from_directory
 sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
 from sql.db_connection import connection_string
-from blueprints.admin_reg import admin_reg_bp
 from dotenv import load_dotenv
 import logging
 from translations import translations
@@ -75,6 +76,132 @@ def get_db_connection():
 @app.route("/startID")
 def startID():
     return render_template("startID.html")
+
+
+
+@app.route("/gps")
+def gps_map():
+    LOCATION_FILE = "location.json"
+    lat, lon = 59.9139, 10.7522  # Default (Oslo)
+
+    try:
+        with open(LOCATION_FILE, "r") as f:
+            loc = json.load(f)
+            lat = loc.get("lat", lat)
+            lon = loc.get("lon", lon)
+    except Exception as e:
+        logger.warning(f"Location load error: {e}")
+
+    return render_template("gps_map.html", lat=lat, lon=lon)
+
+
+@app.route("/update_location", methods=["POST"])
+def update_location():
+    LOCATION_FILE = "location.json"
+    try:
+        data = request.get_json()
+        lat = float(data["lat"])
+        lon = float(data["lon"])
+
+        # Reverse Geocode using Nominatim
+        response = requests.get(
+            "https://nominatim.openstreetmap.org/reverse",
+            params={
+                "format": "json",
+                "lat": lat,
+                "lon": lon,
+                "zoom": 18,
+                "addressdetails": 1
+            },
+            headers={"User-Agent": "EvakueringApp"}
+        )
+        result = response.json()
+        address = result.get("address", {})
+
+        # Extract desired parts
+        house_number = address.get("house_number", "")
+        road = address.get("road", "")
+        city = address.get("city") or address.get("town") or address.get("village", "")
+        county = address.get("state", "")           # 'Agder' etc.
+        postcode = address.get("postcode", "")
+        country = address.get("country", "")
+
+        # Combine parts into readable string
+        parts = []
+
+        if road:
+            street = f"{road} {house_number}".strip()
+            parts.append(street)
+
+        if city:
+            parts.append(city)
+
+        if county:
+            parts.append(county)
+
+        if postcode:
+            parts.append(postcode)
+
+        if country:
+            parts.append(country)
+
+        location_name = ", ".join(parts)
+
+        # Fallback if everything missing
+        if not location_name:
+            location_name = f"{lat:.6f}, {lon:.6f}"
+
+        # Save to JSON
+        with open(LOCATION_FILE, "w") as f:
+            json.dump({
+                "lat": lat,
+                "lon": lon,
+                "location_name": location_name
+            }, f)
+
+        return jsonify({"status": "ok", "location_name": location_name})
+    
+    except Exception as e:
+        print("❌ Error updating location:", e)
+        return jsonify({"status": "error", "message": str(e)}), 500
+
+
+@app.route('/get_user_info', methods=['GET'])
+def get_user_info():
+    """Fetch user info based on EvakuertID."""
+    evakuert_id = request.args.get('evakuert_id')
+
+    if not evakuert_id:
+        return jsonify({"error": "Evakuert ID is required"}), 400
+
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        query = """
+            SELECT Fornavn, MellomNavn, Etternavn, Telefonnummer, Adresse
+            FROM Evakuerte
+            WHERE EvakuertID = ?
+        """
+        cursor.execute(query, (evakuert_id,))
+        row = cursor.fetchone()
+        conn.close()
+
+        if row:
+            user_data = {
+                "fornavn": row[0],
+                "mellomnavn": row[1] if row[1] else "",
+                "etternavn": row[2],
+                "telefonnummer": row[3] if row[3] else "",
+                "adresse": row[4] if row[4] else "",
+            }
+            return jsonify(user_data)
+        else:
+            return jsonify({"error": "User not found"}), 404
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
 
 
 @app.route('/set_user_id', methods=['POST'])
@@ -168,6 +295,10 @@ def finish():
 @app.route("/newuser")
 def newuser():
     return render_template("newuser.html")
+
+@app.route("/olduser")
+def olduser():
+    return render_template("olduser.html")
 
 @app.route("/iot_login")
 def iot_login():
@@ -277,7 +408,7 @@ def find_best_match(face_encoding, known_face_encodings, known_face_ids, known_f
      threshold = 0.6
      logger.debug(f"Best match distance: {best_distance} (threshold: {threshold})")
     
-     if best_distance < threshold:
+     if best_distance == threshold:
          logger.debug(f"Match found: EvakuertID={known_face_ids[best_match_index]}, Name={known_face_names[best_match_index]}")
          return known_face_ids[best_match_index], known_face_names[best_match_index], best_distance
      return None, None, None
@@ -357,6 +488,7 @@ def register():
 
     return render_template('RFIDregister.html', evakuert_id=session["evakuert_id"])
 
+
 @app.route('/api/scan', methods=['GET'])
 def api_scan():
     """Scans an RFID card and links it to the EvakuertID in session."""
@@ -364,21 +496,25 @@ def api_scan():
         return jsonify({'error': 'No EvakuertID found in session'})
 
     scan_result = scan_rfid()
-    if "uid" in scan_result:
-        uid = scan_result["uid"]  # This is the scanned RFID UID
+
+    # ✅ Handle plain string UID returned from scan_rfid()
+    if isinstance(scan_result, str):
+        uid = scan_result
         evakuert_id = session["evakuert_id"]
 
         conn = get_db_connection()
         if conn:
             cursor = conn.cursor()
-            
-            # Store the scanned RFID in `ChipID`
             cursor.execute("UPDATE RFID SET ChipID = ? WHERE EvakuertID = ?", (uid, evakuert_id))
             conn.commit()
             conn.close()
 
-        return jsonify({'message': f'RFID {uid} linked to EvakuertID {evakuert_id}'})
+        return jsonify({
+            'message': f'RFID {uid} linked to EvakuertID {evakuert_id}',
+            'uid': uid
+        })
 
+    # If scan_result is already a dictionary with an error, return it as-is
     return jsonify(scan_result)
 
 
@@ -412,15 +548,281 @@ def register_new_rfid():
 
 
 
-@app.route('/api/scan_rfid', methods=['GET'])
+@app.route("/api/scan_rfid")
 def api_scan_rfid():
-    """API endpoint to scan an RFID card and get its history."""
-    return jsonify(scan_rfid_with_history())
+    result = scan_rfid()  # or scan_rfid_with_logging()
+    return jsonify(result)
 
 
-@app.route("/scan_rfid")
-def scan_rfid():
-    return render_template("scan_rfid.html")
+
+
+@app.route("/scan_location")
+def scan_location():
+    return render_template("scan_location.html")
+
+
+
+
+
+
+
+
+
+
+
+
+from flask import Flask, request, jsonify, session, render_template, redirect, url_for, send_file
+from pyfingerprint.pyfingerprint import PyFingerprint
+from PIL import Image  # For converting BMP to PNG
+import time
+
+
+
+# --------------
+# HTML ROUTES
+# --------------
+
+
+@app.route('/fingerSensor')
+def finger_sensor_page():
+    return render_template("finger_sensor.html")
+
+@app.route('/fingerRegister')
+def finger_register_page():
+    return render_template("fingerRegister.html")
+
+@app.route('/fingerLogin')
+def finger_login_page():
+    return render_template("fingerLogin.html")
+
+# -------------------------
+# Start Fingerprint Registration
+# -------------------------
+@app.route('/start_register', methods=['POST'])
+def start_register():
+    try:
+        f = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
+
+        while not f.readImage():
+            pass
+
+        f.convertImage(0x01)
+        result = f.searchTemplate()
+        positionNumber = result[0]
+
+        if positionNumber == 0:
+            return jsonify({"status": "Fingerprint already exists at position " + str(positionNumber)})
+
+        return jsonify({"status": "Place the same finger again"}), 202
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# -------------------------
+# Confirm Fingerprint Registration
+# -------------------------
+@app.route('/confirm_register', methods=['POST'])
+def confirm_register():
+    try:
+        f = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
+
+        timeout = time.time() + 10
+        while not f.readImage():
+            if time.time() > timeout:
+                raise Exception("Timed out waiting for finger")
+
+        f.convertImage(0x02)
+
+        if f.compareCharacteristics() == 0:
+            return jsonify({"error": "Fingers do not match"}), 400
+
+        f.createTemplate()
+        positionNumber = f.storeTemplate()
+
+        return jsonify({"status": "Fingerprint registered", "evakuert_id": positionNumber})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+# ------------------------
+# Start Fingerprint Verification
+# -------------------------
+@app.route('/start_verify', methods=['POST'])
+def start_verify():
+    try:
+        f = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
+
+        if not f.verifyPassword():
+            raise Exception("Sensor password invalid")
+
+        timeout = time.time() + 10
+        while not f.readImage():
+            if time.time() > timeout:
+                raise Exception("Timed out waiting for finger")
+
+        f.convertImage(0x01)
+        result = f.searchTemplate()
+        positionNumber = result[0]
+        accuracy = result[1]
+
+        if positionNumber == -1:
+            return jsonify({"status": "No match found"}), 404
+
+        session['evakuert_id'] = positionNumber
+        return jsonify({
+            "status": "Match found",
+            "evakuert_id": positionNumber,
+            "accuracy": accuracy
+        })
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+
+
+# -------------------------
+# Capture Fingerprint Image
+# -------------------------
+@app.route('/capture_fingerprint_image')
+def capture_fingerprint_image():
+    try:
+        sensor = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
+
+        if not sensor.verifyPassword():
+            raise Exception('Incorrect sensor password')
+
+        timeout = time.time() + 1
+        while not sensor.readImage():
+            if time.time() > timeout:
+                return jsonify({'error': 'Timed out waiting for finger'}), 408
+
+        # Create image folder if needed
+        base_dir = "fingerprints"
+        os.makedirs(base_dir, exist_ok=True)
+
+        # Use timestamp or session evakuert_id if available
+        evakuert_id = session.get("evakuert_id")
+        if evakuert_id:
+            filename = f"fingerprint_{evakuert_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        else:
+            filename = f"fingerprint_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+
+        bmp_path = os.path.join(base_dir, f"{filename}.bmp")
+        png_path = os.path.join(base_dir, f"{filename}.png")
+
+        sensor.downloadImage(bmp_path)
+
+        img = Image.open(bmp_path)
+        img.save(png_path)
+
+        return jsonify({
+            "status": "Image captured",
+            "url": f"/finger_image/{filename}.png"
+        })
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+
+
+from flask import session, jsonify, send_from_directory
+from pyfingerprint.pyfingerprint import PyFingerprint
+from datetime import datetime
+import os, time
+from PIL import Image
+import cv2
+import numpy as np
+
+@app.route('/recognize_fingerprint')
+def recognize_fingerprint():
+    try:
+        # 1. Connect to fingerprint sensor
+        sensor = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
+        if not sensor.verifyPassword():
+            raise Exception('Incorrect sensor password')
+
+        # 2. Wait for finger (timeout after 10s)
+        timeout = time.time() + 10
+        while not sensor.readImage():
+            if time.time() > timeout:
+                return jsonify({'error': 'Timed out waiting for finger'}), 408
+
+        # 3. Save scanned image with generic name
+        base_dir = "fingerprints"
+        os.makedirs(base_dir, exist_ok=True)
+
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        generic_filename = f"scan_{timestamp}"
+        bmp_path = os.path.join(base_dir, f"{generic_filename}.bmp")
+        png_path = os.path.join(base_dir, f"{generic_filename}.png")
+
+        sensor.downloadImage(bmp_path)
+        Image.open(bmp_path).save(png_path)
+
+        # 4. Use ORB to match against stored images
+        orb = cv2.ORB_create()
+        live_img = cv2.imread(png_path, 0)
+        kp1, des1 = orb.detectAndCompute(live_img, None)
+
+        best_match = None
+        best_score = float('inf')
+        matched_id = None
+
+# Denne delen av koden m[ endres p[ for [ gj;re det beder]]]
+        
+        for file in os.listdir(base_dir):
+            if file.endswith(".png") and "fingerprint_" in file:
+                template_path = os.path.join(base_dir, file)
+                template_img = cv2.imread(template_path, 0)
+                kp2, des2 = orb.detectAndCompute(template_img, None)
+
+                if des1 is not None and des2 is not None:
+                    bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
+                    matches = bf.match(des1, des2)
+                    matches = sorted(matches, key=lambda x: x.distance)
+
+                    score = sum([m.distance for m in matches[:10]])  # Lower = better
+                    if score < best_score:
+                        best_score = score
+                        best_match = file
+                        # Extract evakuert_id from filename: fingerprint_<id>_timestamp.png
+                        try:
+                            matched_id = file.split("_")[1]
+                        except:
+                            matched_id = None
+
+        if best_match and matched_id:
+            # 🔎 Fetch user's name from the database
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("SELECT Fornavn, MellomNavn, Etternavn FROM Evakuerte WHERE EvakuertID = ?", (matched_id,))
+            user_row = cursor.fetchone()
+            conn.close()
+
+            if user_row:
+                fornavn, mellomnavn, etternavn = user_row
+                fullt_navn = f"{fornavn} {mellomnavn + ' ' if mellomnavn else ''}{etternavn}"
+            else:
+                fullt_navn = "Ukjent navn"
+
+            session['evakuert_id'] = matched_id  # Store ID in session
+            return jsonify({
+                "status": "Match found",
+                "evakuert_id": matched_id,
+                "navn": fullt_navn,
+                "matched_file": best_match
+            })
+        
+    except Exception as e:
+        print("[ERROR]", e)
+        return jsonify({'error': str(e)}), 500
+    
+
+@app.route('/finger_image/<filename>')
+def serve_fingerprint_image(filename):
+    file_path = os.path.join("fingerprints", filename)
+    if os.path.exists(file_path):
+        return send_file(file_path, mimetype='image/png')
+    return jsonify({'error': 'File not found'}), 404
 
 
 

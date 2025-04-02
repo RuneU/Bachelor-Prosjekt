@@ -6,6 +6,7 @@ from datetime import datetime
 from sql.db_connection import connection_string
 from rfid_receiver import get_rfid_uid  
 from flask import Flask, Response, request, render_template, jsonify, redirect, url_for, session, send_from_directory
+import json
 
 
 # Configure Serial Communication (Arduino)
@@ -62,6 +63,22 @@ def RFIDregister(evakuert_id, chip_id):
     finally:
         conn.close()
 
+import json
+from datetime import datetime
+
+def read_location_from_file():
+    try:
+        with open("location.json", "r") as f:
+            loc = json.load(f)
+            location_name = loc.get("location_name")
+            if location_name:
+                return location_name
+    except Exception as e:
+        print(f"⚠️ Failed to read location.json: {e}")
+    return "Ukjent"
+
+
+
 def scan_rfid():
     """Scans an RFID card, links it to an EvakuertID if new, updates location, and logs scans."""
     print("🔄 Scanning RFID card...")
@@ -73,21 +90,33 @@ def scan_rfid():
     print(f"✅ RFID Scanned: {rfid_uid}")
 
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    location = "Safe Zone"  # Adjust based on Raspberry Pi site
+    location = read_location_from_file()
 
     # Check if RFID UID is already linked to an EvakuertID
     evakuert_id = get_evakuert_id_by_chipid(rfid_uid)
 
     if evakuert_id:
-        # Log location update
+        # 🧠 Fetch name from database
+        conn = connect_db()
+        cursor = conn.cursor()
+        cursor.execute("SELECT Fornavn, Etternavn FROM Evakuerte WHERE EvakuertID = ?", (evakuert_id,))
+        row = cursor.fetchone()
+        conn.close()
+
+        fornavn = row[0] if row else "Ukjent"
+        etternavn = row[1] if row else ""
+
+        # 📍 Log location update
         log_location_change(evakuert_id, location)
+
         return {
-            'message': 'RFID already linked to an evacuee.',
-            'uid': rfid_uid,
-            'evakuert_id': evakuert_id,
-            'timestamp': timestamp,
-            'location': location,
-            'history': get_location_history(evakuert_id)
+            "message": "RFID already linked to an evacuee.",
+            "rfid_uid": rfid_uid,
+            "evakuert_id": evakuert_id,
+            "fornavn": fornavn,
+            "etternavn": etternavn,
+            "location": location,
+            "location_history": get_location_history(evakuert_id)
         }
 
     # RFID is new, check if the user in session already has an RFID
@@ -121,7 +150,6 @@ def scan_rfid():
         }
 
     return {"error": "Database connection failed. Could not register RFID."}
-
 
 
 def get_evakuert_id_by_chipid(chip_id):
@@ -203,31 +231,83 @@ def scan_rfid_with_history():
 
 
 
-# Log location change
+def get_current_location():
+    """Read location from location.json"""
+    with open("location.json", "r") as f:
+        loc = json.load(f)
+    return f"{loc['lat']}, {loc['lon']}"
+
+def connect_db():
+    return pyodbc.connect(connection_string)
+
+def get_evakuert_id_by_chipid(chipid):
+    """Return EvakuertID from RFID chip"""
+    conn = connect_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT EvakuertID FROM RFID WHERE ChipID = ?", (chipid,))
+    row = cursor.fetchone()
+    conn.close()
+    return row[0] if row else None
+
 def log_location_change(evakuert_id, new_location):
     conn = connect_db()
-    if conn:
-        cursor = conn.cursor()
-        cursor.execute("SELECT Lokasjon FROM Status WHERE EvakuertID = ?", (evakuert_id,))
-        row = cursor.fetchone()
-        old_location = row[0] if row else "Unknown"
+    cursor = conn.cursor()
 
-        cursor.execute("INSERT INTO Lokasjon_log (evakuert_id, old_lokasjon, new_lokasjon, change_date) VALUES (?, ?, ?, GETDATE())", 
-                       (evakuert_id, old_location, new_location))
-        cursor.execute("UPDATE Status SET Lokasjon = ? WHERE EvakuertID = ?", (new_location, evakuert_id))
+    # Check if status exists
+    cursor.execute("SELECT Lokasjon, StatusID FROM Status WHERE EvakuertID = ?", (evakuert_id,))
+    row = cursor.fetchone()
+
+    if row:
+        old_location, status_id = row
+    else:
+        old_location = "Ukjent"
+        cursor.execute("INSERT INTO Status (EvakuertID, Lokasjon, Status) VALUES (?, ?, 'Aktiv')", (evakuert_id, new_location))
         conn.commit()
-        conn.close()
+        cursor.execute("SELECT StatusID FROM Status WHERE EvakuertID = ?", (evakuert_id,))
+        status_id = cursor.fetchone()[0]
 
-# Get location history
+    # Log location change
+    cursor.execute("""
+        INSERT INTO Lokasjon_log (status_id, evakuert_id, old_lokasjon, new_lokasjon)
+        VALUES (?, ?, ?, ?)
+    """, (status_id, evakuert_id, old_location, new_location))
+
+    # Update current status
+    cursor.execute("UPDATE Status SET Lokasjon = ? WHERE EvakuertID = ?", (new_location, evakuert_id))
+
+    conn.commit()
+    conn.close()
+
 def get_location_history(evakuert_id):
     conn = connect_db()
-    if conn:
-        cursor = conn.cursor()
-        cursor.execute("SELECT change_date, old_lokasjon, new_lokasjon FROM Lokasjon_log WHERE evakuert_id = ? ORDER BY change_date DESC", (evakuert_id,))
-        history = cursor.fetchall()
-        conn.close()
-        return [{'timestamp': row[0], 'from': row[1], 'to': row[2]} for row in history]
-    return []
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT CONVERT(VARCHAR, change_date, 120) AS timestamp, old_lokasjon, new_lokasjon
+        FROM Lokasjon_log
+        WHERE evakuert_id = ?
+        ORDER BY change_date DESC
+    """, (evakuert_id,))
+    rows = cursor.fetchall()
+    conn.close()
+    return [{"timestamp": r[0], "from": r[1], "to": r[2]} for r in rows]
+
+def scan_rfid_with_logging():
+    # Fake for now — replace with real serial or scanning logic
+    chip_id = "04A1B2C3D4"  # Simulated read
+    evakuert_id = get_evakuert_id_by_chipid(chip_id)
+    if not evakuert_id:
+        return {"error": "RFID not recognized."}
+
+    location = get_current_location()
+    log_location_change(evakuert_id, location)
+    history = get_location_history(evakuert_id)
+
+    return {
+        "rfid_uid": chip_id,
+        "evakuert_id": evakuert_id,
+        "location": location,
+        "location_history": history
+    }
 
 
 if __name__ == "__main__":
