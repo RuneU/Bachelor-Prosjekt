@@ -8,6 +8,8 @@ incident_creation_bp = Blueprint('incident_creation', __name__)
 @incident_creation_bp.route('/handle_incident', methods=['POST'])
 @login_required
 def handle_incident():
+    lang = request.args.get('lang', session.get('lang', 'no'))
+    session['lang'] = lang
     try:
         status = request.form.get('krise-status')
         krise_situasjon_type = request.form.get('krise-type') 
@@ -23,14 +25,12 @@ def handle_incident():
             print('Krise opprettet vellykket!', 'success')
         else:
             print('Feil ved opprettelse av krise', 'error')
-        lang = request.args.get('lang', session.get('lang', 'no'))
-        session['lang'] = lang
         return redirect(url_for('index', t=translations.get(lang, translations['no']), lang=lang))
     
     except Exception as e:
         print(f"Error: {str(e)}")
         print('En uventet feil oppsto', 'error')
-        return redirect(url_for('incident_creation.incident_creation'))
+        return redirect(url_for('incident_creation.incident_creation', t=translations.get(lang, translations['no']), lang=lang))
 
 
 @incident_creation_bp.route('/incident_creation', methods=['GET', 'POST'])
@@ -38,4 +38,5 @@ def handle_incident():
 def incident_creation():
     lang = request.args.get('lang', session.get('lang', 'no'))
     session['lang'] = lang
-    return render_template('incident_creation.html', t=translations.get(lang, translations['no']), lang=lang)
+    t = translations.get(lang, translations['no'])
+    return render_template('incident_creation.html', t=t, lang=lang)
