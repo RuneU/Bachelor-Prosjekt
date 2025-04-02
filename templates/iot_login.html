@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="no">
+<html lang="{{ lang }}">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Logg Inn</title>
+  <title>{{ t['iot_login_title'] }}</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .hover-effect:hover {
@@ -19,10 +19,10 @@
     <!-- Title and Back Button Row -->
     <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4 md:gap-0">
       <button onclick="history.back()" class="bg-gray-700 hover:bg-gray-800 text-white px-5 py-2 rounded-lg font-semibold shadow-md">
-        ← Tilbake
+        ← {{ t['iot_login_back'] }}
       </button>
       <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 text-center md:text-left">
-        Velg hvordan du vil logge inn
+        {{ t['iot_login_heading'] }}
       </h1>
     </div>
 
@@ -31,32 +31,32 @@
       <!-- Option 1: Bare Fjes -->
       <button onclick="handleButtonClick('bare_fjes')"
               class="hover-effect bg-green-600 hover:bg-green-700 text-white text-left p-6 shadow-lg rounded-xl flex items-center space-x-5 w-full transition">
-        <img class="w-16 h-16" src="{{ url_for('static', filename='img/smile.png') }}" alt="Smile Icon">
+        <img class="w-16 h-16" src="{{ url_for('static', filename='img/smile.png') }}" alt="{{ t['iot_login_face_alt'] }}">
         <div>
-          <h2 class="text-2xl font-bold">Med ansikt</h2>
-          <p class="text-sm">Logg inn med kun ansiktsgjenkjenning</p>
+          <h2 class="text-2xl font-bold">{{ t['iot_login_face_title'] }}</h2>
+          <p class="text-sm">{{ t['iot_login_face_description'] }}</p>
         </div>
       </button>
 
       <!-- Option 2: Bare Finger -->
       <button onclick="handleButtonClick('bare_finger')"
               class="hover-effect bg-purple-600 hover:bg-purple-700 text-white text-left p-6 shadow-lg rounded-xl flex items-center space-x-5 w-full transition">
-        <img class="w-16 h-16" src="{{ url_for('static', filename='img/fingerprint.png') }}" alt="Fingerprint Icon">
+        <img class="w-16 h-16" src="{{ url_for('static', filename='img/fingerprint.png') }}" alt="{{ t['iot_login_fingerprint_alt'] }}">
         <div>
-          <h2 class="text-2xl font-bold">Med Finger</h2>
-          <p class="text-sm">Logg inn med kun fingeravtrykk</p>
+          <h2 class="text-2xl font-bold">{{ t['iot_login_fingerprint_title'] }}</h2>
+          <p class="text-sm">{{ t['iot_login_fingerprint_description'] }}</p>
         </div>
       </button>
     </div>
 
-    <!-- Message for users without biometri -->
+    <!-- Message for users without biometrics -->
     <div class="mt-10 text-center">
       <p class="text-gray-700 text-lg mb-4">
-        Hvis du ikke har registrert ansikt eller finger fra før av:
+        {{ t['iot_login_no_biometrics_message'] }}
       </p>
       <button onclick="handleButtonClick('ingenting')"
               class="hover-effect bg-amber-500 hover:bg-amber-600 text-white px-6 py-3 rounded-lg font-semibold shadow-md transition">
-        Trykk her
+        {{ t['iot_login_no_biometrics_button'] }}
       </button>
     </div>
 
@@ -77,7 +77,7 @@
           url = "{{ url_for('noID') }}";
           break;
         default:
-          alert("Ugyldig valg");
+          alert("{{ t['iot_login_invalid_choice'] }}");
           return;
       }
 
