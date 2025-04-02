@@ -1,0 +1,58 @@
+{% macro render_incident_fill(evakuert, kriser, t={}) %}
+<!-- Krise Informasjon Section -->
+<section id="krise-inf-section">
+    <h1 class="text-xl font-bold mb-4">{{ t['incident_info_heading'] }}</h1>
+    <div class="mb-6">
+        <label for="krise-status" class="text-center block font-bold mb-2">{{ t['incident_status_label'] }}</label>
+        <div class="relative flex justify-center">
+            <button id="krise-status" type="button"
+                class="h-10.5 w-full px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition readonly">
+                {{ evakuert.krise_status if evakuert and evakuert.krise_status else t['incident_status_placeholder'] }}
+            </button>
+            <ul id="kriseDropdownMenu"
+                class="absolute top-0 left-0 w-full bg-white border border-gray-300 rounded-md shadow-lg z-50 hidden">
+                <li class="h-12 px-4 py-2 text-sm text-center hover:bg-gray-200 cursor-pointer" data-value="{{ t['incident_status_new'] }}">{{ t['incident_status_new'] }}</li>
+                <li class="h-12 px-4 py-2 border-t-2 border-gray-400 text-sm text-center hover:bg-gray-200 cursor-pointer" data-value="{{ t['incident_status_ongoing'] }}">{{ t['incident_status_ongoing'] }}</li>
+                <li class="h-12 px-4 py-2 border-t-2 border-gray-400 text-sm text-center hover:bg-gray-200 cursor-pointer" data-value="{{ t['incident_status_finished'] }}">{{ t['incident_status_finished'] }}</li>
+            </ul>
+            <input type="hidden" id="selected-krise-status" name="krise-status" value="{{ evakuert.krise_status if evakuert and evakuert.krise_status else '' }}">
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div>
+            <label for="krise-type" class="block mb-1">{{ t['incident_type_label'] }}</label>
+            <input type="text" id="krise-type" name="krise-type" placeholder="{{ t['incident_type_placeholder'] }}" readonly
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                value="{{ evakuert.krise_type if evakuert else '' }}">
+        </div>
+        <div>
+            <label for="krise-navn-dropdown" class="block mb-1">{{ t['incident_name_label'] }}</label>
+                <div class="relative">
+                    <button id="krise-navn-dropdown" type="button"
+                        class="h-10.5 w-full px-4 py-2 bg-white text-black border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 transition">
+                        {{ evakuert.krise_navn if evakuert and evakuert.krise_navn else t['incident_name_placeholder'] }}
+                </button>
+                <ul id="krise-navn-menu"
+                    class="hidden absolute mt-2 w-full bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 max-h-60 overflow-auto">
+                    {% for k in kriser %}
+                    <li class="px-4 py-2 hover:bg-gray-200 cursor-pointer" data-id="{{ k[0] }}" data-name="{{ k[1] }}">
+                        {{ k[1] }}
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <!-- Hidden inputs to submit the chosen KriseID and KriseNavn -->
+            <input type="hidden" name="krise_id" id="krise_id" value="{{ evakuert.KriseID if evakuert else '' }}">
+            <input type="hidden" name="krise-navn" id="krise-navn"
+                value="{{ evakuert.krise_navn if evakuert else '' }}">
+        </div>
+        <div class="mb-6">
+            <label for="krise-lokasjon" class="block mb-1">{{ t['incident_location_label'] }}</label>
+            <input type="text" id="krise-lokasjon" name="krise-lokasjon" placeholder="{{ t['incident_location_placeholder'] }}" readonly
+                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5"
+                value="{{ evakuert.krise_lokasjon if evakuert else '' }}">
+        </div>
+    </div>
+</section>
+{% endmacro %}

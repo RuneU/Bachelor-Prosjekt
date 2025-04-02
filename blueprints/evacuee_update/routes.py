@@ -1,41 +1,24 @@
 import sys
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify, session
+from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify
 from sql.db_connection import connection_def
 sys.dont_write_bytecode = True
-from blueprints.auth.auth import login_required
+evacuee_update_bp = Blueprint('evacuee_update', __name__, template_folder='../templates')
 from translations import translations
-admin_reg_bp = Blueprint('admin_reg', __name__, template_folder='../templates')
-
-@admin_reg_bp.route('/')
-@login_required
-def admin_reg():
-    lang = request.args.get('lang', session.get('lang', 'no'))
-    session['lang'] = lang
-    return render_template("admin-reg.html", t=translations.get(lang, translations['no']), lang=lang)
-
 def safe_int(value):
     """Helper function to safely convert to integer"""
     return int(value) if value and value.isdigit() else None
 
-@admin_reg_bp.route('/handle_form', methods=['POST'])
-@login_required
+@evacuee_update_bp.route('/handle_form', methods=['POST'])
 def handle_form():
-    lang = request.args.get('lang', session.get('lang', 'no'))
-    session['lang'] = lang
     conn = None
     cursor = None
     try:
         form_data = {
             'evakuert_id': request.form.get('evakuert_id'),
-            'krise_id': request.form.get('krise_id'),
+            'krise_id': request.form.get('krise_id'), 
             'kontakt_person_id': request.form.get('kontakt_person_id'),
             'status_id': request.form.get('status_id'),
             'status': request.form.get('status'),
-            'krise_status': request.form.get('krise-status'),
-            'krise_type': request.form.get('krise-type'),
-            'krise_navn': request.form.get('krise-navn'),
-            'krise_lokasjon': request.form.get('krise-lokasjon'),
-            'annen_info': request.form.get('annen-info'),
             'evak_fnavn': request.form.get('evak-fnavn'),
             'evak_mnavn': request.form.get('evak-mnavn'),
             'evak_enavn': request.form.get('evak-enavn'),
@@ -48,8 +31,9 @@ def handle_form():
             'kon_tlf': request.form.get('kon-tlf')
         }
 
-        if not all([form_data['krise_lokasjon'], form_data['status']]):
-            return "Lokasjon and Status are required fields", 400
+        # Validate required fields
+        if not form_data['status']:
+            return "Status is a required field", 400
 
         conn = connection_def()
         cursor = conn.cursor()
@@ -60,18 +44,10 @@ def handle_form():
         is_update = form_data['evakuert_id'] and form_data['evakuert_id'].isdigit()
         if is_update:
             evakuert_id = safe_int(form_data['evakuert_id'])
-            new_krise_id = safe_int(form_data['krise_id'])
             kontakt_person_id = safe_int(form_data['kontakt_person_id'])
             status_id = safe_int(form_data['status_id'])
             
-            # Update only the Evakuerte table to point to the new KriseID.
-            cursor.execute("""
-                UPDATE Evakuerte 
-                SET KriseID = ?
-                WHERE EvakuertID = ?
-            """, (new_krise_id, evakuert_id))
-            
-            # Continue updating the other tables as before.
+            # Do not update KriseID; update only the fields in Evakuerte.
             cursor.execute("""
                 UPDATE Evakuerte 
                 SET Fornavn = ?, MellomNavn = ?, Etternavn = ?, 
@@ -106,19 +82,8 @@ def handle_form():
                 status_id
             ))
         else:
-            # Insert new records as before...
-            cursor.execute("""
-                INSERT INTO Krise (KriseSituasjonType, KriseNavn, Lokasjon, Tekstboks, Status)
-                OUTPUT INSERTED.KriseID
-                VALUES (?, ?, ?, ?, ?)
-            """, (
-                form_data['krise-type'],
-                form_data['krise-navn'],
-                form_data['krise-lokasjon'],
-                form_data['annen-info'],
-                form_data['krise-status'],
-            ))
-            krise_id = cursor.fetchval()
+            # Do not insert into Krise; set KriseID to None.
+            krise_id = None
             cursor.execute("""
                 INSERT INTO Evakuerte (Fornavn, MellomNavn, Etternavn, Telefonnummer, Adresse, KriseID)
                 OUTPUT INSERTED.EvakuertID
@@ -139,7 +104,7 @@ def handle_form():
                 form_data['kon_fnavn'],
                 form_data['kon_mnavn'],
                 form_data['kon-enavn'],
-                safe_int(form_data['kon_tlf']),
+                safe_int(form_data['kon-tlf']),
                 evakuert_id
             ))
             cursor.execute("""
@@ -151,7 +116,10 @@ def handle_form():
                 evakuert_id
             ))
         conn.commit()
-        return redirect(url_for('admin_status.admin', t=translations.get(lang, translations['no']), lang=lang))
+        
+        lang = request.args.get('lang', session.get('lang', 'no'))
+        session['lang'] = lang
+        return redirect(url_for('index', t=translations.get(lang, translations['no']), lang=lang))
     except ValueError as ve:
         conn.rollback()
         return f"Invalid input format: {str(ve)}", 400
@@ -164,10 +132,12 @@ def handle_form():
         if conn:
             conn.close()
 
-
-@admin_reg_bp.route('/<int:evakuert_id>')
-@login_required
+@evacuee_update_bp.route('/evacuee-update/<int:evakuert_id>')
 def adminreg_with_id(evakuert_id):
+    lang = request.args.get('lang', session.get('lang', 'no'))
+    session['lang'] = lang
+    t = translations.get(lang, translations['no'])
+
     conn = connection_def()
     cursor = conn.cursor()
     try:
@@ -184,18 +154,12 @@ def adminreg_with_id(evakuert_id):
                 e.Adresse,
                 kp.Fornavn AS kon_fornavn, 
                 kp.MellomNavn AS kon_mellomnavn, 
-                kp.Etternavn AS kon_etternavn, 
+                kp.Etternavn AS kon_enavn, 
                 kp.Telefonnummer AS kon_tlf,
-                kr.KriseSituasjonType, 
-                kr.KriseNavn, 
-                kr.Lokasjon, 
-                kr.Tekstboks,
-                kr.Status AS krise_status,
                 s.Status AS evak_status,
                 s.Lokasjon
             FROM Evakuerte e
             LEFT JOIN KontaktPerson kp ON e.EvakuertID = kp.EvakuertID
-            LEFT JOIN Krise kr ON e.KriseID = kr.KriseID
             LEFT JOIN Status s ON e.EvakuertID = s.EvakuertID
             WHERE e.EvakuertID = ?
         """, (evakuert_id,))
@@ -219,13 +183,8 @@ def adminreg_with_id(evakuert_id):
             "kon_mnavn": data[10],
             "kon_enavn": data[11],
             "kon_tlf": data[12],
-            "krise_type": data[13],
-            "krise_navn": data[14],
-            "krise_lokasjon": data[15],
-            "annen_info": data[16],
-            "krise_status": data[17],
-            "evak_status": data[18],
-            "evak_lokasjon": data[19]
+            "evak_status": data[13],
+            "evak_lokasjon": data[14]
         }
 
         # Fetch log data for this EvakuertID.
@@ -240,42 +199,13 @@ def adminreg_with_id(evakuert_id):
         # Also fetch all crisis records for the dropdown.
         cursor.execute("SELECT KriseID, KriseNavn FROM Krise")
         kriser = cursor.fetchall()
-        lang = request.args.get('lang', session.get('lang', 'no'))
-        session['lang'] = lang
-        return render_template("admin-reg.html", evakuert=evakuert_data, logs=logs, kriser=kriser, t=translations.get(lang, translations['no']), lang=lang)
+
+
+        return render_template("evacuee_update.html", t=t, lang=lang, evakuert=evakuert_data, logs=logs, kriser=kriser)
     
     except Exception as e:
         return f"Database error: {e}", 500
     
-    finally:
-        cursor.close()
-        conn.close()
-
-@admin_reg_bp.route('/get_krise_details/<int:krise_id>')
-@login_required
-def get_krise_details(krise_id):
-    conn = connection_def()
-    cursor = conn.cursor()
-    try:
-        cursor.execute("""
-            SELECT KriseSituasjonType, KriseNavn, Lokasjon, Tekstboks, Status AS status
-            FROM Krise
-            WHERE KriseID = ?
-        """, (krise_id,))
-        row = cursor.fetchone()
-        if row:
-            data = {
-                "KriseSituasjonType": row[0],
-                "KriseNavn": row[1],
-                "Lokasjon": row[2],
-                "Tekstboks": row[3],
-                "status": row[4]
-            }
-            return jsonify(data)
-        else:
-            return jsonify({"error": "Krise not found"}), 404
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
     finally:
         cursor.close()
         conn.close()

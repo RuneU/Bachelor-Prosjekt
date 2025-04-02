@@ -1,0 +1,126 @@
+{% import "components/navbar_component.html" as navbar_component %}
+{% import "components/incident_component.html" as incident_component %}
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>{{ t['incident_creation_title'] }}</title>
+</head>
+
+<body>
+    {{ navbar_component.render_navbar(navbar, t=t) }}
+
+    <main class="container mx-auto py-10 px-6 flex-grow bg-gray-100 text-gray-800 rounded-lg">
+        <form method="POST" action="{{ url_for('incident_creation.handle_incident') }}">
+
+            <!-- Krise Informasjon Section -->
+            <h1 class="text-xl font-bold mb-4">{{ t['incident_creation_heading'] }}</h1>
+            {{ incident_component.render_incident(evakuert, kriser, t=t) }}
+
+            <div class="text-center">
+                <button type="submit" class="bg-gray-700 text-white px-6 py-2 rounded">{{ t['incident_creation_confirm'] }}</button>
+            </div>
+        </form>
+
+        <!-- Updated Confirmation Modal -->
+        <div id="confirmationModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex justify-center items-center">
+            <div class="bg-white p-6 rounded-lg max-w-md w-full">
+                <h2 class="text-2xl font-bold mb-4">{{ t['incident_creation_model_heading'] }}</h2>
+                <div id="confirmationContent" class="mb-4 overflow-auto max-h-80 text-l">
+                    <p><strong>{{ t['incident_creation_model_status'] }}</strong> <span id="confirmStatus"></span></p>
+                    <p><strong>{{ t['incident_creation_model_type'] }}</strong> <span id="confirmType"></span></p>
+                    <p><strong>{{ t['incident_creation_model_name'] }}</strong> <span id="confirmName"></span></p>
+                    <p><strong>{{ t['incident_creation_model_location'] }}</strong> <span id="confirmLocation"></span></p>
+                    <p><strong>{{ t['incident_creation_model_info'] }}</strong> <span id="confirmInfo"></span></p>
+                </div>
+                <div class="flex justify-end">
+                    <button id="cancelButton" class="mr-2 bg-gray-300 px-4 py-2 rounded text-lg">{{ t['incident_creation_back'] }}</button>
+                    <button id="confirmButton" class="bg-green-600 text-white px-4 py-2 rounded text-lg">{{ t['incident_creation_confirm'] }}</button>
+                </div>
+            </div>
+        </div>
+
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="mb-4 p-4 bg-red-100 text-red-700 rounded">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    </main>
+
+    <script>
+        // Krise status dropdown functionality
+        const kriseDropdownButton = document.getElementById('krise-status');
+        const kriseDropdownMenu = document.getElementById('kriseDropdownMenu');
+        
+        // Toggle dropdown visibility
+        kriseDropdownButton.addEventListener('click', (e) => {
+            e.stopPropagation();
+            kriseDropdownMenu.classList.toggle('hidden');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!kriseDropdownButton.contains(event.target) && !kriseDropdownMenu.contains(event.target)) {
+                kriseDropdownMenu.classList.add('hidden');
+            }
+        });
+
+        // Handle option selection
+        kriseDropdownMenu.querySelectorAll('li').forEach(option => {
+            option.addEventListener('click', () => {
+                kriseDropdownButton.textContent = option.textContent;
+                document.getElementById('selected-krise-status').value = option.dataset.value;
+                kriseDropdownMenu.classList.add('hidden');
+            });
+        });
+
+        function showConfirmation() {
+            const status = document.getElementById('selected-krise-status').value;
+            const type = document.getElementById('krise-type').value;
+            const name = document.getElementById('krise-navn').value;
+            const location = document.getElementById('krise-lokasjon').value;
+            const info = document.getElementById('annen-info').value;
+
+            document.getElementById('confirmStatus').textContent = status;
+            document.getElementById('confirmType').textContent = type;
+            document.getElementById('confirmName').textContent = name;
+            document.getElementById('confirmLocation').textContent = location;
+            document.getElementById('confirmInfo').textContent = info;
+
+            document.getElementById('confirmationModal').classList.remove('hidden');
+            return false;
+        }
+
+        function closeModal() {
+            document.getElementById('confirmationModal').classList.add('hidden');
+        }
+
+        document.getElementById('confirmButton').addEventListener('click', function () {
+            document.querySelector('form').submit();
+            closeModal();
+        });
+
+        document.getElementById('cancelButton').addEventListener('click', closeModal);
+
+        document.querySelector('form').addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent default form submission
+        });
+
+        // When the submit button is clicked, show the confirmation popup
+        document.querySelector('button[type="submit"]').addEventListener('click', function(e) {
+            e.preventDefault();
+            showConfirmation();
+        });
+    </script>
+
+</body>
+
+</html>

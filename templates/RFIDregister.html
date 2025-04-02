@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registrer Armbånd</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 flex justify-center items-center min-h-screen text-black">
+
+  <div class="bg-white px-10 py-6 rounded-2xl shadow-xl w-full max-w-2xl border border-gray-300">
+
+    <!-- Top Row -->
+    <div class="relative mb-8">
+      <button onclick="history.back()" 
+              class="absolute left-0 top-0 bg-gray-700 hover:bg-gray-800 text-white px-5 py-2 rounded-lg font-semibold shadow-md">
+        ← Tilbake
+      </button>
+      <h2 class="text-3xl font-extrabold text-gray-800 text-center">Registrer Armbånd</h2>
+    </div>
+
+    <!-- Evakuert ID Display -->
+    <p class="text-xl text-gray-700 mb-6 text-center">
+      Evakuert ID:
+      <span class="font-bold text-blue-600" id="evakuert-id">{{ evakuert_id }}</span>
+    </p>
+
+    <!-- Instructions -->
+    <div class="text-lg text-gray-600 mb-6 text-center">
+      <p>Hold armbåndet nær leseren for å registrere det.</p>
+      <p id="scan-status" class="text-red-600 font-semibold mt-3 hidden">📡 Leser armbånd ...</p>
+    </div>
+
+    <!-- Scan Button -->
+    <form id="rfid-form" class="space-y-4">
+      <input type="hidden" id="evakuert_id" value="{{ evakuert_id }}">
+
+      <button id="scan-btn" type="button"
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold py-3 rounded-lg transition">
+        Skann Armbånd
+      </button>
+    </form>
+
+    <!-- Success / Error Messages -->
+    <div id="success-message" class="hidden mt-6 text-center">
+      <p class="text-green-600 text-lg font-semibold mb-3">
+        ✅ Suksess! Armbåndet ble registrert.
+      </p>
+      <a href="{{ url_for('startID') }}"
+         class="inline-block bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-lg shadow transition">
+        Gå til Startside
+      </a>
+    </div>
+
+    <p id="error-message" class="hidden text-center text-red-500 text-lg font-semibold mt-5"></p>
+
+  </div>
+
+  <script>
+    document.getElementById("scan-btn").addEventListener("click", async function () {
+      const scanStatus = document.getElementById("scan-status");
+      const successMessage = document.getElementById("success-message");
+      const errorMessage = document.getElementById("error-message");
+      const evakuertId = document.getElementById("evakuert-id").textContent;
+
+      scanStatus.classList.remove("hidden");
+      successMessage.classList.add("hidden");
+      errorMessage.classList.add("hidden");
+
+      try {
+        const scanResponse = await fetch(`/api/scan`);
+        const scanResult = await scanResponse.json();
+
+        scanStatus.classList.add("hidden");
+
+        if (scanResult.error) {
+          errorMessage.textContent = scanResult.error;
+          errorMessage.classList.remove("hidden");
+          return;
+        }
+
+        const chipID = scanResult.uid;
+        console.log(`✅ Skannet RFID UID: ${chipID}`);
+
+        if (scanResult.message === "New RFID detected. Please register with an Evakuert ID.") {
+          const registerResponse = await fetch(`/api/register_new_rfid`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ evakuert_id: evakuertId, chip_id: chipID }),
+          });
+
+          const registerResult = await registerResponse.json();
+
+          if (registerResult.error) {
+            errorMessage.textContent = registerResult.error;
+            errorMessage.classList.remove("hidden");
+          } else {
+            successMessage.classList.remove("hidden");
+          }
+
+        } else {
+          successMessage.classList.remove("hidden");
+        }
+
+      } catch (error) {
+        scanStatus.classList.add("hidden");
+        errorMessage.textContent = "❌ Kunne ikke registrere armbånd. Prøv igjen.";
+        errorMessage.classList.remove("hidden");
+      }
+    });
+  </script>
+
+</body>
+</html>

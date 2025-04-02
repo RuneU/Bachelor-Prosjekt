@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <title>Fingeravtrykkregistrering</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      background-color: #e0f7fa;
+      font-family: Arial, sans-serif;
+    }
+
+    @keyframes loadingBar {
+      0% { width: 0%; }
+      100% { width: 100%; }
+    }
+
+    .loading-bar {
+      height: 8px;
+      background-color: #22c55e;
+      animation: loadingBar 2s linear forwards;
+      border-radius: 4px;
+    }
+
+    .button-glow:hover {
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+      transform: translateY(-2px);
+      transition: all 0.2s ease-in-out;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-start p-6">
+
+  <!-- Header with Back Button -->
+  <!-- Centered Header with Back Button -->
+<div class="relative w-full max-w-5xl mb-8 flex items-center justify-center">
+  <!-- Back button: positioned far left -->
+  <button onclick="history.back()" 
+          class="absolute left-0 bg-gray-700 hover:bg-gray-800 text-white px-5 py-2 rounded-lg font-semibold shadow-md">
+    ← Tilbake
+  </button>
+
+  <!-- Centered title -->
+  <h1 class="text-3xl font-bold text-gray-800 text-center">
+    Fingeravtrykkregistrering
+  </h1>
+</div>
+
+
+  <!-- Main layout -->
+  <div class="flex gap-6 flex-col md:flex-row items-start w-full max-w-5xl">
+
+    <!-- Instructions -->
+    <div class="w-full md:w-48 p-4 rounded-lg border border-blue-400 shadow bg-white text-sm">
+      <p class="font-semibold text-blue-700">Instruksjoner:</p>
+      <ul class="list-disc pl-4 text-gray-700 mt-2">
+        <li>Plasser samme finger to ganger</li>
+        <li>Vent på bekreftelse</li>
+        <li>Finger lagres med ID</li>
+      </ul>
+    </div>
+
+    <!-- Status Box -->
+    <div id="status-box" class="w-full md:w-[400px] h-[240px] flex flex-col items-center justify-center text-lg font-semibold text-center bg-gray-100 border-2 border-blue-500 rounded-lg shadow text-gray-800 overflow-hidden relative transition-all duration-300">
+      <p id="status-text">Trykk "Skann finger" for å starte</p>
+    </div>
+
+    <!-- Tips -->
+    <div class="w-full md:w-48 p-4 rounded-lg border border-blue-400 shadow bg-white text-sm">
+      <p class="font-semibold text-blue-700">Tips:</p>
+      <ul class="list-disc pl-4 text-gray-700 mt-2">
+        <li>Hold fingeren stille</li>
+        <li>Bruk tørre og rene fingre</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <!-- Action Buttons -->
+<div class="flex flex-col sm:flex-row gap-4 mt-8">
+    <button onclick="scanAndShow()" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded shadow button-glow">
+      Skann finger og vis bilde
+    </button>
+  
+    <!-- Converted "Bekreft" to link to Flask route -->
+    <a href="{{ url_for('RFIDregister') }}" class="px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded shadow button-glow">
+      Bekreft finger
+    </a>
+
+  </div>
+  
+  <!-- JavaScript -->
+  <script>
+    async function scanAndShow() {
+      const statusBox = document.getElementById("status-box");
+
+      statusBox.innerHTML = `
+        <div class="w-full px-4">
+          <p class="mb-3 animate-pulse">Skanner finger...</p>
+          <div class="w-full bg-gray-300 rounded">
+            <div class="loading-bar"></div>
+          </div>
+        </div>
+      `;
+
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      try {
+        const res = await fetch("/capture_fingerprint_image");
+        const data = await res.json();
+
+        if (data.url) {
+          statusBox.innerHTML = `
+            <p class="mb-2">✅ Skanning fullført!</p>
+            <img src="${data.url}?t=${new Date().getTime()}" alt="Fingerprint" class="w-40 h-auto border border-gray-400 rounded shadow transition duration-300" />
+          `;
+        } else {
+          statusBox.innerHTML = `<p class="text-red-600">Feil: ${data.error || "Ukjent feil"}</p>`;
+        }
+      } catch (err) {
+        statusBox.innerHTML = `<p class="text-red-600">Klarte ikke å hente fingerbilde.</p>`;
+      }
+    }
+  </script>
+</body>
+</html>

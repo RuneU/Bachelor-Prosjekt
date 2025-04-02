@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <title>GPS Kart</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css" />
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+  <style>
+    #map { height: 600px; }
+    .leaflet-control-geocoder-icon {
+      background-image: url('https://cdn.jsdelivr.net/npm/leaflet-control-geocoder/dist/images/search-icon.png');
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-start p-4">
+
+  <div class="w-full max-w-4xl bg-white p-6 rounded-xl shadow-md">
+    <div class="flex flex-col md:flex-row items-center justify-between mb-4 gap-4">
+      <h1 class="text-2xl font-bold text-gray-800">📍 GPS Lokasjon</h1>
+      <input
+        type="text"
+        id="search"
+        placeholder="Søk etter sted..."
+        class="w-full md:w-64 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+        onkeydown="handleSearchKey(event)"
+      />
+    </div>
+
+    <div id="map" class="rounded-lg shadow-inner"></div>
+  </div>
+
+  <script>
+    const lat = {{ lat }};
+    const lon = {{ lon }};
+
+    const map = L.map('map').setView([lat, lon], 15);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    const marker = L.marker([lat, lon], { draggable: true }).addTo(map);
+
+    // Update location on drag end
+    marker.on('dragend', function () {
+      const pos = marker.getLatLng();
+      updateLocation(pos.lat, pos.lng);
+    });
+
+    // Search functionality with Enter key
+    function handleSearchKey(event) {
+      if (event.key === "Enter") {
+        const query = document.getElementById("search").value;
+        if (!query) return;
+
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`)
+          .then(res => res.json())
+          .then(data => {
+            if (data && data.length > 0) {
+              const result = data[0];
+              const newLat = parseFloat(result.lat);
+              const newLon = parseFloat(result.lon);
+
+              map.setView([newLat, newLon], 16);
+              marker.setLatLng([newLat, newLon]);
+              updateLocation(newLat, newLon);
+            } else {
+              alert("❌ Ingen treff");
+            }
+          })
+          .catch(() => alert("❌ Søket feilet"));
+      }
+    }
+
+    // POST to backend
+    function updateLocation(lat, lon) {
+      fetch('/update_location', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ lat, lon })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.location_name) {
+          alert("✅ Lokasjon oppdatert: " + data.location_name);
+        } else {
+          alert("✅ Lokasjon oppdatert!");
+        }
+      })
+      .catch(error => alert("❌ Feil ved oppdatering"));
+    }
+  </script>
+</body>
+</html>

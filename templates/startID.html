@@ -2,40 +2,78 @@
 <html lang="no">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .hover-effect:hover {
-      transform: translateY(-5px);
+      transform: translateY(-4px);
       transition: transform 0.3s ease;
     }
   </style>
 </head>
-<body class="bg-white p-4 flex flex-col items-center justify-center min-h-screen">
+<body class="bg-gradient-to-br from-gray-800 to-gray-900 min-h-screen flex items-center justify-center p-4">
 
-  <!-- Registered User Section -->
-  <div class="w-full max-w-md p-6 mt-6 bg-white rounded-lg shadow-lg border border-red-500">
-    <label for="ID" class="block text-sm font-medium text-red-500 mb-2">
-    </label>
-    <div class="flex flex-col gap-4 md:flex-row">
-      <a
-        href="{{ url_for('iot_login') }}"
-        class="block w-full text-center bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 active:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200"
-      >
-        Logg inn(For deg som har registert deg før på systemet)
-      </a>
-      <a
-        href="{{ url_for('newuser') }}"
-        class="block w-full text-center bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 active:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200"
-      >
-        Ny bruker(For deg som IKKE har registert deg for på systemet)
+  <div class="w-full max-w-2xl relative"> <!-- Make container relative for absolute child -->
+
+    <div class="p-8 bg-white rounded-2xl shadow-xl border border-gray-200 text-center">
+      <h1 class="text-3xl font-bold text-blue-700 mb-8">Velg handling</h1>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <!-- Logg inn -->
+        <a
+          href="{{ url_for('iot_login') }}"
+          class="hover-effect bg-blue-500 hover:bg-blue-600 text-white py-10 px-6 rounded-2xl text-xl font-semibold shadow-md transition flex flex-col items-center"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+          Logg inn
+          <p class="text-base font-normal mt-2">For registrerte brukere</p>
+        </a>
+
+        <!-- Ny bruker -->
+        <a
+          href="{{ url_for('newuser') }}"
+          class="hover-effect bg-green-500 hover:bg-green-600 text-white py-10 px-6 rounded-2xl text-xl font-semibold shadow-md transition flex flex-col items-center"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Ny bruker
+          <p class="text-base font-normal mt-2">For nye i systemet</p>
+        </a>
+
+        <!-- Oppdater posisjon -->
+        <a
+          href="{{ url_for('scan_location') }}"
+          class="hover-effect bg-purple-500 hover:bg-purple-600 text-white py-10 px-6 rounded-2xl text-xl font-semibold shadow-md transition flex flex-col items-center"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 .795.321 1.558.894 2.121M15 15l2.293 2.293a1 1 0 001.414-1.414L16.414 13.5M4 4h16v16H4V4z"/>
+          </svg>
+          Oppdater posisjon
+          <p class="text-base font-normal mt-2">Med RFID-brikke</p>
+        </a>
+
+      </div>
+
+      <p class="mt-8 text-sm text-gray-600">
+        Har du fått en ID? Logg inn direkte eller opprett ny bruker.
+      </p>
+    </div>
+
+    <!-- Admin Button (Bottom Right inside card) -->
+    <div class="absolute bottom-4 right-4">
+      <a href="{{ url_for('gps_map') }}"
+         class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow">
+        Admin
       </a>
     </div>
-    <p class="mt-2 text-sm text-uiared">
-      Legg til ID som du har fått fra registeringen eller skriv inn ditt fulle navn med fornavn og etternavn
-    </p>
+
   </div>
 
 </body>
+
 </html>

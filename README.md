@@ -35,7 +35,7 @@ Installer flowbite ```npm install flowbite```
 kjør ```python app.py``` for å sjekke at det fungerer.
 
 ## Database tilkobling
-Opprett en env fil i root directory som heter ```.env```
+Opprett en env fil i root directory av prosjektet som heter ```.env```
 
 I ```.env``` filen legg til koden under. Bytt ut plassholder informasjon med den ekte database informasjonen
 
@@ -45,6 +45,7 @@ DB_SERVER=<server.database.windows.net>
 DB_DATABASE=<databaseNavn>
 DB_UID=<brukerID>
 DB_PWD=<Passord>
+
 ```
 
 Installer dotenv 
@@ -59,6 +60,15 @@ Husk å installere driveren
 ```
 pip install pyodbc
 ```
+## Face ID
+For å kjøre face registering og lagering, må man først laste ned cmake (https://cmake.org/)
+Etter det må man laste ned microsoft visual stuido build tool 2022 C++ (https://visualstudio.microsoft.com/downloads/?q=build+tools)
+Deretter må du restarte Pcen
+Deretter kan du bruke kommandoen:
+```
+pip install face.recognition
+```
+
 
 Ferdig
 
@@ -76,6 +86,20 @@ python -m unittest discover test
 
 ```
  pip install opencv-python-headless   
+```
+
+## Docker
+For å lettere kunne åpne prosjektet gjennom nye pcer, så har vi valgt å bruke docker. Når du har sørget for å laste ned docker. Så kjører du denne kommandoen for å bygge opp prosjektet. 
+```
+docker build --no-cache -t flask-app .
+```
+Det kan ta litt tid på grunn av face registering modulen. Så hvis du kun trenger å åpne nettsiden, og ikke IOT siden, så kan du ingorere face.recognition i requirement.txt. For å starte denne kontaineren, kjør denne kommandoen. 
+```
+docker run -p 5000:5000 flask-app
+```
+For å kunne kjøre IOT nettsiden, kjør denne kommandoen
+```
+docker run -p 5000:5000 flask-app python IOT.py
 ```
 
 
