@@ -2,7 +2,7 @@ import serial
 import time
 
 # Serial Port Settings (Adjust for your OS)
-SERIAL_PORT = "/dev/ttyACM0"  # For Linux/Raspberry Pi (use "COM3" on Windows)
+SERIAL_PORT = "/dev/arduino_RFID"  # For Linux/Raspberry Pi (use "COM3" on Windows)
 BAUD_RATE = 9600  # Match Arduino Serial.begin(9600)
 
 # Global variable for Serial connection
@@ -26,29 +26,31 @@ ser = connect_serial()
 
 def get_rfid_uid():
     """Continuously reads RFID UID from Arduino over Serial."""
-    global ser  # Ensure we are modifying the global `ser`
+    global ser
 
     if not ser:
         return None  
 
-    ser.flushInput()  # Clear old data
-    print("🔄 Waiting for RFID card... (Scan an RFID card)")
+    ser.flushInput()
+    print("🔄 Waiting for RFID card...")
 
     try:
         while True:
-            data = ser.readline().decode("utf-8").strip()  
-            if data:
-                if "Card UID:" in data:
-                    uid = data.replace("Card UID:", "").strip()
+            line = ser.readline().decode("utf-8", errors="ignore").strip()
+            if line:
+                print(f"📨 Raw line: {line}")
+                if "Card UID:" in line:
+                    uid = line.replace("Card UID:", "").strip()
                     print(f"✅ RFID UID Received: {uid}")
                     return uid
     except serial.SerialException as e:
         print(f"❌ Serial connection lost: {e}, reconnecting...")
-        ser = connect_serial()  # Attempt reconnection
+        ser = connect_serial()
         return None
     except Exception as e:
         print(f"❌ Error reading RFID from Arduino: {e}")
         return None
+
 
 if __name__ == "__main__":
     while True:

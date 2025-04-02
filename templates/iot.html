@@ -3,76 +3,78 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin</title>
-  <!-- Tailwind CSS CDN -->
+  <title>Registrering</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .hover-effect:hover {
-      transform: translateY(-5px);
+      transform: translateY(-3px);
       transition: transform 0.3s ease;
     }
   </style>
 </head>
-<body class="bg-white text-black p-4">
-  <div class="max-w-screen-lg mx-auto">
-    <h1 class="text-3xl font-bold text-center my-6">Velg hvordan du vil registrere deg</h1>
+<body class="bg-gray-900 text-black min-h-screen flex items-center justify-center p-4">
 
-    <!-- Responsive grid for option buttons -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-      <!-- Option Button 1: Fjes og Finger -->
+  <div class="w-full max-w-4xl bg-white rounded-2xl shadow-xl p-8">
+
+    <!-- Title and Back Button Row -->
+    <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4 md:gap-0">
+      <button onclick="history.back()" class="bg-gray-700 hover:bg-gray-800 text-white px-5 py-2 rounded-lg font-semibold shadow-md">
+        ← Tilbake
+      </button>
+      <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 text-center md:text-left">
+        Hvordan vil du registrere deg?
+      </h1>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <!-- Option 1: Fjes og Finger -->
       <button onclick="handleButtonClick('capture_page')"
-              class="hover-effect w-full text-left bg-white p-6 shadow-lg border border-red-500 rounded-xl transition transform hover:shadow-xl">
-        <div class="flex items-center space-x-4">
-          <img class="w-12 h-12" src="{{ url_for('static', filename='img/id.png') }}" alt="ID Logo">
-          <div>
-            <h2 class="text-xl font-medium">Fjes og Finger</h2>
-            <p class="text-red-500">Registrer med ansikt og fingeravtrykk</p>
-          </div>
+              class="hover-effect bg-blue-600 hover:bg-blue-700 text-white text-left p-6 shadow-lg rounded-xl flex items-center space-x-5 w-full transition">
+        <img class="w-16 h-16" src="{{ url_for('static', filename='img/id.png') }}" alt="ID Icon">
+        <div>
+          <h2 class="text-2xl font-bold">Fjes + Finger</h2>
+          <p class="text-sm">Registrer deg med både ansikt og fingeravtrykk</p>
         </div>
       </button>
 
-      <!-- Option Button 2: Bare fjes -->
+      <!-- Option 2: Bare Fjes -->
       <button onclick="handleButtonClick('capture_page')"
-              class="hover-effect w-full text-left bg-white p-6 shadow-lg border border-red-500 rounded-xl transition transform hover:shadow-xl">
-        <div class="flex items-center space-x-4">
-          <img class="w-12 h-12" src="{{ url_for('static', filename='img/smile.png') }}" alt="Smile Logo">
-          <div>
-            <h2 class="text-xl font-medium">Bare fjes</h2>
-            <p class="text-red-500">Registrer kun med ansikt</p>
-          </div>
+              class="hover-effect bg-green-600 hover:bg-green-700 text-white text-left p-6 shadow-lg rounded-xl flex items-center space-x-5 w-full transition">
+        <img class="w-16 h-16" src="{{ url_for('static', filename='img/smile.png') }}" alt="Smile Icon">
+        <div>
+          <h2 class="text-2xl font-bold">Kun Fjes</h2>
+          <p class="text-sm">Registrer deg med kun ansiktsgjenkjenning</p>
         </div>
       </button>
 
-      <!-- Option Button 3: Bare finger -->
+      <!-- Option 3: Bare Finger -->
       <button onclick="handleButtonClick('fingerRegister')"
-              class="hover-effect w-full text-left bg-white p-6 shadow-lg border border-red-500 rounded-xl transition transform hover:shadow-xl">
-        <div class="flex items-center space-x-4">
-          <img class="w-12 h-12" src="{{ url_for('static', filename='img/fingerprint.png') }}" alt="Finger Logo">
-          <div>
-            <h2 class="text-xl font-medium">Bare finger</h2>
-            <p class="text-red-500">Registrer kun med fingeravtrykk</p>
-          </div>
+              class="hover-effect bg-purple-600 hover:bg-purple-700 text-white text-left p-6 shadow-lg rounded-xl flex items-center space-x-5 w-full transition">
+        <img class="w-16 h-16" src="{{ url_for('static', filename='img/fingerprint.png') }}" alt="Fingerprint Icon">
+        <div>
+          <h2 class="text-2xl font-bold">Kun Finger</h2>
+          <p class="text-sm">Registrer deg med kun fingeravtrykk</p>
         </div>
       </button>
 
-      <!-- Option Button 4: Ingenting -->
-      <button onclick="handleButtonClick('noID')"
-              class="hover-effect w-full text-left bg-white p-6 shadow-lg border border-red-500 rounded-xl transition transform hover:shadow-xl">
-        <div class="flex items-center space-x-4">
-          <img class="w-12 h-12" src="{{ url_for('static', filename='img/sad.png') }}" alt="Nothing Logo">
-          <div>
-            <h2 class="text-xl font-medium">Ingenting</h2>
-            <p class="text-red-500">Registrer uten biometri</p>
-          </div>
+      <!-- Option 4: Ingenting -->
+      <button onclick="handleButtonClick('register')"
+              class="hover-effect bg-amber-500 hover:bg-amber-600 text-white text-left p-6 shadow-lg rounded-xl flex items-center space-x-5 w-full transition">
+        <img class="w-16 h-16" src="{{ url_for('static', filename='img/sad.png') }}" alt="No ID Icon">
+        <div>
+          <h2 class="text-2xl font-bold">Ingen Biometri</h2>
+          <p class="text-sm">Registrer deg uten bruk av ansikt eller finger</p>
         </div>
       </button>
+
     </div>
   </div>
 
   <script>
     function handleButtonClick(option) {
       let url = "";
-      
+
       switch (option) {
         case "capture_page":
           url = "{{ url_for('capture_page') }}";
@@ -83,11 +85,14 @@
         case "noID":
           url = "{{ url_for('noID') }}";
           break;
+        case "register":
+          url = "{{ url_for('register') }}";
+          break;
         default:
           alert("Ugyldig valg");
           return;
       }
-      
+
       window.location.href = url;
     }
   </script>

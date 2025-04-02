@@ -1,70 +1,104 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="no">
 <head>
-  <meta charset="UTF-8">
-  <title>Face Recognition</title>
+  <meta charset="UTF-8" />
+  <title>Ansiktsgjenkjenning</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
+      background-color: #e0f7fa;
       font-family: Arial, sans-serif;
-      background-color: #f7f7f7;
-      margin: 0;
-      padding: 20px;
+      overflow: hidden;
     }
-    h1 {
-      text-align: center;
-    }
-    #video-container {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 20px;
-    }
-    #videoFeed {
-      border: 2px solid #333;
-    }
-    #captureButton {
-      display: block;
-      margin: 0 auto;
-      padding: 10px 20px;
-      background-color: #28a745;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    #captureButton:hover {
-      background-color: #218838;
-    }
-    #result {
-      text-align: center;
-      margin-top: 20px;
+    .button:hover {
+      transform: scale(1.05);
     }
   </style>
 </head>
-<body>
-  <h1>Face Recognition</h1>
-  <div id="video-container">
-    <img id="videoFeed" src="{{ url_for('video_feed', recognition=True) }}" alt="Video Feed" width="640" height="480">
+<body class="min-h-screen bg-[#e0f7fa] flex flex-col items-center justify-start p-6">
+
+  <!-- Top Navigation -->
+  <div class="w-full max-w-5xl flex justify-between items-center mb-8">
+    <button onclick="history.back()" class="bg-gray-700 hover:bg-gray-800 text-white px-5 py-2 rounded-lg font-semibold shadow-md">
+      ← Tilbake
+    </button>
+    <h1 class="text-3xl font-extrabold text-gray-800 text-center w-full -ml-12">Ansiktsgjenkjenning</h1>
   </div>
-  <button id="captureButton">Capture Face</button>
-  <div id="result"></div>
-  
+
+  <!-- Main Section -->
+  <div class="flex flex-col md:flex-row items-center justify-center gap-6">
+
+    <!-- Instructions -->
+    <div class="w-52 bg-white border-2 border-blue-500 rounded-xl p-4 shadow text-center text-gray-800">
+      <strong class="block mb-2">Tips:</strong>
+      <ul class="text-sm text-left list-disc list-inside space-y-1">
+        <li>Se rett inn i kameraet</li>
+        <li>Hold deg rolig i noen sekunder</li>
+        <li>Unngå bakgrunnslys</li>
+        <li>Klikk "Skann ansikt"</li>
+      </ul>
+    </div>
+
+    <!-- Video Feed -->
+    <img id="videoFeed" class="w-[400px] h-[240px] object-cover border-4 border-blue-500 rounded-xl shadow-md bg-black"
+         src="{{ url_for('video_feed', recognition=True) }}" alt="Video Feed" />
+
+  </div>
+
+  <!-- Button Group -->
+  <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mt-6">
+    <button id="captureButton"
+            class="bg-green-600 hover:bg-green-700 text-white font-semibold text-lg px-6 py-3 rounded-lg shadow transition button">
+      Skann Ansikt
+    </button>
+
+    <a href="{{ url_for('fingerLogin') }}"
+       class="bg-purple-600 hover:bg-purple-700 text-white font-semibold text-lg px-6 py-3 rounded-lg shadow transition button">
+      Funker ikke? Prøv finger
+    </a>
+  </div>
+
+  <!-- Modal Popup -->
+  <div id="popup-modal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-xl p-6 shadow-xl max-w-md w-full text-center">
+      <h2 class="text-xl font-bold text-green-700 mb-4">✅ Funnet ID</h2>
+      <p id="popup-id" class="text-lg text-gray-700 mb-2"></p>
+      <p id="popup-name" class="text-lg text-gray-700 mb-4"></p>
+      <p class="text-sm text-gray-600 mb-6">Er dette riktig person?</p>
+      <div class="flex justify-center gap-4">
+        <button onclick="window.location.href='/register'"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg shadow">
+          Ja, det stemmer – fortsett
+        </button>
+        <button onclick="window.location.reload()"
+                class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold px-4 py-2 rounded-lg shadow">
+          Prøv igjen
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
-    document.getElementById("captureButton").addEventListener("click", function() {
+    document.getElementById("captureButton").addEventListener("click", function () {
       fetch("/capture_face", { method: "POST" })
-      .then(response => response.json())
-      .then(data => {
-        const resultDiv = document.getElementById("result");
-        if (data.success) {
-          resultDiv.innerHTML = "<p>Face captured successfully!</p><pre>" + JSON.stringify(data.recognized_faces, null, 2) + "</pre>";
-        } else {
-          resultDiv.innerHTML = "<p>Error: " + data.message + "</p>";
-        }
-      })
-      .catch(error => {
-        document.getElementById("result").innerText = "Error capturing face.";
-        console.error("Error:", error);
-      });
+        .then(response => response.json())
+        .then(data => {
+          if (data.success && data.recognized_faces.length > 0) {
+            const face = data.recognized_faces[0];
+            document.getElementById("popup-id").innerText = "ID: " + face.id;
+            document.getElementById("popup-name").innerText = "Navn: " + face.name;
+            document.getElementById("popup-modal").classList.remove("hidden");
+          } else {
+            alert("❌ " + (data.message || "Ingen gjenkjenning."));
+          }
+        })
+        .catch(error => {
+          alert("Feil ved skanning.");
+          console.error("Error:", error);
+        });
     });
   </script>
+
 </body>
 </html>
