@@ -1,16 +1,18 @@
 <!DOCTYPE html>
-<html lang="no">
+<html lang="{{ lang }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Din EvakuertID</title>
+    <title>{{ t['show_evakuertID_title'] }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="min-h-screen bg-gray-150 flex items-center justify-center">
     <div class="bg-white p-10 rounded-lg shadow-md max-w-lg w-full text-center">
-        <h2 class="text-3xl font-bold mb-6">Din EvakuertID. </br> Noter nummeret ditt ned</h2>
+        <h2 class="text-3xl font-bold mb-6">{{ t['show_evakuertID_heading'] }}</h2>
         <p class="text-6xl font-extrabold mb-8">{{ evakuertID }}</p>
-        <a href="{{ url_for('index') }}" class="bg-green-600 text-white px-6 py-3 rounded text-xl">Tilbake til forsiden</a>
+        <a href="{{ url_for('index') }}" class="bg-green-600 text-white px-6 py-3 rounded text-xl">
+            {{ t['show_evakuertID_back_button'] }}
+        </a>
     </div>
 </body>
 </html>
