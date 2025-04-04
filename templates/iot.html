@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="no">
+<html lang="{{ lang }}">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registrering</title>
+  <title>{{ t['iot_register_title'] }}</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .hover-effect:hover {
@@ -19,52 +19,52 @@
     <!-- Title and Back Button Row -->
     <div class="flex flex-col md:flex-row justify-between items-center mb-10 gap-4 md:gap-0">
       <button onclick="history.back()" class="bg-gray-700 hover:bg-gray-800 text-white px-5 py-2 rounded-lg font-semibold shadow-md">
-        ← Tilbake
+        ← {{ t['iot_register_back'] }}
       </button>
       <h1 class="text-3xl md:text-4xl font-extrabold text-gray-800 text-center md:text-left">
-        Hvordan vil du registrere deg?
+        {{ t['iot_register_heading'] }}
       </h1>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-      <!-- Option 1: Fjes og Finger -->
+      <!-- Option 1: Face and Finger -->
       <button onclick="handleButtonClick('capture_page')"
               class="hover-effect bg-blue-600 hover:bg-blue-700 text-white text-left p-6 shadow-lg rounded-xl flex items-center space-x-5 w-full transition">
-        <img class="w-16 h-16" src="{{ url_for('static', filename='img/id.png') }}" alt="ID Icon">
+        <img class="w-16 h-16" src="{{ url_for('static', filename='img/id.png') }}" alt="{{ t['iot_register_face_finger_alt'] }}">
         <div>
-          <h2 class="text-2xl font-bold">Fjes + Finger</h2>
-          <p class="text-sm">Registrer deg med både ansikt og fingeravtrykk</p>
+          <h2 class="text-2xl font-bold">{{ t['iot_register_face_finger_title'] }}</h2>
+          <p class="text-sm">{{ t['iot_register_face_finger_description'] }}</p>
         </div>
       </button>
 
-      <!-- Option 2: Bare Fjes -->
+      <!-- Option 2: Face Only -->
       <button onclick="handleButtonClick('capture_page')"
               class="hover-effect bg-green-600 hover:bg-green-700 text-white text-left p-6 shadow-lg rounded-xl flex items-center space-x-5 w-full transition">
-        <img class="w-16 h-16" src="{{ url_for('static', filename='img/smile.png') }}" alt="Smile Icon">
+        <img class="w-16 h-16" src="{{ url_for('static', filename='img/smile.png') }}" alt="{{ t['iot_register_face_alt'] }}">
         <div>
-          <h2 class="text-2xl font-bold">Kun Fjes</h2>
-          <p class="text-sm">Registrer deg med kun ansiktsgjenkjenning</p>
+          <h2 class="text-2xl font-bold">{{ t['iot_register_face_title'] }}</h2>
+          <p class="text-sm">{{ t['iot_register_face_description'] }}</p>
         </div>
       </button>
 
-      <!-- Option 3: Bare Finger -->
+      <!-- Option 3: Finger Only -->
       <button onclick="handleButtonClick('fingerRegister')"
               class="hover-effect bg-purple-600 hover:bg-purple-700 text-white text-left p-6 shadow-lg rounded-xl flex items-center space-x-5 w-full transition">
-        <img class="w-16 h-16" src="{{ url_for('static', filename='img/fingerprint.png') }}" alt="Fingerprint Icon">
+        <img class="w-16 h-16" src="{{ url_for('static', filename='img/fingerprint.png') }}" alt="{{ t['iot_register_finger_alt'] }}">
         <div>
-          <h2 class="text-2xl font-bold">Kun Finger</h2>
-          <p class="text-sm">Registrer deg med kun fingeravtrykk</p>
+          <h2 class="text-2xl font-bold">{{ t['iot_register_finger_title'] }}</h2>
+          <p class="text-sm">{{ t['iot_register_finger_description'] }}</p>
         </div>
       </button>
 
-      <!-- Option 4: Ingenting -->
+      <!-- Option 4: No Biometrics -->
       <button onclick="handleButtonClick('register')"
               class="hover-effect bg-amber-500 hover:bg-amber-600 text-white text-left p-6 shadow-lg rounded-xl flex items-center space-x-5 w-full transition">
-        <img class="w-16 h-16" src="{{ url_for('static', filename='img/sad.png') }}" alt="No ID Icon">
+        <img class="w-16 h-16" src="{{ url_for('static', filename='img/sad.png') }}" alt="{{ t['iot_register_no_biometrics_alt'] }}">
         <div>
-          <h2 class="text-2xl font-bold">Ingen Biometri</h2>
-          <p class="text-sm">Registrer deg uten bruk av ansikt eller finger</p>
+          <h2 class="text-2xl font-bold">{{ t['iot_register_no_biometrics_title'] }}</h2>
+          <p class="text-sm">{{ t['iot_register_no_biometrics_description'] }}</p>
         </div>
       </button>
 
@@ -82,14 +82,11 @@
         case "fingerRegister":
           url = "{{ url_for('fingerRegister') }}";
           break;
-        case "noID":
-          url = "{{ url_for('noID') }}";
-          break;
         case "register":
           url = "{{ url_for('register') }}";
           break;
         default:
-          alert("Ugyldig valg");
+          alert("{{ t['iot_register_invalid_choice'] }}");
           return;
       }
 

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="no">
+<html lang="{{ lang }}">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Admin Panel</title>
+  <title>{{ t['startID_title'] }}</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .hover-effect:hover {
@@ -14,14 +14,14 @@
 </head>
 <body class="bg-gradient-to-br from-gray-800 to-gray-900 min-h-screen flex items-center justify-center p-4">
 
-  <div class="w-full max-w-2xl relative"> <!-- Make container relative for absolute child -->
+  <div class="w-full max-w-2xl relative">
 
     <div class="p-8 bg-white rounded-2xl shadow-xl border border-gray-200 text-center">
-      <h1 class="text-3xl font-bold text-blue-700 mb-8">Velg handling</h1>
+      <h1 class="text-3xl font-bold text-blue-700 mb-8">{{ t['startID_heading'] }}</h1>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-        <!-- Logg inn -->
+        <!-- Log In -->
         <a
           href="{{ url_for('iot_login') }}"
           class="hover-effect bg-blue-500 hover:bg-blue-600 text-white py-10 px-6 rounded-2xl text-xl font-semibold shadow-md transition flex flex-col items-center"
@@ -29,11 +29,11 @@
           <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M12 5l7 7-7 7"/>
           </svg>
-          Logg inn
-          <p class="text-base font-normal mt-2">For registrerte brukere</p>
+          {{ t['startID_login'] }}
+          <p class="text-base font-normal mt-2">{{ t['startID_login_description'] }}</p>
         </a>
 
-        <!-- Ny bruker -->
+        <!-- New User -->
         <a
           href="{{ url_for('newuser') }}"
           class="hover-effect bg-green-500 hover:bg-green-600 text-white py-10 px-6 rounded-2xl text-xl font-semibold shadow-md transition flex flex-col items-center"
@@ -41,11 +41,11 @@
           <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
           </svg>
-          Ny bruker
-          <p class="text-base font-normal mt-2">For nye i systemet</p>
+          {{ t['startID_new_user'] }}
+          <p class="text-base font-normal mt-2">{{ t['startID_new_user_description'] }}</p>
         </a>
 
-        <!-- Oppdater posisjon -->
+        <!-- Update Location -->
         <a
           href="{{ url_for('scan_location') }}"
           class="hover-effect bg-purple-500 hover:bg-purple-600 text-white py-10 px-6 rounded-2xl text-xl font-semibold shadow-md transition flex flex-col items-center"
@@ -53,27 +53,26 @@
           <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 .795.321 1.558.894 2.121M15 15l2.293 2.293a1 1 0 001.414-1.414L16.414 13.5M4 4h16v16H4V4z"/>
           </svg>
-          Oppdater posisjon
-          <p class="text-base font-normal mt-2">Med RFID-brikke</p>
+          {{ t['startID_update_location'] }}
+          <p class="text-base font-normal mt-2">{{ t['startID_update_location_description'] }}</p>
         </a>
 
       </div>
 
       <p class="mt-8 text-sm text-gray-600">
-        Har du fått en ID? Logg inn direkte eller opprett ny bruker.
+        {{ t['startID_footer'] }}
       </p>
     </div>
 
-    <!-- Admin Button (Bottom Right inside card) -->
+    <!-- Admin Button -->
     <div class="absolute bottom-4 right-4">
       <a href="{{ url_for('gps_map') }}"
          class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-semibold shadow">
-        Admin
+        {{ t['startID_admin'] }}
       </a>
     </div>
 
   </div>
 
 </body>
-
 </html>

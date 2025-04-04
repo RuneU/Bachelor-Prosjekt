@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="no">
+<html lang="{{ lang }}">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>RFID Scan</title>
+  <title>{{ t['scan_location_title'] }}</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-900 flex justify-center items-center min-h-screen text-black">
@@ -15,33 +15,40 @@
       <div class="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent"></div>
     </div>
 
+    <!-- Header -->
     <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-10">
-  <button onclick="history.back()" class="bg-gray-700 hover:bg-gray-800 text-white px-5 py-2 rounded-lg font-semibold shadow-md">
-    ← Tilbake
-  </button>
-  <h1 class="text-2xl md:text-3xl font-extrabold text-gray-800 text-center md:text-right flex-1">
-    ID skanning og lokasjonsoppdatering
-  </h1>
-</div>
+      <button onclick="history.back()" class="bg-gray-700 hover:bg-gray-800 text-white px-5 py-2 rounded-lg font-semibold shadow-md">
+        ← {{ t['scan_location_back'] }}
+      </button>
+      <h1 class="text-2xl md:text-3xl font-extrabold text-gray-800 text-center md:text-right flex-1">
+        {{ t['scan_location_heading'] }}
+      </h1>
+    </div>
+
     <!-- Display Scan Result -->
     <div id="scan-result" class="text-center hidden">
-      <p class="text-lg font-semibold text-gray-700">Navn: 
-      <span id="full_name" class="text-blue-500"></span>
+      <p class="text-lg font-semibold text-gray-700">{{ t['scan_location_name'] }}: 
+        <span id="full_name" class="text-blue-500"></span>
       </p>
-      <p class="text-lg font-semibold text-gray-700">Evakuert ID: <span id="evakuert_id" class="text-blue-600"></span></p>
-      <p class="text-lg font-semibold text-gray-700">RFID UID: <span id="rfid_uid" class="text-green-600"></span></p>
-
-      <p class="text-lg font-semibold mt-4 text-gray-700">📍 Nåværende Lokasjon: <span id="location" class="text-indigo-600"></span></p>
+      <p class="text-lg font-semibold text-gray-700">{{ t['scan_location_evacuee_id'] }}: 
+        <span id="evakuert_id" class="text-blue-600"></span>
+      </p>
+      <p class="text-lg font-semibold text-gray-700">{{ t['scan_location_rfid_uid'] }}: 
+        <span id="rfid_uid" class="text-green-600"></span>
+      </p>
+      <p class="text-lg font-semibold mt-4 text-gray-700">📍 {{ t['scan_location_current_location'] }}: 
+        <span id="location" class="text-indigo-600"></span>
+      </p>
 
       <!-- Table for Location History -->
       <div id="location-section" class="mt-6 hidden">
-        <h3 class="text-lg font-bold text-gray-800 mb-2">📜 Lokasjonshistorikk:</h3>
+        <h3 class="text-lg font-bold text-gray-800 mb-2">📜 {{ t['scan_location_history_heading'] }}</h3>
         <table class="w-full text-left border border-gray-300 rounded-lg overflow-hidden">
           <thead class="bg-gray-200 text-gray-700">
             <tr>
-              <th class="py-2 px-4">Tidspunkt</th>
-              <th class="py-2 px-4">Fra</th>
-              <th class="py-2 px-4">Til</th>
+              <th class="py-2 px-4">{{ t['scan_location_table_time'] }}</th>
+              <th class="py-2 px-4">{{ t['scan_location_table_from'] }}</th>
+              <th class="py-2 px-4">{{ t['scan_location_table_to'] }}</th>
             </tr>
           </thead>
           <tbody id="location-history-table" class="text-gray-700">
@@ -56,7 +63,7 @@
 
     <!-- Scan Button -->
     <button id="scan-btn" class="w-full mt-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg shadow transition">
-      Skann Armbånd
+      {{ t['scan_location_scan_button'] }}
     </button>
 
   </div>
@@ -90,7 +97,7 @@
           document.getElementById("evakuert_id").textContent = result.evakuert_id || "N/A";
           document.getElementById("rfid_uid").textContent = result.rfid_uid || "N/A";
           document.getElementById("full_name").textContent = `${result.fornavn || ""} ${result.etternavn || ""}`;
-          locationText.textContent = result.location || "Ukjent";
+          locationText.textContent = result.location || "{{ t['scan_location_unknown'] }}";
 
           result.location_history?.forEach(entry => {
             const row = document.createElement("tr");
@@ -107,7 +114,7 @@
         }
       } catch (error) {
         loadingSpinner.classList.add("hidden");
-        errorMessage.textContent = "Klarte ikke hente data. Prøv igjen.";
+        errorMessage.textContent = "{{ t['scan_location_error_message'] }}";
         errorMessage.classList.remove("hidden");
       }
     });

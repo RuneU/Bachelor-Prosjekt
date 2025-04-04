@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="no">
+<html lang="{{ lang }}">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Registrering</title>
+  <title>{{ t['newuser_title'] }}</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     .hover-effect:hover {
@@ -18,16 +18,15 @@
 
     <!-- Input Section -->
     <div class="flex-1 max-w-md w-full p-6 bg-white rounded-xl shadow-lg border border-red-500">
-      <!-- Inside Input Section -->
-<div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-10">
-  <button onclick="history.back()" class="bg-gray-700 hover:bg-gray-800 text-white px-5 py-2 rounded-lg font-semibold shadow-md">
-    ← Tilbake
-  </button>
-  <h1 class="text-2xl md:text-3xl font-extrabold text-gray-800 text-center md:text-left flex-1">
-    Hvordan vil du registrere deg?
-  </h1>
-</div>
-
+<!-- Inside Input Section -->
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4 mb-10">
+        <button onclick="history.back()" class="bg-gray-700 hover:bg-gray-800 text-white px-5 py-2 rounded-lg font-semibold shadow-md">
+          ← {{ t['newuser_back'] }}
+        </button>
+        <h1 class="text-2xl md:text-3xl font-extrabold text-gray-800 text-center md:text-left flex-1">
+          {{ t['newuser_heading'] }}
+        </h1>
+      </div>
 
       <input
         type="text"
@@ -35,7 +34,7 @@
         name="ID"
         inputmode="numeric"
         class="w-full text-xl text-center px-6 py-4 border border-red-400 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
-        placeholder="Skriv ID med bruk av tastatur"
+        placeholder="{{ t['newuser_input_placeholder'] }}"
         readonly
       />
 
@@ -43,17 +42,17 @@
         id="nextBtn"
         class="mt-6 w-full bg-blue-700 hover:bg-blue-800 text-white text-xl font-bold py-4 rounded-lg transition hover-effect"
       >
-        Neste side
+        {{ t['newuser_next'] }}
       </button>
 
       <p class="mt-4 text-sm text-gray-600">
-        Tast inn ID-en du fikk ved registrering<br>eller fullt navn med fornavn og etternavn.
+        {{ t['newuser_instructions'] }}
       </p>
     </div>
 
     <!-- Keypad Section -->
     <div class="w-full max-w-xs p-6 bg-white rounded-xl shadow-lg border border-red-500">
-      <h3 class="text-center text-lg font-semibold text-red-600 mb-4">Tastatur</h3>
+      <h3 class="text-center text-lg font-semibold text-red-600 mb-4">{{ t['newuser_keypad_heading'] }}</h3>
       <div class="grid grid-cols-3 gap-4">
         <!-- 1-9 -->
         <button type="button" class="bg-blue-600 text-white text-2xl py-4 rounded-lg hover-effect" onclick="appendNumber('1')">1</button>
@@ -67,7 +66,7 @@
         <button type="button" class="bg-blue-600 text-white text-2xl py-4 rounded-lg hover-effect" onclick="appendNumber('9')">9</button>
 
         <!-- Utility row -->
-        <button type="button" class="bg-red-500 text-white text-xl py-4 rounded-lg hover-effect" onclick="clearInput()">Tøm</button>
+        <button type="button" class="bg-red-500 text-white text-xl py-4 rounded-lg hover-effect" onclick="clearInput()">{{ t['newuser_clear'] }}</button>
         <button type="button" class="bg-blue-600 text-white text-2xl py-4 rounded-lg hover-effect" onclick="appendNumber('0')">0</button>
         <button type="button" class="bg-yellow-500 text-white text-xl py-4 rounded-lg hover-effect" onclick="backspaceInput()">⌫</button>
       </div>
@@ -95,7 +94,7 @@
       const evakuertID = document.getElementById("numberInput").value;
 
       if (!evakuertID || isNaN(evakuertID)) {
-        alert("Vennligst skriv inn en gyldig ID.");
+        alert("{{ t['newuser_invalid_id'] }}");
         return;
       }
 
@@ -109,7 +108,7 @@
           if (data.message) {
             window.location.href = "/iot";
           } else {
-            alert("Feil: " + data.error);
+            alert("{{ t['newuser_error'] }}: " + data.error);
           }
         })
         .catch((error) => {
