@@ -100,7 +100,9 @@ def register():
 
 @registrer_bp.route("/register/show_evakuert/<int:evakuert_id>")
 def show_evakuert(evakuert_id):
-    return render_template("show_evakuertID.html", evakuertID=evakuert_id)
+    lang = request.args.get('lang', session.get('lang', 'no'))
+    session['lang'] = lang
+    return render_template("show_evakuertID.html", t=translations.get(lang, translations['no']), lang=lang, evakuertID=evakuert_id)
 
 
 @registrer_bp.route('/register/get_krise_details/<krise_id>')
