@@ -306,7 +306,7 @@ translations = {
         'scan_location_error_message': "Failed to fetch data. Please try again.",
         # Show EvakuertID Page Translations
         'show_evakuertID_title': "Your Evacuee ID",
-        'show_evakuertID_heading': "Your Evacuee ID. </br> Write down your number",
+        'show_evakuertID_heading': "Your Evacuee ID. Write down your number",
         'show_evakuertID_back_button': "Back to Home",
         # StartID Page Translations
         'startID_title': "Choose Action",
@@ -627,7 +627,7 @@ translations = {
         'scan_location_error_message': "Klarte ikke hente data. Prøv igjen.",
         # Show EvakuertID Page Translations
         'show_evakuertID_title': "Din EvakuertID",
-        'show_evakuertID_heading': "Din EvakuertID. </br> Noter nummeret ditt ned",
+        'show_evakuertID_heading': "Din EvakuertID. Noter nummeret ditt ned",
         'show_evakuertID_back_button': "Tilbake til forsiden",
         # StartID Page Translations
         'startID_title': "Velg handling",
