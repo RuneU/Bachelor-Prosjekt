@@ -136,6 +136,22 @@ document.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('submit', function(e) {
         e.preventDefault();
 
+        // Mapping of form field keys to human-readable names
+        const fieldLabels = {
+            'evak-fnavn': 'evakuert fornavn',
+            'evak-mnavn': 'evakuert mellomnavn',
+            'evak-enavn': 'evakuert etternavn',
+            'evak-tlf': 'evakuert telefonnummer',
+            'evak-adresse': 'evakuert adresse',
+            'evak-lokasjon': 'evakuert lokasjon',
+            'kon-fnavn': 'Pårørende fornavn',
+            'kon-mnavn': 'Pårørende mellomnavn',
+            'kon-enavn': 'Pårørende etternavn',
+            'kon-tlf': 'Pårørende elefonnummer',
+            // add additional mappings as needed:
+            // 'some-key': 'Human Readable Name'
+        };
+
         // Gather form data
         const formData = new FormData(form);
         let contentHTML = '';
@@ -155,11 +171,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Loop through the form data and add fields not in the ignore list
         for (const [key, value] of formData.entries()) {
             if (!ignoreKeys.has(key)) {
-                contentHTML += `<p><strong>${key}:</strong> ${value}</p>`;
+                const fieldName = fieldLabels[key] || key;
+                contentHTML += `<p><strong>${fieldName}:</strong> ${value}</p>`;
             }
         }
         confirmationContent.innerHTML = contentHTML;
-
         modal.classList.remove('hidden');
     });
 
