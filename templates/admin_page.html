@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ lang }}">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,20 +9,24 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='dist/css/output.css') }}">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-50 text-gray-800 font-sans flex flex-col min-h-screen">
     <!-- Navigation Bar -->
     <nav class="bg-white shadow-md">
         <div class="container flex justify-between items-center mx-auto py-4 px-6">
             <!-- Left Section: Language Change -->
             <div class="flex space-x-4">
-                <a href="{{ url_for('admin_page', lang='en') }}" class="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition">English</a>
-                <a href="{{ url_for('admin_page', lang='no') }}" class="px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition">Norsk</a>
+                <a href="{{ url_for('admin_page', lang='en') }}"
+                    class="px-4 py-2 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition">English</a>
+                <a href="{{ url_for('admin_page', lang='no') }}"
+                    class="px-4 py-2 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition">Norsk</a>
             </div>
 
 
             <!-- Right Section: Login Button -->
             <div>
-                <a href="{{ url_for('auth.logout') }}" class="px-5 py-2.5 bg-blue-700 text-white rounded-lg shadow-md hover:bg-blue-800 transition">
+                <a href="{{ url_for('auth.logout') }}"
+                    class="px-5 py-2.5 bg-blue-700 text-white rounded-lg shadow-md hover:bg-blue-800 transition">
                     {{ t['logout'] }}
                 </a>
             </div>
@@ -36,32 +41,40 @@
 
         <!-- Button Container -->
         <div class="flex justify-center space-x-6">
-            <!-- Button 1: Incident Creation -->
-            <a href="{{ url_for('incident_creation.incident_creation', lang=lang) }}"
-               class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-10 px-10 rounded-lg shadow-lg text-xl flex items-center justify-center w-40 h-40">
-                {{ t['admin_incident_creation'] }}
+
+            <!-- Button 1: Evacuee registration -->
+            <a href="{{ url_for('registrer.register') }}"
+                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-10 px-10 rounded-lg shadow-lg text-xl flex items-center justify-center w-40 h-40">
+                {{ t['admin_evacuee_registration'] }}
             </a>
 
-            <!-- Button 2: Admin Status -->
+            <!-- Button 2: Evacuee Search -->
+            <a href="{{ url_for('evacuee_search') }}"
+                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-10 px-10 rounded-lg shadow-lg text-xl flex items-center justify-center w-40 h-40">
+                {{ t['admin_evacuee_search'] }}
+            </a>
+
+            <!-- Button 3: Admin Status -->
             <a href="{{ url_for('admin_status.admin') }}"
-               class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-10 px-10 rounded-lg shadow-lg text-xl flex items-center justify-center w-40 h-40">
+                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-10 px-10 rounded-lg shadow-lg text-xl flex items-center justify-center w-40 h-40">
                 {{ t['admin_status'] }}
             </a>
 
-            <!-- Button 3: Evacuee Search -->
-            <a href="{{ url_for('evacuee_search') }}"
-               class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-10 px-10 rounded-lg shadow-lg text-xl flex items-center justify-center w-40 h-40">
-                {{ t['admin_evacuee_search'] }}
-            </a>
-            <!-- Button 4: Evacuee registration -->
-            <a href="{{ url_for('registrer.register') }}"
+            <!-- Button 3: Admin Incident -->
+            <a href="{{ url_for('admin_status_inc') }}"
                 class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-10 px-10 rounded-lg shadow-lg text-xl flex items-center justify-center w-40 h-40">
-                 {{ t['admin_evacuee_registration'] }}
+                {{ t['admin_incident'] }}
             </a>
-            
+
+            <!-- Button 4: Incident Creation -->
+            <a href="{{ url_for('incident_creation.incident_creation', lang=lang) }}"
+                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-10 px-10 rounded-lg shadow-lg text-xl flex items-center justify-center w-40 h-40">
+                {{ t['admin_incident_creation'] }}
+            </a>
+
             <!-- Button 5: Create new user -->
             <a href="{{ url_for('auth.create_user') }}"
-               class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-10 px-10 rounded-lg shadow-lg text-xl flex items-center justify-center w-40 h-40">
+                class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-10 px-10 rounded-lg shadow-lg text-xl flex items-center justify-center w-40 h-40">
                 {{ t['admin_create_user'] }}
             </a>
         </div>
@@ -69,4 +82,5 @@
 
     {% include 'footer.html' %}
 </body>
+
 </html>

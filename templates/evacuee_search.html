@@ -1,4 +1,3 @@
-{% import "components/navbar_component.html" as navbar_component %}
 <head>
 	<meta charset="UTF-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,8 +7,6 @@
 	<link rel="stylesheet" href="{{url_for('static',filename='dist/css/output.css')}}">
 </head>
 <body>
-
-	{{ navbar_component.render_navbar(navbar, t=t) }}
 
     <main class="container mx-auto py-10 px-6 flex-grow bg-gray-100 text-gray-800 rounded-lg">
         <h1 class="text-4xl font-bold text-center">{{ t['evacuee_search_heading'] }}</h1>

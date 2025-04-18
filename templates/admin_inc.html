@@ -64,7 +64,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for record in evakuerte_statuses %}
+                    {% for record in evakuerte_statuses | sort(attribute='FullName') %}
                     <tr class="odd:bg-white even:bg-gray-50 border-b">
                         <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                             {{ record.FullName }}
