@@ -27,6 +27,10 @@ def index():
     session['lang'] = lang
     return render_template('index.html', t=translations.get(lang, translations['no']), lang=lang)
 
+@app.route("/landing-page")
+def landingPage():
+    return render_template('landingPage.html')
+
 @app.route('/set_user_id', methods=['POST'])
 def set_user_id():
     data = request.json
