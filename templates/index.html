@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ExitNode - Evacuee Registration</title>
+    <title>{{ t['index_title'] }}</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -33,12 +33,12 @@
             <div class="flex justify-between items-center">
                 <!-- Language Selection -->
                 <div class="flex space-x-3">
-                    <a href="?lang=en" class="px-4 py-2 bg-blue-600 text-white rounded-full text-sm font-medium hover:bg-blue-700 transition-colors duration-300 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">English</a>
-                    <a href="?lang=no" class="px-4 py-2 bg-green-600 text-white rounded-full text-sm font-medium hover:bg-green-700 transition-colors duration-300 focus:ring-2 focus:ring-green-500 focus:ring-offset-2">Norwegian</a>
+                    <a href="?lang=en" class="px-4 py-2 bg-blue-600 text-white rounded-full text-sm font-medium hover:bg-blue-700 transition-colors duration-300 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">{{ t['english'] }}</a>
+                    <a href="?lang=no" class="px-4 py-2 bg-green-600 text-white rounded-full text-sm font-medium hover:bg-green-700 transition-colors duration-300 focus:ring-2 focus:ring-green-500 focus:ring-offset-2">{{ t['norwegian'] }}</a>
                 </div>
                 <!-- Login Button -->
                 <a href="/login" class="px-6 py-2 bg-white text-blue-600 border border-blue-200 rounded-full text-sm font-medium hover:bg-blue-50 transition-colors duration-300 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                    Login
+                    {{ t['login'] }}
                 </a>
             </div>
         </div>
@@ -54,7 +54,7 @@
                 <h1 class="text-5xl font-bold text-gray-900 ml-4">ExitNode</h1>
             </div>
             <p class="text-xl text-gray-600 leading-relaxed mb-12">
-                Welcome to ExitNode's evacuation registration system. Your safety is our priority.
+                {{ t['welcome_paragraph'] }}
             </p>
         </div>
 
@@ -67,8 +67,8 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                     </svg>
-                    <h2 class="text-2xl font-bold mb-2">Register</h2>
-                    <p class="text-blue-100">Register as an evacuee</p>
+                    <h2 class="text-2xl font-bold mb-2">{{ t['nav_register'] }}</h2>
+                    <p class="text-blue-100">{{ t['nav_register_as'] }}</p>
                 </div>
             </a>
 
@@ -79,8 +79,8 @@
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
-                    <h2 class="text-2xl font-bold mb-2">Update</h2>
-                    <p class="text-blue-100">Update evacuee information</p>
+                    <h2 class="text-2xl font-bold mb-2">{{ t['nav_evacuee_update'] }}</h2>
+                    <p class="text-blue-100">{{ t['nav_evacuee_update_info'] }}</p>
                 </div>
             </a>
         </div>
@@ -89,7 +89,7 @@
     <!-- Footer -->
     <footer class="bg-white/80 backdrop-blur-md py-8 mt-auto">
         <div class="container mx-auto px-6 text-center text-gray-600">
-            <p>&copy; 2025 ExitNode. All rights reserved.</p>
+            <p>&copy;{{ t['footer_text'] }}</p>
         </div>
     </footer>
 </body>
