@@ -231,7 +231,7 @@ translations = {
         'navbar_logged_in': "Innlogget",
         # Evacuee Component Translations
         'registration_page': "Registreringsside",
-        'evak_status_label': "Evakuert Status*",
+        'evak_status_label': "Evakuerte sin Status",
         'evak_status_placeholder': "Velg Status",
         'evak_status_1': "Fysisk uskadet",
         'evak_status_2': "Vanlig",

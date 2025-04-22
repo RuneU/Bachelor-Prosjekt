@@ -8,27 +8,28 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css" />
   <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
   <style>
-    #map { height: 600px; }
-    .leaflet-control-geocoder-icon {
-      background-image: url('https://cdn.jsdelivr.net/npm/leaflet-control-geocoder/dist/images/search-icon.png');
-    }
+    #map { height: 300px; width: 100%; }
+    body { font-family: 'Inter', sans-serif; }
   </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col items-center justify-start p-4">
+<body class="bg-gray-800 flex items-center justify-center min-h-screen px-4">
 
-  <div class="w-full max-w-4xl bg-white p-6 rounded-xl shadow-md">
-    <div class="flex flex-col md:flex-row items-center justify-between mb-4 gap-4">
-      <h1 class="text-2xl font-bold text-gray-800">📍 GPS Lokasjon</h1>
+  <div class="bg-white w-full max-w-2xl rounded-xl shadow-lg p-4 space-y-3">
+
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-2">
+      <h1 class="text-lg font-semibold text-gray-800">GPS Lokasjon</h1>
       <input
         type="text"
         id="search"
         placeholder="Søk etter sted..."
-        class="w-full md:w-64 px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring focus:border-blue-300"
+        class="w-full sm:w-64 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring focus:border-blue-400 transition"
         onkeydown="handleSearchKey(event)"
       />
     </div>
 
-    <div id="map" class="rounded-lg shadow-inner"></div>
+    <div id="map" class="rounded-lg border border-gray-300 shadow-inner"></div>
+
+    <p class="text-sm text-gray-500 text-center mt-1">Dra markøren eller søk for å oppdatere lokasjonen.</p>
   </div>
 
   <script>
@@ -43,13 +44,11 @@
 
     const marker = L.marker([lat, lon], { draggable: true }).addTo(map);
 
-    // Update location on drag end
     marker.on('dragend', function () {
       const pos = marker.getLatLng();
       updateLocation(pos.lat, pos.lng);
     });
 
-    // Search functionality with Enter key
     function handleSearchKey(event) {
       if (event.key === "Enter") {
         const query = document.getElementById("search").value;
@@ -67,14 +66,13 @@
               marker.setLatLng([newLat, newLon]);
               updateLocation(newLat, newLon);
             } else {
-              alert("❌ Ingen treff");
+              alert("Ingen treff");
             }
           })
-          .catch(() => alert("❌ Søket feilet"));
+          .catch(() => alert("Søket feilet"));
       }
     }
 
-    // POST to backend
     function updateLocation(lat, lon) {
       fetch('/update_location', {
         method: 'POST',
@@ -86,13 +84,14 @@
       .then(response => response.json())
       .then(data => {
         if (data.location_name) {
-          alert("✅ Lokasjon oppdatert: " + data.location_name);
+          alert("Lokasjon oppdatert: " + data.location_name);
         } else {
-          alert("✅ Lokasjon oppdatert!");
+          alert("Lokasjon oppdatert!");
         }
       })
-      .catch(error => alert("❌ Feil ved oppdatering"));
+      .catch(error => alert("Feil ved oppdatering"));
     }
   </script>
+
 </body>
 </html>
