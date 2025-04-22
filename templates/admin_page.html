@@ -34,7 +34,14 @@
     </nav>
 
     <main class="container mx-auto text-center py-20 px-6 flex-grow">
-        <h1 class="text-4xl font-bold text-gray-800 mb-6">{{ t['admin_welcome_heading'] }}</h1>
+        <!-- Logo and Title Container -->
+        <div class="flex items-center justify-center mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-red-700 mr-3" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            <span class="text-3xl font-bold text-gray-900">ExitNode</span>
+        </div>
         <p class="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed mb-12">
             {{ t['admin_welcome_paragraph'] }}
         </p>

@@ -16,8 +16,8 @@ translations = {
         'confirm_your_information': "Confirm your information",
         # Admin page Translations
         'admin_incident_creation': "Incident Creation",
-        'admin_status': "Admin Status",
-        'admin_incident': "Admin Incident",
+        'admin_status': "List for evacuees",
+        'admin_incident': "List for incidents",
         'admin_evacuee_search': "Search for evacuees by ID",
         'admin_create_user': "Register new user",
         'admin_evacuee_registration': "Evacuee Registration",
@@ -213,8 +213,8 @@ translations = {
         'confirm_your_information': "Bekreft dine opplysninger",
         # Admin page Translations
         'admin_incident_creation': "Hendelse Opprettelse",
-        'admin_status': "Admin Status",
-        'admin_incident': "Admin Hendelse",
+        'admin_status': "Liste over evakuerte",
+        'admin_incident': "Liste over hendelser",
         'admin_evacuee_search': "Søk etter evakuerte med ID",
         'admin_create_user': "Registrer ny bruker",
         'admin_evacuee_registration': "Registrering av evakuert",
