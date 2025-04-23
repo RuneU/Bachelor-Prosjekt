@@ -1,26 +1,6 @@
-import os
-import sys
-import folium
-import json
-import requests
-from io import BytesIO
-import cv2
-import pyodbc
-import numpy as np
-import face_recognition as face
+from common_imports import *
 from face_utils import save_face
-import mysql.connector
-sys.dont_write_bytecode = True
-from datetime import datetime
-from flask import Flask, Response, request, render_template, jsonify, redirect, url_for, session, send_from_directory
-sys.path.append(os.path.join(os.path.dirname(__file__), 'sql'))
-from sql.db_connection import connection_string
-from dotenv import load_dotenv
-import logging
-from translations import translations
-from rfid_module import RFIDregister, scan_rfid, scan_rfid_with_history, get_evakuert_id_by_chipid
 
-# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -30,17 +10,15 @@ load_dotenv()
 
 from blueprints.registrer.routes import registrer_bp
 
-
 try:
     from face_utils import generate_frames
 except ImportError as e:
     print("Feil ved import av face.py:", e)
 
-
 app = Flask(__name__)
 app.secret_key = 'your-secret-key'
 
-camera = cv2.VideoCapture(0)  # Open webcam
+camera = cv2.VideoCapture(0)  
 
 FACES_FOLDER = "static/faces"
 
@@ -51,8 +29,6 @@ if AZURE_CONNECTION_STRING is None:
     raise ValueError("AZURE_STORAGE_CONNECTION_STRING is not set. Check your .env file!")
 
 CONTAINER_NAME = os.getenv("AZURE_CONTAINER_NAME")
-
-
 
 def get_db_connection():
     """Establish and return a connection using pyodbc (SQL Server)."""
@@ -70,14 +46,101 @@ def get_db_connection():
         print(f"❌ Database connection error: {e}")
         return None
     
-
-
 @app.route("/")
 @app.route("/startID")
 def startID():
     return render_template("startID.html")
 
+@app.route("/noID")
+def noID():
+    return render_template("noID.html")
 
+@app.route("/fingerLogin")
+def fingerLogin():
+    return render_template("fingerLogin.html")
+
+@app.route("/fingerRegister")
+def fingerRegister():
+    return render_template("fingerRegister.html")
+
+@app.route("/RFID")
+def RFID():
+    return render_template("RFID.html")
+
+@app.route("/finish")
+def finish():
+    return render_template("finish.html")
+
+@app.route("/newuser")
+def newuser():
+    return render_template("newuser.html")
+
+@app.route("/olduser")
+def olduser():
+    return render_template("olduser.html")
+
+@app.route("/iot_login")
+def iot_login():
+    return render_template("iot_login.html")
+
+@app.route('/fingerRegister')
+def finger_register_page():
+    return render_template("fingerRegister.html")
+
+@app.route('/fingerLogin')
+def finger_login_page():
+    return render_template("fingerLogin.html")
+
+@app.route("/api/scan_rfid")
+def api_scan_rfid():
+    result = scan_rfid()  # or scan_rfid_with_logging()
+    return jsonify(result)
+
+@app.route("/scan_location")
+def scan_location():
+    return render_template("scan_location.html")
+
+
+@app.route('/set_user_id', methods=['POST'])
+def set_user_id():
+    data = request.json
+    if "evakuert_id" not in data or not data["evakuert_id"].isdigit():
+        return jsonify({"error": "Invalid Evakuert ID"}), 400
+    
+    session["evakuert_id"] = int(data["evakuert_id"])
+    return jsonify({"message": "Evakuert ID stored successfully"}), 200
+
+@app.route('/iot')
+def iot():
+    if "evakuert_id" not in session:
+        return redirect(url_for("startID"))  # Ensure user has an ID before proceeding
+    return render_template("iot.html", evakuert_id=session["evakuert_id"])
+
+@app.route('/capture')
+def capture_page():
+    if "evakuert_id" not in session:
+        return redirect(url_for("startID"))
+    return render_template('capture.html', evakuert_id=session["evakuert_id"])
+
+@app.route("/check_session")
+def check_session():
+    return jsonify({"evakuert_id": session.get("evakuert_id", "No ID in session")})
+
+ # Route for the recognition page
+@app.route('/recognition')
+def recognition():
+     return render_template('recognition.html')
+
+@app.route('/RFIDregister')
+def RFIDregister():
+    if "evakuert_id" not in session:
+        return redirect(url_for("startID"))
+    return render_template('RFIDregister.html', evakuert_id=session["evakuert_id"])
+
+@app.route('/scan', methods=['GET'])
+def scan():
+    result = scan_rfid()
+    return render_template('scan.html', scan_result=result)
 
 @app.route("/gps")
 def gps_map():
@@ -93,6 +156,61 @@ def gps_map():
         logger.warning(f"Location load error: {e}")
 
     return render_template("gps_map.html", lat=lat, lon=lon)
+
+
+def generate_frames_with_progress():
+    global latest_frame
+
+    # Try to open the default camera (index 0)
+    camera = cv2.VideoCapture(0)
+    if not camera.isOpened():
+        logging.error("🚫 Could not open camera.")
+        return
+
+    logging.info("Camera started. Streaming frames...")
+
+    try:
+        while True:
+            success, frame = camera.read()
+            if not success:
+                logging.error("⚠️ Failed to read frame from camera.")
+                break
+
+            # Save a copy of the latest frame for other routes to access
+            latest_frame = frame.copy()
+
+            # Encode frame as JPEG
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame_bytes = buffer.tobytes()
+
+            # Yield multipart response
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
+
+    finally:
+        camera.release()
+        logging.info("🛑 Camera released.")
+
+
+
+# Route for video feed with progress updates
+@app.route('/video_feed')
+def video_feed():
+    evakuert_id = request.args.get("evakuert_id")  # Get from URL param
+    recognition_mode = request.args.get('recognition', default=False, type=bool)
+    # Remove the fetching of known faces if they're not used in generate_frames_with_progress
+    if recognition_mode:
+        return Response(generate_frames_with_progress(),
+                        mimetype='multipart/x-mixed-replace; boundary=frame')
+    else:
+        return Response(generate_frames(evakuert_id),
+                        mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+@app.route('/progress')
+def progress():
+    return Response(generate_frames_with_progress(),
+                    mimetype='text/event-stream')
 
 
 @app.route("/update_location", methods=["POST"])
@@ -147,11 +265,9 @@ def update_location():
 
         location_name = ", ".join(parts)
 
-        # Fallback if everything missing
         if not location_name:
             location_name = f"{lat:.6f}, {lon:.6f}"
 
-        # Save to JSON
         with open(LOCATION_FILE, "w") as f:
             json.dump({
                 "lat": lat,
@@ -164,7 +280,6 @@ def update_location():
     except Exception as e:
         print("❌ Error updating location:", e)
         return jsonify({"status": "error", "message": str(e)}), 500
-
 
 @app.route('/get_user_info', methods=['GET'])
 def get_user_info():
@@ -201,37 +316,6 @@ def get_user_info():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-
-
-@app.route('/set_user_id', methods=['POST'])
-def set_user_id():
-    data = request.json
-    if "evakuert_id" not in data or not data["evakuert_id"].isdigit():
-        return jsonify({"error": "Invalid Evakuert ID"}), 400
-    
-    session["evakuert_id"] = int(data["evakuert_id"])
-    return jsonify({"message": "Evakuert ID stored successfully"}), 200
-
-@app.route('/iot')
-def iot():
-    if "evakuert_id" not in session:
-        return redirect(url_for("startID"))  # Ensure user has an ID before proceeding
-    return render_template("iot.html", evakuert_id=session["evakuert_id"])
-
-
-@app.route('/capture')
-def capture_page():
-    if "evakuert_id" not in session:
-        return redirect(url_for("startID"))
-    return render_template('capture.html', evakuert_id=session["evakuert_id"])
-
-@app.route("/check_session")
-def check_session():
-    return jsonify({"evakuert_id": session.get("evakuert_id", "No ID in session")})
-
-
-
 @app.route('/save_photo', methods=['POST'])
 def save_photo():
     try:
@@ -249,7 +333,6 @@ def save_photo():
         logger.error(f"Error saving face: {e}")
         return jsonify({"error": str(e)}), 500
 
-
 def prepare_image(image):
     """Zoom in on the detected face in the image."""
     # Load the pre-trained Haar Cascade classifier for face detection
@@ -259,7 +342,6 @@ def prepare_image(image):
     faces = face_cascade.detectMultiScale(image, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
 
     if len(faces) > 0:
-        # Get the first detected face (assuming only one face is present)
         (x, y, w, h) = faces[0]
 
         # Crop the image to focus on the detected face
@@ -268,42 +350,6 @@ def prepare_image(image):
 
     # If no face is detected, return the original image
     return image
-
-@app.route("/noID")
-def noID():
-    return render_template("noID.html")
-
-
-
-
-@app.route("/fingerLogin")
-def fingerLogin():
-    return render_template("fingerLogin.html")
-
-@app.route("/fingerRegister")
-def fingerRegister():
-    return render_template("fingerRegister.html")
-
-@app.route("/RFID")
-def RFID():
-    return render_template("RFID.html")
-
-@app.route("/finish")
-def finish():
-    return render_template("finish.html")
-
-@app.route("/newuser")
-def newuser():
-    return render_template("newuser.html")
-
-@app.route("/olduser")
-def olduser():
-    return render_template("olduser.html")
-
-@app.route("/iot_login")
-def iot_login():
-    return render_template("iot_login.html")
-
 
 @app.route('/capture_face', methods=['POST'])
 def capture_face():
@@ -330,29 +376,37 @@ def capture_face():
          return jsonify({"success": False, "message": "No faces recognized."})
 
 def recognize_faces_from_image(image_path):
-     # Gather known faces from the Evakuerte table
-     known_face_encodings, known_face_ids, known_face_names = fetch_known_faces_from_db()
-    
-     # Load and encode the captured face image
-     image = face.load_image_file(image_path)
-     captured_encodings = face.face_encodings(image)
-    
-     recognized_faces = []
-     for captured_encoding in captured_encodings:
-         best_match_id, best_match_name, distance = find_best_match(
-             captured_encoding,
-             known_face_encodings,
-             known_face_ids,
-             known_face_names
-         )
-         if best_match_id is not None:
-             recognized_faces.append({
-                 "id": best_match_id,
-                 "name": best_match_name,
-                 "distance": float(distance)
-             })
-    
-     return recognized_faces
+    known_face_encodings, known_face_ids, known_face_names = fetch_known_faces_from_db()
+
+    image = face.load_image_file(image_path)
+
+    # Detect face locations first
+    face_locations = face.face_locations(image)
+    print(f"🔍 Detected {len(face_locations)} face(s) in image")
+
+    if not face_locations:
+        return []  # No face detected at all
+
+    # Then encode faces at those locations
+    captured_encodings = face.face_encodings(image, face_locations)
+
+    recognized_faces = []
+    for captured_encoding in captured_encodings:
+        best_match_id, best_match_name, distance = find_best_match(
+            captured_encoding,
+            known_face_encodings,
+            known_face_ids,
+            known_face_names
+        )
+        if best_match_id is not None:
+            recognized_faces.append({
+                "id": best_match_id,
+                "name": best_match_name,
+                "distance": float(distance)
+            })
+
+    return recognized_faces
+
 
 def fetch_known_faces_from_db():
     
@@ -394,6 +448,7 @@ def fetch_known_faces_from_db():
     
      return known_face_encodings, known_face_ids, known_face_names
 
+
 def find_best_match(face_encoding, known_face_encodings, known_face_ids, known_face_names):
    
      if not known_face_encodings:
@@ -407,74 +462,11 @@ def find_best_match(face_encoding, known_face_encodings, known_face_ids, known_f
      # Set your matching threshold – adjust if necessary
      threshold = 0.6
      logger.debug(f"Best match distance: {best_distance} (threshold: {threshold})")
-    
-     if best_distance == threshold:
+   
+     if best_distance <= threshold:
          logger.debug(f"Match found: EvakuertID={known_face_ids[best_match_index]}, Name={known_face_names[best_match_index]}")
          return known_face_ids[best_match_index], known_face_names[best_match_index], best_distance
      return None, None, None
-
-def generate_frames_with_progress():
-    
-     global latest_frame
-     camera = cv2.VideoCapture(0)
-     if not camera.isOpened():
-         logger.error("Failed to open camera.")
-         return
-    
-     try:
-         while True:
-             success, frame = camera.read()
-             if not success:
-                 logger.error("Failed to read frame from camera.")
-                 break
-            
-             # Update the global latest_frame for capture_face to use
-             latest_frame = frame.copy()
-             ret, buffer = cv2.imencode('.jpg', frame)
-             frame_bytes = buffer.tobytes()
-            
-             yield (b'--frame\r\n'
-                    b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')
-     finally:
-         camera.release()
-
-
- # Route for video feed with progress updates
-@app.route('/video_feed')
-def video_feed():
-     evakuert_id = request.args.get("evakuert_id")  # Get from URL param
-     recognition_mode = request.args.get('recognition', default=False, type=bool)
-     # Remove the fetching of known faces if they're not used in generate_frames_with_progress
-     if recognition_mode:
-         return Response(generate_frames_with_progress(),
-                         mimetype='multipart/x-mixed-replace; boundary=frame')
-     else:
-         return Response(generate_frames(evakuert_id), 
-                         mimetype='multipart/x-mixed-replace; boundary=frame')
-
-@app.route('/progress')
-def progress():
-     return Response(generate_frames_with_progress(),
-                     mimetype='text/event-stream')
-
- # Route for the recognition page
-@app.route('/recognition')
-def recognition():
-     return render_template('recognition.html')
-
-
-@app.route('/RFIDregister')
-def RFIDregister():
-    if "evakuert_id" not in session:
-        return redirect(url_for("startID"))
-    return render_template('RFIDregister.html', evakuert_id=session["evakuert_id"])
-
-
-@app.route('/scan', methods=['GET'])
-def scan():
-    result = scan_rfid()
-    return render_template('scan.html', scan_result=result)
-
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -488,16 +480,13 @@ def register():
 
     return render_template('RFIDregister.html', evakuert_id=session["evakuert_id"])
 
-
 @app.route('/api/scan', methods=['GET'])
 def api_scan():
-    """Scans an RFID card and links it to the EvakuertID in session."""
     if "evakuert_id" not in session:
         return jsonify({'error': 'No EvakuertID found in session'})
 
     scan_result = scan_rfid()
 
-    # ✅ Handle plain string UID returned from scan_rfid()
     if isinstance(scan_result, str):
         uid = scan_result
         evakuert_id = session["evakuert_id"]
@@ -514,9 +503,7 @@ def api_scan():
             'uid': uid
         })
 
-    # If scan_result is already a dictionary with an error, return it as-is
     return jsonify(scan_result)
-
 
 @app.route('/api/register_new_rfid', methods=['POST'])
 def register_new_rfid():
@@ -532,12 +519,10 @@ def register_new_rfid():
     if conn:
         cursor = conn.cursor()
 
-        # Chick if EvakuertID exists in `Evakuerte`
         cursor.execute("SELECT EvakuertID FROM Evakuerte WHERE EvakuertID = ?", (evakuert_id,))
         if not cursor.fetchone():
             return jsonify({"error": "Invalid Evakuert ID"}), 400
 
-        # Insert new RFID into the table
         cursor.execute("INSERT INTO RFID (ChipID, EvakuertID) VALUES (?, ?)", (chip_id, evakuert_id))
         conn.commit()
         conn.close()
@@ -546,58 +531,6 @@ def register_new_rfid():
 
     return jsonify({"error": "Database connection failed"}), 500
 
-
-
-@app.route("/api/scan_rfid")
-def api_scan_rfid():
-    result = scan_rfid()  # or scan_rfid_with_logging()
-    return jsonify(result)
-
-
-
-
-@app.route("/scan_location")
-def scan_location():
-    return render_template("scan_location.html")
-
-
-
-
-
-
-
-
-
-
-
-
-from flask import Flask, request, jsonify, session, render_template, redirect, url_for, send_file
-from pyfingerprint.pyfingerprint import PyFingerprint
-from PIL import Image  # For converting BMP to PNG
-import time
-
-
-
-# --------------
-# HTML ROUTES
-# --------------
-
-
-@app.route('/fingerSensor')
-def finger_sensor_page():
-    return render_template("finger_sensor.html")
-
-@app.route('/fingerRegister')
-def finger_register_page():
-    return render_template("fingerRegister.html")
-
-@app.route('/fingerLogin')
-def finger_login_page():
-    return render_template("fingerLogin.html")
-
-# -------------------------
-# Start Fingerprint Registration
-# -------------------------
 @app.route('/start_register', methods=['POST'])
 def start_register():
     try:
@@ -618,9 +551,7 @@ def start_register():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# -------------------------
 # Confirm Fingerprint Registration
-# -------------------------
 @app.route('/confirm_register', methods=['POST'])
 def confirm_register():
     try:
@@ -643,9 +574,7 @@ def confirm_register():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ------------------------
 # Start Fingerprint Verification
-# -------------------------
 @app.route('/start_verify', methods=['POST'])
 def start_verify():
     try:
@@ -677,11 +606,7 @@ def start_verify():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-
-
-# -------------------------
 # Capture Fingerprint Image
-# -------------------------
 @app.route('/capture_fingerprint_image')
 def capture_fingerprint_image():
     try:
@@ -695,11 +620,9 @@ def capture_fingerprint_image():
             if time.time() > timeout:
                 return jsonify({'error': 'Timed out waiting for finger'}), 408
 
-        # Create image folder if needed
         base_dir = "fingerprints"
         os.makedirs(base_dir, exist_ok=True)
 
-        # Use timestamp or session evakuert_id if available
         evakuert_id = session.get("evakuert_id")
         if evakuert_id:
             filename = f"fingerprint_{evakuert_id}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
@@ -722,31 +645,19 @@ def capture_fingerprint_image():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-
-
-from flask import session, jsonify, send_from_directory
-from pyfingerprint.pyfingerprint import PyFingerprint
-from datetime import datetime
-import os, time
-from PIL import Image
-import cv2
-import numpy as np
-
 @app.route('/recognize_fingerprint')
 def recognize_fingerprint():
     try:
-        # 1. Connect to fingerprint sensor
+        
         sensor = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
         if not sensor.verifyPassword():
             raise Exception('Incorrect sensor password')
-
-        # 2. Wait for finger (timeout after 10s)
+        
         timeout = time.time() + 10
         while not sensor.readImage():
             if time.time() > timeout:
                 return jsonify({'error': 'Timed out waiting for finger'}), 408
 
-        # 3. Save scanned image with generic name
         base_dir = "fingerprints"
         os.makedirs(base_dir, exist_ok=True)
 
@@ -767,8 +678,6 @@ def recognize_fingerprint():
         best_score = float('inf')
         matched_id = None
 
-# Denne delen av koden m[ endres p[ for [ gj;re det beder]]]
-        
         for file in os.listdir(base_dir):
             if file.endswith(".png") and "fingerprint_" in file:
                 template_path = os.path.join(base_dir, file)
@@ -816,7 +725,6 @@ def recognize_fingerprint():
         print("[ERROR]", e)
         return jsonify({'error': str(e)}), 500
     
-
 @app.route('/finger_image/<filename>')
 def serve_fingerprint_image(filename):
     file_path = os.path.join("fingerprints", filename)
@@ -824,9 +732,7 @@ def serve_fingerprint_image(filename):
         return send_file(file_path, mimetype='image/png')
     return jsonify({'error': 'File not found'}), 404
 
-
-
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=True)
 
 

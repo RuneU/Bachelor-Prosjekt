@@ -1,4 +1,3 @@
-{% import "components/navbar_component.html" as navbar_component %}
 {% import "components/incident_fill_component.html" as fill_component %}
 {% import "components/evacuee_component.html" as evacuee_component %}
 {% import "components/contactperson_component.html" as contact_component %}
@@ -16,8 +15,6 @@
 
 <body class="min-h-screen bg-gray-150 text-black font-sans flex flex-col">
 
-	{{ navbar_component.render_navbar(navbar, t=t) }}
-
     <!-- Language Buttons -->
     <div class=" py-2">
 		<div class="container mx-auto flex justify-end space-x-4 px-6">
@@ -33,7 +30,7 @@
 			<input type="hidden" name="kontakt_person_id" value="{{ evakuert.KontaktPersonID if evakuert else '' }}">
 			<input type="hidden" name="status_id" value="{{ evakuert.StatusID if evakuert else '' }}">
 
-			<!-- Render Hendelse Info Component -->
+			<!-- Render Incident Info Component -->
 			{{ fill_component.render_incident_fill(evakuert, kriser, t=t) }}
 
 

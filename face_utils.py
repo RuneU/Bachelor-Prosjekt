@@ -1,13 +1,5 @@
-import cv2
-import os
-import base64
-from datetime import datetime
-import pyodbc
-import numpy as np
-from dotenv import load_dotenv
-from azure.storage.blob import BlobServiceClient
-from flask import Flask, Response, request, render_template, jsonify, redirect, url_for, session
-import logging
+from common_imports import *
+
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -47,6 +39,7 @@ except Exception as e:
 
 
 import cv2
+
 
 
 def load_known_faces(faces_folder):
@@ -93,7 +86,7 @@ def insert_face_metadata(evakuert_id, image_url):
         logger.error(f"Failed to update face metadata: {e}")
 
 
-def generate_frames(evakuert_id=None):  # Pass the ID explicitly
+def generate_frames(evakuert_id):  # Pass the ID explicitly
     face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
     camera = cv2.VideoCapture(0)
 
