@@ -25,7 +25,7 @@ def handle_incident():
             print('Krise opprettet vellykket!', 'success')
         else:
             print('Feil ved opprettelse av krise', 'error')
-        return redirect(url_for('index', t=translations.get(lang, translations['no']), lang=lang))
+        return redirect(url_for('admin_page', t=translations.get(lang, translations['no']), lang=lang))
     
     except Exception as e:
         print(f"Error: {str(e)}")
