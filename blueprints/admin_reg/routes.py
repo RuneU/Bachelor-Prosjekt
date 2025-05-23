@@ -29,7 +29,6 @@ def handle_form():
             'evakuert_id': request.form.get('evakuert_id'),
             'krise_id': request.form.get('krise_id'),
             'kontakt_person_id': request.form.get('kontakt_person_id'),
-            'status_id': request.form.get('status_id'),
             'status': request.form.get('status'),
             'krise_status': request.form.get('krise-status'),
             'krise_type': request.form.get('krise-type'),
@@ -48,8 +47,8 @@ def handle_form():
             'kon_tlf': request.form.get('kon-tlf')
         }
 
-        if not all([form_data['krise_lokasjon'], form_data['status']]):
-            return "Lokasjon and Status are required fields", 400
+        if not all([form_data['evak_lokasjon'], form_data['status']]):
+            return "'evakuert lokasjon' and 'status' are required fields", 400
 
         conn = connection_def()
         cursor = conn.cursor()
@@ -62,7 +61,6 @@ def handle_form():
             evakuert_id = safe_int(form_data['evakuert_id'])
             new_krise_id = safe_int(form_data['krise_id'])
             kontakt_person_id = safe_int(form_data['kontakt_person_id'])
-            status_id = safe_int(form_data['status_id'])
             
             # Update only the Evakuerte table to point to the new KriseID.
             cursor.execute("""
@@ -99,11 +97,9 @@ def handle_form():
             cursor.execute("""
                 UPDATE Status 
                 SET Status = ?, Lokasjon = ?
-                WHERE StatusID = ?
             """, (
                 form_data['status'],
-                form_data['evak_lokasjon'],
-                status_id
+                form_data['evak_lokasjon']
             ))
         else:
             # Insert new records as before...
@@ -258,7 +254,7 @@ def get_krise_details(krise_id):
     cursor = conn.cursor()
     try:
         cursor.execute("""
-            SELECT KriseSituasjonType, KriseNavn, Lokasjon, Tekstboks, Status AS status
+            SELECT KriseSituasjonType, KriseNavn, Lokasjon, Tekstboks, Status
             FROM Krise
             WHERE KriseID = ?
         """, (krise_id,))
@@ -269,7 +265,7 @@ def get_krise_details(krise_id):
                 "KriseNavn": row[1],
                 "Lokasjon": row[2],
                 "Tekstboks": row[3],
-                "status": row[4]
+                "Status": row[4]
             }
             return jsonify(data)
         else:
