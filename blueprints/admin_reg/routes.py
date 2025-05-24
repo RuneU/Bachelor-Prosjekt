@@ -11,7 +11,23 @@ admin_reg_bp = Blueprint('admin_reg', __name__, template_folder='../templates')
 def admin_reg():
     lang = request.args.get('lang', session.get('lang', 'no'))
     session['lang'] = lang
-    return render_template("admin-reg.html", t=translations.get(lang, translations['no']), lang=lang)
+    conn = None
+    cursor = None
+    kriser = []
+    try:
+        conn = connection_def()
+        cursor = conn.cursor()
+        cursor.execute("SELECT KriseID, KriseNavn FROM Krise")
+        kriser = cursor.fetchall()
+    except Exception as e:
+        print(f"Error fetching kriser in /admin-reg: {e}") # Log error
+        # Decide if you want to return an error page or render with empty kriser
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+    return render_template("admin-reg.html", t=translations.get(lang, translations['no']), lang=lang, kriser=kriser, evakuert=None, logs=[]) # Pass kriser, and default evakuert and logs
 
 def safe_int(value):
     """Helper function to safely convert to integer"""
@@ -30,10 +46,7 @@ def handle_form():
             'krise_id': request.form.get('krise_id'),
             'kontakt_person_id': request.form.get('kontakt_person_id'),
             'status': request.form.get('status'),
-            'krise_status': request.form.get('krise-status'),
-            'krise_type': request.form.get('krise-type'),
             'krise_navn': request.form.get('krise-navn'),
-            'krise_lokasjon': request.form.get('krise-lokasjon'),
             'annen_info': request.form.get('annen-info'),
             'evak_fnavn': request.form.get('evak-fnavn'),
             'evak_mnavn': request.form.get('evak-mnavn'),
@@ -47,11 +60,20 @@ def handle_form():
             'kon_tlf': request.form.get('kon-tlf')
         }
 
-        if not all([form_data['evak_lokasjon'], form_data['status']]):
-            return "'evakuert lokasjon' and 'status' are required fields", 400
+        if not form_data['krise_id'] or not form_data['status']:
+            return "KriseID (Incident ID) and Status (Evacuee Status) are required fields", 400
+        
+        try:
+            krise_id_int = int(form_data['krise_id'])
+        except (ValueError, TypeError):
+            return "Invalid KriseID format", 400
 
         conn = connection_def()
         cursor = conn.cursor()
+        
+        cursor.execute("SELECT COUNT(*) FROM Krise WHERE KriseID = ?", (krise_id_int,))
+        if cursor.fetchone()[0] == 0:
+            return "Error: Selected KriseID does not exist in the database", 400
 
         def safe_int(value):
             return int(value) if value and value.isdigit() else None
@@ -59,17 +81,14 @@ def handle_form():
         is_update = form_data['evakuert_id'] and form_data['evakuert_id'].isdigit()
         if is_update:
             evakuert_id = safe_int(form_data['evakuert_id'])
-            new_krise_id = safe_int(form_data['krise_id'])
             kontakt_person_id = safe_int(form_data['kontakt_person_id'])
             
-            # Update only the Evakuerte table to point to the new KriseID.
             cursor.execute("""
                 UPDATE Evakuerte 
                 SET KriseID = ?
                 WHERE EvakuertID = ?
-            """, (new_krise_id, evakuert_id))
+            """, (krise_id_int, evakuert_id))
             
-            # Continue updating the other tables as before.
             cursor.execute("""
                 UPDATE Evakuerte 
                 SET Fornavn = ?, MellomNavn = ?, Etternavn = ?, 
@@ -102,19 +121,6 @@ def handle_form():
                 form_data['evak_lokasjon']
             ))
         else:
-            # Insert new records as before...
-            cursor.execute("""
-                INSERT INTO Krise (KriseSituasjonType, KriseNavn, Lokasjon, Tekstboks, Status)
-                OUTPUT INSERTED.KriseID
-                VALUES (?, ?, ?, ?, ?)
-            """, (
-                form_data['krise-type'],
-                form_data['krise-navn'],
-                form_data['krise-lokasjon'],
-                form_data['annen-info'],
-                form_data['krise-status'],
-            ))
-            krise_id = cursor.fetchval()
             cursor.execute("""
                 INSERT INTO Evakuerte (Fornavn, MellomNavn, Etternavn, Telefonnummer, Adresse, KriseID)
                 OUTPUT INSERTED.EvakuertID
@@ -123,19 +129,23 @@ def handle_form():
                 form_data['evak_fnavn'],
                 form_data['evak_mnavn'],
                 form_data['evak_enavn'],
-                safe_int(form_data['evak_tlf']),
+                form_data['evak_tlf'],
                 form_data['evak_adresse'],
-                krise_id
+                krise_id_int
             ))
             evakuert_id = cursor.fetchval()
+            if not evakuert_id:
+                conn.rollback()
+                return "Failed to create Evakuerte record.", 500
+
             cursor.execute("""
                 INSERT INTO KontaktPerson (Fornavn, MellomNavn, Etternavn, Telefonnummer, EvakuertID)
                 VALUES (?, ?, ?, ?, ?)
             """, (
                 form_data['kon_fnavn'],
                 form_data['kon_mnavn'],
-                form_data['kon-enavn'],
-                safe_int(form_data['kon_tlf']),
+                form_data['kon_enavn'],
+                form_data['kon_tlf'],
                 evakuert_id
             ))
             cursor.execute("""
