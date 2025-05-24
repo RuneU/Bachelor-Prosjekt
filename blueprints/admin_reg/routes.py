@@ -45,7 +45,6 @@ def handle_form():
             'evakuert_id': request.form.get('evakuert_id'),
             'krise_id': request.form.get('krise_id'),
             'kontakt_person_id': request.form.get('kontakt_person_id'),
-            'status_id': request.form.get('status_id'),
             'status': request.form.get('status'),
             'krise_navn': request.form.get('krise-navn'),
             'annen_info': request.form.get('annen-info'),
@@ -83,7 +82,6 @@ def handle_form():
         if is_update:
             evakuert_id = safe_int(form_data['evakuert_id'])
             kontakt_person_id = safe_int(form_data['kontakt_person_id'])
-            status_id = safe_int(form_data['status_id'])
             
             cursor.execute("""
                 UPDATE Evakuerte 
@@ -118,11 +116,9 @@ def handle_form():
             cursor.execute("""
                 UPDATE Status 
                 SET Status = ?, Lokasjon = ?
-                WHERE StatusID = ?
             """, (
                 form_data['status'],
-                form_data['evak_lokasjon'],
-                status_id
+                form_data['evak_lokasjon']
             ))
         else:
             cursor.execute("""
@@ -268,7 +264,7 @@ def get_krise_details(krise_id):
     cursor = conn.cursor()
     try:
         cursor.execute("""
-            SELECT KriseSituasjonType, KriseNavn, Lokasjon, Tekstboks, Status AS status
+            SELECT KriseSituasjonType, KriseNavn, Lokasjon, Tekstboks, Status
             FROM Krise
             WHERE KriseID = ?
         """, (krise_id,))
@@ -279,7 +275,7 @@ def get_krise_details(krise_id):
                 "KriseNavn": row[1],
                 "Lokasjon": row[2],
                 "Tekstboks": row[3],
-                "status": row[4]
+                "Status": row[4]
             }
             return jsonify(data)
         else:
