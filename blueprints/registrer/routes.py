@@ -15,9 +15,9 @@ def register():
             evak_enavn = request.form.get("evak-enavn")
             evak_adresse = request.form.get("evak-adresse")
             evak_tlf = request.form.get("evak-tlf")
-            status = request.form.get("status")
-            evak_lokasjon = request.form.get("evak-lokasjon")
+            evakuee_initial_lokasjon = request.form.get("evak-lokasjon")
             krise_id = request.form.get("krise_id")
+            selected_evacuee_status = request.form.get("status")
             kon_fnavn = request.form.get("kon-fnavn")
             kon_mnavn = request.form.get("kon-mnavn")
             kon_enavn = request.form.get("kon-enavn")
@@ -68,7 +68,7 @@ def register():
 
             # Insert into Status table
             query_status = "INSERT INTO Status ([Status], Lokasjon, EvakuertID) VALUES (?, ?, ?)"
-            cursor.execute(query_status, (status, evak_lokasjon, evakuert_id))
+            cursor.execute(query_status, (selected_evacuee_status, evakuee_initial_lokasjon, evakuert_id))
             conn.commit()
 
             cursor.close()

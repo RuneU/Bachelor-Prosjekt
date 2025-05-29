@@ -32,22 +32,28 @@ google_bp = make_google_blueprint(
 # -------------------------------
 @auth_bp.route('/register_user', methods=['GET', 'POST'])
 def register_user():
+    lang = request.args.get('lang', session.get('lang', 'no'))
+    session['lang'] = lang
     if request.method == 'POST':
         username   = request.form.get('username')
+        email      = request.form.get('email')
         password   = request.form.get('password')
         first_name = request.form.get('first_name')
         last_name  = request.form.get('last_name')
-        
-        # Hash the password
+
+        # Convert empty email to None
+        if not email:
+            email = None
+
         password_hash = generate_password_hash(password)
         try:
             conn = pyodbc.connect(connection_string)
             cursor = conn.cursor()
             insert_query = """
-                INSERT INTO Users (username, password, first_name, last_name)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO Users (username, email, password, first_name, last_name)
+                VALUES (?, ?, ?, ?, ?)
             """
-            cursor.execute(insert_query, (username, password_hash, first_name, last_name))
+            cursor.execute(insert_query, (username, email, password_hash, first_name, last_name))
             conn.commit()
             flash("Registration successful! You can now log in.", "success")
             return redirect(url_for('auth.login'))
@@ -59,8 +65,6 @@ def register_user():
                 cursor.close()
             if 'conn' in locals():
                 conn.close()
-            lang = request.args.get('lang', session.get('lang', 'no'))
-            session['lang'] = lang
     return render_template('register_user.html', t=translations.get(lang, translations['no']), lang=lang)
 
 # -------------------------------

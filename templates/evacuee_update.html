@@ -66,10 +66,43 @@
             const formData = new FormData(form);
             // Added 'text-lg' to increase the text size of the generated list
             let contentHtml = '<ul class="list-disc pl-5 text-lg">';
+            
+            // Translations for prefixes - these will be passed from the template
+            const evacueeText = "{{ t['text_evacuee'] }}";
+            const contactPersonText = "{{ t['text_contact_person'] }}";
+
+            // Mappings for form field names to their display names (translation keys)
+            const fieldNameMappings = {
+                'status': "{{ t['evak_status_label'] }}",
+                'evak-fnavn': `${evacueeText} {{ t['evak_fnavn_label'] }}`,
+                'evak-mnavn': `${evacueeText} {{ t['evak_mnavn_label'] }}`,
+                'evak-enavn': `${evacueeText} {{ t['evak_enavn_label'] }}`,
+                'evak-tlf': `${evacueeText} {{ t['evak_tlf_label'] }}`,
+                'evak-adresse': `${evacueeText} {{ t['evak_adresse_label'] }}`,
+                'evak-lokasjon': `${evacueeText} {{ t['evak_lokasjon_label'] }}`,
+                'kon-fnavn': `${contactPersonText} {{ t['contactperson_fnavn_label'] }}`,
+                'kon-mnavn': `${contactPersonText} {{ t['contactperson_mnavn_label'] }}`,
+                'kon-enavn': `${contactPersonText} {{ t['contactperson_enavn_label'] }}`,
+                'kon-tlf': `${contactPersonText} {{ t['contactperson_tlf_label'] }}`
+            };
+
             for (const [key, value] of formData.entries()) {
-                // Exclude hidden inputs if you don't want to show them.
-                if (['evakuert_id', 'kontakt_person_id', 'status_id'].includes(key)) continue;
-                contentHtml += `<li><strong>${key}:</strong> ${value}</li>`;
+                // Exclude hidden inputs and empty fields
+                if (['evakuert_id', 'kontakt_person_id', 'status_id'].includes(key) || !value) continue;
+
+                let displayName = fieldNameMappings[key] || key.replace(/-/g, ' '); // Fallback to key with spaces
+                
+                // For the 'status' field, we need to get the display text from the dropdown
+                if (key === 'status') {
+                    const statusButton = document.getElementById('evak_status');
+                    const selectedStatusText = statusButton.textContent.trim();
+                     // Only add if a status has been selected (not the placeholder)
+                    if (selectedStatusText !== "{{ t['evak_status_placeholder'] }}") {
+                        contentHtml += `<li><strong>${displayName}:</strong> ${selectedStatusText}</li>`;
+                    }
+                } else {
+                    contentHtml += `<li><strong>${displayName}</strong> ${value}</li>`;
+                }
             }
             contentHtml += '</ul>';
             return contentHtml;

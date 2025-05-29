@@ -6,7 +6,7 @@ CREATE TABLE Krise (
     Status VARCHAR(256) NOT NULL,
     Lokasjon VARCHAR(256) NOT NULL,
     Tekstboks TEXT NULL,
-    Opprettet DATETIME NOT NULL DEFAULT,
+    Opprettet DATETIME NOT NULL DEFAULT GETDATE(),
     FerdigTimestamp DATETIME NULL,
     PRIMARY KEY (KriseID)
 );
@@ -52,13 +52,6 @@ CREATE TABLE RFID (
     FOREIGN KEY (EvakuertID) REFERENCES Evakuerte(EvakuertID) ON DELETE CASCADE
 );
 
-CREATE TABLE Faces (
-    FaceID INT IDENTITY(1,1) PRIMARY KEY, 
-    EvakuertID INT NOT NULL, 
-    ImageURL NVARCHAR(500) NOT NULL, 
-    Timestamp DATETIME DEFAULT GETDATE(), 
-    FOREIGN KEY (EvakuertID) REFERENCES Evakuerte(EvakuertID) ON DELETE CASCADE);
-
 -- Oppretelse av tabell for Lokasjons logg for evakuerte gjennom Status tabell
 CREATE TABLE Lokasjon_log (
     log_id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
@@ -97,24 +90,10 @@ BEGIN
     WHERE change_date < DATEADD(DAY, -14, GETDATE());
 END;
 
--- Opprettelse av tabellen "RFID"
-CREATE TABLE RFID (
-    ID INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
-    EvakuertID INT UNIQUE,
-    FOREIGN KEY (EvakuertID) REFERENCES Evakuerte(EvakuertID) ON DELETE CASCADE
-);
-
-CREATE TABLE Faces (
-    FaceID INT IDENTITY(1,1) PRIMARY KEY, 
-    EvakuertID INT NOT NULL, 
-    ImageURL NVARCHAR(500) NOT NULL, 
-    Timestamp DATETIME DEFAULT GETDATE(), 
-    FOREIGN KEY (EvakuertID) REFERENCES Evakuerte(EvakuertID) ON DELETE CASCADE);
-
 CREATE TABLE Users (
     id INT NOT NULL IDENTITY(1,1) PRIMARY KEY,
     username VARCHAR(100) NOT NULL UNIQUE,
-    email VARCHAR(255) NOT NULL UNIQUE,
+    email VARCHAR(255) NULL,
     email_confirmed_at DATETIME NULL,
     password VARCHAR(255) NOT NULL,
     active BIT NOT NULL CONSTRAINT DF_Users_active DEFAULT 1,
